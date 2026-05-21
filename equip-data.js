@@ -7,21 +7,11 @@ const categories = [
 const equipData = {
     "BB-gun": {
         subCategories: [
-            { id: "bb-ap", name: "Đạn Xuyên Giáp (AP)" },
-            { id: "bb-he", name: "Đạn Nổ (HE)" },
-            { id: "bb-sap", name: "Đạn Nổ Xuyên (SAP)" }
             { id: "bb-light", name: "Mục tiêu giáp Light" }
         ],
         tierlists: {
-            "bb-ap": {
-                "SS+": ["quad-305-skc"],
-                "S+": ["twin-457-mka"]
-            },
-            "bb-he": {
+            "bb-light": {
                 "SS": ["triple-406-mkii"],
-            },
-            "bb-sap": {
-                "S++": ["triple-406-m1940"]
             }
         }
     },

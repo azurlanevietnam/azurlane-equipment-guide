@@ -37,16 +37,7 @@ function selectMainTab(catName) {
     renderSubTabs(data.subCategories);
     selectSubTab('all');
 
-    let allEquipForMainTab = [];
-    for (let subKey in data.tierlists) {
-        for (let tierKey in data.tierlists[subKey]) {
-            data.tierlists[subKey][tierKey].forEach(equipId => {
-                if (!allEquipForMainTab.includes(equipId)) {
-                    allEquipForMainTab.push(equipId);
-                }
-            });
-        }
-    }
+    let allEquipForMainTab = Object.keys(equipDetails[currentMainTab] || {});
     renderDetailsView(allEquipForMainTab);
 }
 
@@ -68,19 +59,10 @@ function selectSubTab(subId) {
     let equipListWithTiers = [];
     
     if (subId === 'all') {
-        const data = equipData[currentMainTab];
-        let allEquips = [];
-        for (let subKey in data.tierlists) {
-            for (let tierKey in data.tierlists[subKey]) {
-                data.tierlists[subKey][tierKey].forEach(equipId => {
-                    if (!allEquips.includes(equipId)) {
-                        allEquips.push(equipId);
-                    }
-                });
-            }
-        }
-        equipListWithTiers = allEquips.map(id => {
-            const equipInfo = equipDetails[currentMainTab] ? equipDetails[currentMainTab][id] : null;
+        const allEquipIds = Object.keys(equipDetails[currentMainTab] || {});
+        
+        equipListWithTiers = allEquipIds.map(id => {
+            const equipInfo = equipDetails[currentMainTab][id];
             return { id: id, tier: equipInfo ? (equipInfo.tier || "Unranked") : "Unranked" };
         });
     } else {
@@ -209,7 +191,6 @@ function renderDetailsView(equipList) {
         let sourceHTML = equipInfo.source ? equipInfo.source.join('<br>') : '';
         let descHTML = equipInfo.desc ? equipInfo.desc.map(d => `<div>${d}</div>`).join('') : '';
         
-        // Lấy dữ liệu loại đạn (nếu không có thì in ra dấu gạch ngang)
         let ammoTypeHTML = equipInfo.ammoType || "-";
         let ammoModHTML = equipInfo.ammoMod || "-";
 
