@@ -10,6 +10,7 @@ const equipData = {
             { id: "bb-ap", name: "Đạn Xuyên Giáp (AP)" },
             { id: "bb-he", name: "Đạn Nổ (HE)" },
             { id: "bb-sap", name: "Đạn Nổ Xuyên (SAP)" }
+            { id: "bb-light", name: "Mục tiêu giáp Light" }
         ],
         tierlists: {
             "bb-ap": {
