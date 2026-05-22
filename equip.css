@@ -126,7 +126,7 @@
 
 .row-card-equip {
     display: grid;
-    grid-template-columns: 180px 100px 160px 80px 160px 120px 1fr;
+    grid-template-columns: 180px 100px 160px 80px 140px 140px 1fr;
     align-items: stretch;
     background-color: #fff;
     padding: 20px 30px;
@@ -196,12 +196,20 @@
     transform: translateX(0);
 }
 
-.rld-value {
+.rld-value-container {
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+.rld-item {
     font-size: 16px;
     font-weight: 500;
     color: #27ae60;
-    line-height: 1.5;
-    align-self: center;
+    line-height: 1.15;
+    padding: 0 4px;
 }
 
 .source-value-container {
@@ -290,4 +298,24 @@
     background-position: center;
     background-repeat: no-repeat;
     z-index: 1;
+}
+
+.box-rainbow {
+    --gear-bg: var(--bg-rainbow);
+}
+
+.box-yellow {
+    --gear-bg: var(--bg-yellow);
+}
+
+.box-purple {
+    --gear-bg: var(--bg-purple);
+}
+
+.box-blue {
+    --gear-bg: var(--bg-blue);
+}
+
+.box-gray {
+    --gear-bg: var(--bg-gray, #f7f9fa);
 }

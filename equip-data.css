@@ -1,16 +1,16 @@
         /* BB-gun */
         .twin-457-mka {
-            --gear-img: url('https://azurlane.netojuu.com/images/thumb/3/3a/14500.png/90px-14500.png');
+            --gear-img: url('https://azurlane.netojuu.com/images/3/3a/14500.png');
             --gear-bg: var(--bg-rainbow);
         }
 
         .quad-305-skc {
-            --gear-img: url('https://azurlane.netojuu.com/images/thumb/8/8a/44320.png/90px-44320.png');
+            --gear-img: url('https://azurlane.netojuu.com/images/8/8a/44320.png');
             --gear-bg: var(--bg-rainbow);
         }
 
         .triple-406-mkii {
-            --gear-img: url('https://azurlane.netojuu.com/images/thumb/8/80/24400.png/90px-24400.png');
+            --gear-img: url('https://azurlane.netojuu.com/images/8/80/24400.png');
             --gear-bg: var(--bg-rainbow);
         }
 
@@ -20,12 +20,12 @@
         }
 
         .triple-406-mk7 {
-            --gear-img: url('https://azurlane.netojuu.com/images/thumb/e/e8/14400.png/128px-14400.png');
+            --gear-img: url('https://azurlane.netojuu.com/images/e/e8/14400.png');
             --gear-bg: var(--bg-rainbow);
         }
 
         .triple-460-t94 {
-            --gear-img: url('https://azurlane.netojuu.com/images/thumb/9/97/34200.png/192px-34200.png');
+            --gear-img: url('https://azurlane.netojuu.com/images/9/97/34200.png');
             --gear-bg: var(--bg-rainbow);
         }
 
@@ -40,12 +40,12 @@
         }
 
         .triple-380-mle {
-            --gear-img: url('https://azurlane.netojuu.com/images/thumb/a/a6/50480.png/60px-50480.png');
+            --gear-img: url('https://azurlane.netojuu.com/images/a/a6/50480.png');
             --gear-bg: var(--bg-yellow);
         }
 
         .triple-406-mle {
-            --gear-img: url('https://azurlane.netojuu.com/images/thumb/2/2a/51000.png/60px-51000.png');
+            --gear-img: url('https://azurlane.netojuu.com/images/2/2a/51000.png');
             --gear-bg: var(--bg-yellow);
         }
 

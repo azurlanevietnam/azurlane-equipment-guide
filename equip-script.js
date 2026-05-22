@@ -3,7 +3,7 @@ const subTabsContainer = document.getElementById('subTabs');
 const tierlistViewContainer = document.getElementById('tierlistView');
 const detailsViewContainer = document.getElementById('detailsView');
 
-let currentMainTab = categories[3]; 
+let currentMainTab = categories[3];
 let currentSubTab = "";
 
 function initEquipPage() {
@@ -55,12 +55,12 @@ function selectSubTab(subId) {
     if (activeBtn) activeBtn.classList.add('active');
 
     currentSubTab = subId;
-    
+
     let equipListWithTiers = [];
-    
+
     if (subId === 'all') {
         const allEquipIds = Object.keys(equipDetails[currentMainTab] || {});
-        
+
         equipListWithTiers = allEquipIds.map(id => {
             const equipInfo = equipDetails[currentMainTab][id];
             return { id: id, tier: equipInfo ? (equipInfo.tier || "Unranked") : "Unranked" };
@@ -73,45 +73,42 @@ function selectSubTab(subId) {
             });
         }
     }
-    
+
     renderTierlistView(equipListWithTiers);
 }
 
 const tierColors = [
-    "#FF5252",
-    "#FF7043",
-    "#FF9800",
-    "#FFB74D",
-    "#FFCA28",
-    "#FFEE58",
-    "#D4E157",
-    "#9CCC65",
-    "#66BB6A",
-    "#4DB6AC",
-    "#26C6DA",
-    "#29B6F6",
-    "#42A5F5",
-    "#5C6BC0",
-    "#7E57C2",
-    "#AB47BC",
-    "#D81B60",
-    "#F06292"
+    "#FF5252", // 1. Đỏ tươi
+    "#FF7043", // 2. Cam đỏ 
+    "#FFA726", // 3. Cam sáng (Tách biệt rõ rệt hơn so với màu cũ)
+    "#FFCA28", // 4. Vàng hổ phách
+    "#FFEE58", // 5. Vàng rực
+    "#9CCC65", // 6. Xanh lá mạ
+    "#4CAF50", // 7. Xanh lá chuẩn (Đậm hơn một tone để cắt đứt dải màu lá mạ nhạt)
+    "#009688", // 8. Xanh mòng két (Tạo độ trầm rõ ràng phân tách dải Xanh lá và Xanh dương)
+    "#00BCD4", // 9. Xanh lơ / Cyan (Lược bỏ các dải màu lơ lỡ cỡ, giữ đúng 1 tone Cyan)
+    "#2196F3", // 10. Xanh dương (Chuyển sang tone xanh đại dương đậm đà, không bị lẫn với xanh lơ)
+    "#3F51B5", // 11. Xanh chàm / Indigo
+    "#673AB7", // 12. Tím đậm
+    "#9C27B0", // 13. Tím hồng
+    "#E91E63", // 14. Hồng đỏ
+    "#9E9E9E"  // 15. Xám / Grey (Điểm dừng hoàn hảo cho Tier thấp nhất / Unranked)
 ];
 
 const tierPriority = [
-    "SS+", "SS+", "SS", "SS-", 
+    "SS+", "SS", "SS-",
     "S++", "S+", "S", "S-", "A+", "A", "A-", "B+", "B", "C", "D", "E", "F"
 ];
 
 function renderTierlistView(equipListWithTiers) {
     let groupedEquips = {};
-    
+
     equipListWithTiers.forEach(item => {
         const equipId = item.id;
         const tier = item.tier;
         const equipItem = equipDetails[currentMainTab] ? equipDetails[currentMainTab][equipId] : null;
         if (!equipItem) return;
-        
+
         if (!groupedEquips[tier]) groupedEquips[tier] = [];
         if (!groupedEquips[tier].includes(equipId)) {
             groupedEquips[tier].push(equipId);
@@ -131,7 +128,7 @@ function renderTierlistView(equipListWithTiers) {
     let html = "";
     sortedTiers.forEach((tier, index) => {
         let color = tierColors[index % tierColors.length];
-        
+
         groupedEquips[tier].sort((a, b) => {
             let orderA = originalOrder.indexOf(a);
             let orderB = originalOrder.indexOf(b);
@@ -141,10 +138,16 @@ function renderTierlistView(equipListWithTiers) {
         let itemsHtml = "";
         groupedEquips[tier].forEach(equipId => {
             const equipItem = equipDetails[currentMainTab][equipId];
-
             let safeTitle = equipItem.name.replace(/"/g, '&quot;');
+
+            let customStyle = "";
+            if (equipItem.code) {
+                customStyle = `style="--gear-img: url('https://azurlane.netojuu.com/images/${equipItem.code}.png');"`;
+            }
             
-            itemsHtml += `<div class="tierlist-icon ${equipId}" title="${safeTitle}"></div>`;
+            let bgClass = equipItem.box ? `box-${equipItem.box}` : 'box-gray';
+
+            itemsHtml += `<div class="tierlist-icon ${bgClass}" title="${safeTitle}" ${customStyle}></div>`;
         });
 
         html += `
@@ -158,47 +161,49 @@ function renderTierlistView(equipListWithTiers) {
         </div>
         `;
     });
-    
+
     tierlistViewContainer.innerHTML = html;
 }
 
 function renderDetailsView(equipList) {
     let finalHTML = "";
-    
+
     const originalOrder = Object.keys(equipDetails[currentMainTab] || {});
 
     equipList.sort((a, b) => {
         const tierA = (equipDetails[currentMainTab] && equipDetails[currentMainTab][a]) ? (equipDetails[currentMainTab][a].tier || "Unranked") : "Unranked";
         const tierB = (equipDetails[currentMainTab] && equipDetails[currentMainTab][b]) ? (equipDetails[currentMainTab][b].tier || "Unranked") : "Unranked";
-        
+
         let indexA = tierPriority.indexOf(tierA);
         let indexB = tierPriority.indexOf(tierB);
-        
+
         if (indexA === -1) indexA = 999;
         if (indexB === -1) indexB = 999;
-        
+
         if (indexA !== indexB) {
             return indexA - indexB;
         }
-        
+
         let orderA = originalOrder.indexOf(a);
         let orderB = originalOrder.indexOf(b);
         return orderA - orderB;
     });
-    
+
     equipList.forEach(equipId => {
         const equipInfo = equipDetails[currentMainTab] ? equipDetails[currentMainTab][equipId] : null;
         if (!equipInfo) return;
 
         let statsHTML = equipInfo.stats ? equipInfo.stats.join('<br>') : '';
         let descHTML = equipInfo.desc ? equipInfo.desc.map(d => `<div>${d}</div>`).join('') : '';
-        
+
         let ammoTypeHTML = equipInfo.ammoType || "-";
         let ammoModHTML = equipInfo.ammoMod || "-";
-        let rldHTML = equipInfo.rld || "-";
+        let rldHTML = equipInfo.rld 
+            ? equipInfo.rld.map(r => `<div class="rld-item">${r}</div>`).join('') 
+            : "-";
 
-        let sourceHTML = equipInfo.source 
-            ? equipInfo.source.map(src => `<div class="source-item">${src}</div>`).join('') 
+        let sourceHTML = equipInfo.source
+            ? equipInfo.source.map(src => `<div class="source-item">${src}</div>`).join('')
             : '';
 
         let formattedName = equipInfo.name.replace(/ /g, "_");
@@ -207,9 +212,20 @@ function renderDetailsView(equipList) {
             generatedLink += "#tabber-Type_" + equipInfo.linkTab;
         }
 
-        let imgBoxHTML = equipInfo.link || equipInfo.linkTab !== undefined
-            ? `<a href="${generatedLink}" target="_blank" class="base-box square-box ${equipId} clickable-equip"></a>`
-            : `<div class="base-box square-box ${equipId}"></div>`;
+        let customStyle = "";
+        if (equipInfo.code) {
+            customStyle = `style="--gear-img: url('https://azurlane.netojuu.com/images/${equipInfo.code}.png');"`;
+        }
+
+        let bgClass = equipInfo.box ? `box-${equipInfo.box}` : 'box-gray';
+
+        let imgBoxHTML = "";
+        if (equipInfo.link || equipInfo.linkTab !== undefined) {
+            let finalLink = equipInfo.link || generatedLink;
+            imgBoxHTML = `<a href="${finalLink}" target="_blank" class="base-box square-box ${bgClass} clickable-equip" ${customStyle}></a>`;
+        } else {
+            imgBoxHTML = `<div class="base-box square-box ${bgClass}" ${customStyle}></div>`;
+        }
 
         finalHTML += `
         <div class="row-card-equip">
@@ -243,15 +259,19 @@ function renderDetailsView(equipList) {
             
             <div class="col-rld">
                 <div class="label-style">Reload</div>
-                <div class="rld-value">${rldHTML}</div>
+                <div class="rld-value-container">${rldHTML}</div>
             </div>
             
             <div class="col-desc">${descHTML}</div>
         </div>
         `;
     });
-    
+
     detailsViewContainer.innerHTML = finalHTML;
 }
 
-document.addEventListener("DOMContentLoaded", initEquipPage);
+if (document.readyState === 'loading') {
+    document.addEventListener("DOMContentLoaded", initEquipPage);
+} else {
+    initEquipPage();
+}
