@@ -24,6 +24,11 @@
             --gear-bg: var(--bg-rainbow);
         }
 
+        .triple-460-t94 {
+            --gear-img: url('https://azurlane.netojuu.com/images/thumb/9/97/34200.png/192px-34200.png');
+            --gear-bg: var(--bg-rainbow);
+        }
+
         .twin-406-mk4 {
             --gear-img: url('https://azurlane.netojuu.com/images/thumb/3/32/14520.png/60px-14520.png');
             --gear-bg: var(--bg-yellow);

@@ -1,4 +1,4 @@
-        .equip-main-tabs {
+.equip-main-tabs {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
@@ -75,7 +75,7 @@
 
 .tier-row {
     display: flex;
-    background: #1a252f; /* Nền tối để làm nổi bật khung trang bị */
+    background: #1a252f;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -126,7 +126,7 @@
 
 .row-card-equip {
     display: grid;
-    grid-template-columns: 180px 100px 180px 80px 160px 1fr;
+    grid-template-columns: 180px 100px 160px 80px 160px 120px 1fr;
     align-items: stretch;
     background-color: #fff;
     padding: 20px 30px;
@@ -153,31 +153,70 @@
 }
 
 .base-box.square-box {
+    display: block;
+    width: 100%;
     aspect-ratio: 1 / 1;
     max-width: 130px;
     position: relative;
     background: var(--gear-bg, #f7f9fa);
+    border-radius: 12px;
 }
 
-.col-tier, .col-source, .col-stat, .col-ammo {
+.base-box.square-box.clickable-equip {
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+}
+
+.base-box.square-box.clickable-equip:hover {
+    transform: scale(1.05);
+}
+
+.base-box.square-box.clickable-equip:active {
+    transform: scale(0.95);
+}
+
+.col-tier, .col-source, .col-stat, .col-ammo, .col-rld {
     display: grid;
-    grid-template-rows: 35px 1fr; 
+    grid-template-rows: 35px 1fr;
     text-align: center;
     padding: 0;
-    border-left: 1px solid #eee; 
+    border-left: 1px solid #eee;
 }
 
-.col-ammo {
+.col-rld {
     border-right: 1px solid #eee;
 }
 
-/* 2. Dịch chuyển để bù gap=20px */
-.col-tier > div, .col-source > div, .col-stat > div {
+.col-tier > div, .col-source > div, .col-stat > div, .col-ammo > div {
     transform: translateX(10px);
 }
 
-.col-ammo > div {
+.col-rld > div {
     transform: translateX(0);
+}
+
+.rld-value {
+    font-size: 16px;
+    font-weight: 500;
+    color: #27ae60;
+    line-height: 1.5;
+    align-self: center;
+}
+
+.source-value-container {
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+.source-item {
+    font-size: 16px;
+    font-weight: 500;
+    color: #2980b9;
+    line-height: 1.15;
 }
 
 .ammo-container {
@@ -190,7 +229,7 @@
 .ammo-type-value {
     font-size: 24px;
     font-weight: 900;
-    color: #e67e22;/
+    color: #e67e22;
 }
 
 .ammo-mod-value {
@@ -208,25 +247,43 @@
     padding-bottom: 8px;
 }
 
-.tier-value, .stat-value, .source-value {
-    align-self: center; 
-    padding-top: 0; 
+.tier-value, .stat-value {
+    align-self: center;
+    padding-top: 0;
 }
 
-.stat-value, .source-value {
+.tier-value {
+    font-size: 48px;
+    font-weight: 900;
+    color: #e74c3c;
+    line-height: 1.1;
+}
+
+.stat-value {
     font-size: 16px;
     font-weight: 500;
     color: #2980b9;
     line-height: 1.5;
 }
-        
+
+.col-desc {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #555;
+    text-align: justify;
+}
+
 .tierlist-icon::after,
 .base-box.square-box::after {
     content: "";
     position: absolute;
-    top: 0; 
-    left: 0; 
-    right: 0; 
+    top: 0;
+    left: 0;
+    right: 0;
     bottom: 0;
     background-image: var(--gear-img);
     background-size: contain;

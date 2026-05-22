@@ -16,33 +16,14 @@
 </head>
 
 <body>
-    <nav class="top-navbar">
-        <div class="nav-left">
-            <div class="menu-container">
-                <div class="menu-trigger">☰ MENU</div>
-                <div class="side-drawer">
-                    <div class="drawer-grid">
-                        <a href="index.html" class="drawer-box">HEALER LIST</a>
-                        <a href="equip.html" class="drawer-box">EQUIPMENT LIST</a>
-                    </div>
-                </div>
-            </div>
-            <a href="index.html" class="nav-logo">
-                <img src="https://cdn2.steamgriddb.com/icon_thumb/db261d4f615f0e982983be499e57ccda.png" alt="Logo">
-            </a>
-        </div>
-        <div class="nav-right">
-            <a href="https://pbs.twimg.com/media/HI1tqekXwAAQKWo?format=jpg&name=4096x4096" target="_blank" class="rickroll-btn">
-                TIER ZÚ!
-            </a>
-        </div>
-    </nav>
+    <nav class="top-navbar" id="global-navbar"></nav>
 
     <div class="container">
         <h1 class="main-title">HEALER TIER LIST</h1>
         <div id="tierlist-container" class="tierlist-wrapper"></div>
     </div>
 
+    <script src="nav-mesh.js"></script>
     <script src="data.js"></script>
     <script src="script.js"></script>
 </body>

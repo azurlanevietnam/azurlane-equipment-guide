@@ -141,7 +141,10 @@ function renderTierlistView(equipListWithTiers) {
         let itemsHtml = "";
         groupedEquips[tier].forEach(equipId => {
             const equipItem = equipDetails[currentMainTab][equipId];
-            itemsHtml += `<div class="tierlist-icon ${equipId}" title="${equipItem.name}"></div>`;
+
+            let safeTitle = equipItem.name.replace(/"/g, '&quot;');
+            
+            itemsHtml += `<div class="tierlist-icon ${equipId}" title="${safeTitle}"></div>`;
         });
 
         html += `
@@ -188,17 +191,31 @@ function renderDetailsView(equipList) {
         if (!equipInfo) return;
 
         let statsHTML = equipInfo.stats ? equipInfo.stats.join('<br>') : '';
-        let sourceHTML = equipInfo.source ? equipInfo.source.join('<br>') : '';
         let descHTML = equipInfo.desc ? equipInfo.desc.map(d => `<div>${d}</div>`).join('') : '';
         
         let ammoTypeHTML = equipInfo.ammoType || "-";
         let ammoModHTML = equipInfo.ammoMod || "-";
+        let rldHTML = equipInfo.rld || "-";
+
+        let sourceHTML = equipInfo.source 
+            ? equipInfo.source.map(src => `<div class="source-item">${src}</div>`).join('') 
+            : '';
+
+        let formattedName = equipInfo.name.replace(/ /g, "_");
+        let generatedLink = "https://azurlane.koumakan.jp/wiki/" + formattedName;
+        if (equipInfo.linkTab !== undefined && equipInfo.linkTab !== null) {
+            generatedLink += "#tabber-Type_" + equipInfo.linkTab;
+        }
+
+        let imgBoxHTML = equipInfo.link || equipInfo.linkTab !== undefined
+            ? `<a href="${generatedLink}" target="_blank" class="base-box square-box ${equipId} clickable-equip"></a>`
+            : `<div class="base-box square-box ${equipId}"></div>`;
 
         finalHTML += `
         <div class="row-card-equip">
             <div class="col-equip-info">
                 <div class="equip-name-title">${equipInfo.name}</div>
-                <div class="base-box square-box ${equipId}"></div>
+                ${imgBoxHTML}
             </div>
             
             <div class="col-tier">
@@ -208,7 +225,7 @@ function renderDetailsView(equipList) {
             
             <div class="col-source">
                 <div class="label-style">Vị trí thu thập</div>
-                <div class="source-value">${sourceHTML}</div>
+                <div class="source-value-container">${sourceHTML}</div>
             </div>
 
             <div class="col-stat">
@@ -222,6 +239,11 @@ function renderDetailsView(equipList) {
                     <div class="ammo-type-value">${ammoTypeHTML}</div>
                     <div class="ammo-mod-value">${ammoModHTML}</div>
                 </div>
+            </div>
+            
+            <div class="col-rld">
+                <div class="label-style">Reload</div>
+                <div class="rld-value">${rldHTML}</div>
             </div>
             
             <div class="col-desc">${descHTML}</div>
