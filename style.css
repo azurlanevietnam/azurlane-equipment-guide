@@ -159,11 +159,16 @@
         }
 
         :root {
-            --bg-rainbow: linear-gradient(120deg, #FFADAD, #FFD6A5, #FDFFB6, #CAFFBF, #9BF6FF, #A0C4FF, #BDB2FF, #FFC6FF);
-            --bg-yellow: linear-gradient(120deg, #FFF9C4, #FFF176, #FFEE58, #FDD835);
-            --bg-purple: linear-gradient(120deg, #F3E5F5, #E1BEE7, #CE93D8, #BA68C8);
-            --bg-blue: linear-gradient(120deg, #E1F5FE, #B3E5FC, #81D4FA, #4FC3F7, #29B6F6);
-            --bg-gray: #f7f9fa;
+            --bg-gray: url('bg/bg1.png') center/cover no-repeat;
+            --bg-blue: url('bg/bg2.png') center/cover no-repeat;
+            --bg-purple: url('bg/bg3.png') center/cover no-repeat;
+            --bg-yellow: url('bg/bg4.png') center/cover no-repeat;
+            --bg-rainbow: url('bg/bg5.png') center/cover no-repeat;
+            --bg-ex: linear-gradient(135deg, #FF6699, #FFA366, #FFD633, #66E699, #4DB8FF, #B266FF);
+        }
+
+        .box-ex {
+            --gear-bg: var(--bg-ex);
         }
 
         .container {

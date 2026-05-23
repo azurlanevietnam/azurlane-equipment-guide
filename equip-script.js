@@ -96,7 +96,7 @@ const tierColors = [
 ];
 
 const tierPriority = [
-    "SS+", "SS", "SS-",
+    "EX", "SS+", "SS", "SS-",
     "S++", "S+", "S", "S-", "A+", "A", "A-", "B+", "B", "C", "D", "E", "F"
 ];
 
@@ -127,7 +127,14 @@ function renderTierlistView(equipListWithTiers) {
 
     let html = "";
     sortedTiers.forEach((tier, index) => {
-        let color = tierColors[index % tierColors.length];
+        let labelStyle = "";
+        if (tier === "EX") {
+            labelStyle = "background: var(--bg-ex); color: #fff; text-shadow: 1px 1px 3px rgba(0,0,0,0.8);";
+        } else {
+            let colorIndex = sortedTiers.includes("EX") ? index - 1 : index;
+            let color = tierColors[colorIndex % tierColors.length];
+            labelStyle = `background-color: ${color};`;
+        }
 
         groupedEquips[tier].sort((a, b) => {
             let orderA = originalOrder.indexOf(a);
@@ -152,7 +159,7 @@ function renderTierlistView(equipListWithTiers) {
 
         html += `
         <div class="tier-row">
-            <div class="tier-label" style="background-color: ${color};">
+            <div class="tier-label" style="${labelStyle}">
                 ${tier}
             </div>
             <div class="tier-items">

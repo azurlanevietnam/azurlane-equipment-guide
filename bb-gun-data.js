@@ -1,15 +1,49 @@
 equipData["BB-gun"] = {
     subCategories: [
-        { id: "bb-light", name: "Mục tiêu giáp Light" }
+        { id: "bb-light", name: "Mục tiêu giáp Light" },
+        { id: "bb-medium", name: "Mục tiêu giáp Medium" },
+        { id: "bb-heavy", name: "Mục tiêu giáp Heavy" },
+        { id: "bb-dps", name: "Theo DPS (3:4:3)" },
+        { id: "bb-rld", name: "Theo Reload" }
+
     ],
     tierlists: {
         "bb-light": {
-            "SS": ["triple-406-mkii"],
+            "EX": ["twin-410-t3s"],
+            "SS": ["triple-406-mkii"]
+        },
+        "bb-medium": {
+            "EX": ["twin-410-t3s"],
+            "SS+": ["triple-406-im1940"],
+            "SS": ["quad-305-skc"],
+        },
+        "bb-heavy": {
+            "EX": ["twin-410-t3s"],
+            "SS-": ["quad-305-skc"],
+        },
+        "bb-dps": {
+            "EX": ["twin-410-t3s"],
+        },
+        "bb-rld": {
+            "EX": ["twin-410-t3s"],
         }
     }
 };
 
 equipDetails["BB-gun"] = {
+    "twin-410-t3s": {
+        name: "Twin 410mm (Type 3 Shell)",
+        source: ["Visitors Dyed in Red Event Shop", "PR1/2 Research", "Gear Lab"],
+        tier: "EX",
+        stats: ["FP +25", "AA +25"],
+        ammoType: "Beehive",
+        ammoMod: "140% / 110% / 90%",
+        rld: ["19.29s"],
+        linkTab: 0,
+        desc: [""],
+        code: "d/d8/34100",
+        box: "yellow"
+    },
     "quad-305-skc": {
         name: "Quadruple 305mm (SK C39 Prototype)",
         source: ["PR8 Research"],
@@ -179,9 +213,73 @@ equipDetails["BB-gun"] = {
         code: "d/d7/44500",
         box: "yellow"
     },
+    "triple-406-mkd": {
+        name: "Triple 406mm (16\"/50 Mark D Mod 0 Prototype)",
+        tier: "A+",
+        source: ["Gear Lab"],
+        stats: ["FP +45"],
+        ammoType: "APMKD",
+        ammoMod: "45% / 130% / 115%",
+        rld: ["24.21s"],
+        linkTab: 0,
+        desc: [""],
+        code: "3/31/14360",
+        box: "yellow"
+    },
+    "triple-410-t10": {
+        name: "Triple 410mm (10th Year Type Prototype)",
+        tier: "A+",
+        source: ["PR1 Research", "Gear Lab"],
+        stats: ["FP +45"],
+        ammoType: "AP",
+        ammoMod: "45% / 130% / 110%",
+        rld: ["24.14s"],
+        linkTab: 0,
+        desc: [""],
+        code: "8/83/34180",
+        box: "yellow"
+    },
+    "twin-410-moda": {
+        name: "Twin 410mm (Mod.A Prototype)",
+        tier: "A+",
+        source: ["PR7 Research"],
+        stats: ["FP +45"],
+        ammoType: "AP",
+        ammoMod: "40% / 130% / 130%",
+        rld: ["22.60s"],
+        linkTab: 0,
+        desc: [""],
+        code: "1/1a/34320",
+        box: "yellow"
+    },
+    "twin-406-skc": {
+        name: "Twin 406mm (SK C/34 Prototype)",
+        tier: "A+",
+        source: ["Tower of Transcendence Event Drop", "PR2 Research", "Gear Lab"],
+        stats: ["FP +45"],
+        ammoType: "HE",
+        ammoMod: "140% / 110% / 90%",
+        rld: ["19.42s"],
+        linkTab: 0,
+        desc: [""],
+        code: "8/8a/44200",
+        box: "yellow"
+    },
+    "triple-305-skc-bb": {
+        name: "Triple 305mm (SK C/39 Prototype)",
+        tier: "A+",
+        source: ["PR3 Research", "Gear Lab"],
+        stats: ["FP +45"],
+        ammoType: "HE",
+        ammoMod: "140% / 110% / 90%",
+        rld: ["18.20s"],
+        desc: [""],
+        code: "a/a7/44300",
+        box: "yellow"
+    },
     "triple-406/45-mk7": {
         name: "Triple 406mm/45 (Mk 7 Prototype)",
-        tier: "A+",
+        tier: "A",
         source: ["PR8 Research"],
         stats: ["FP +45"],
         ammoType: "AP",
@@ -191,5 +289,174 @@ equipDetails["BB-gun"] = {
         desc: [""],
         code: "7/74/14480",
         box: "yellow"
-    }
+    },
+    "triple-406-mk6p": {
+        name: "Triple 406mm (Mk 6 Prototype)",
+        tier: "A",
+        source: ["PR6 Research"],
+        stats: ["FP +45"],
+        ammoType: "HE",
+        ammoMod: "140% / 110% / 90%",
+        rld: ["30.06s"],
+        linkTab: 0,
+        desc: [""],
+        code: "8/87/14540",
+        box: "yellow"
+    },
+    "twin-381-mkii": {
+        name: "Twin 381mm (BL 15\" Mk II)",
+        tier: "A",
+        source: ["PR1/2/3 Research", "Fight On, Royal Maids! Event Reward", "Aurora Noctis Event Drop", "Gear Lab"],
+        stats: ["FP +45"],
+        ammoType: "HE",
+        ammoMod: "140% / 110% / 90%",
+        rld: ["17.96s"],
+        linkTab: 0,
+        desc: [""],
+        code: "b/b7/24300",
+        box: "yellow"
+    },
+    "quad-380-mle": {
+        name: "Quadruple 380mm (Mle 1935)",
+        tier: "A-",
+        source: ["Core Exchange Shop", "Gear Lab"],
+        stats: ["FP +45"],
+        ammoType: "HE",
+        ammoMod: "140% / 110% / 90%",
+        rld: ["25.80s", "Volley Time: 0.15s"],
+        linkTab: 3,
+        desc: [""],
+        code: "b/bf/50400",
+        box: "yellow"
+    },
+    "triple-381-m1934": {
+        name: "Triple 381mm (Model 1934)",
+        tier: "A-",
+        source: ["Empyreal Tragicomedy Event Shop", "The Flame-Touched Dagger Event Drop", "Gear Lab"],
+        stats: ["FP +45"],
+        ammoType: "AP*",
+        ammoMod: "40% / 135% / 115%",
+        rld: ["1-2 Salvo: 24.02s", "3+ Salvo: 31.23s"],
+        linkTab: 3,
+        desc: [""],
+        code: "6/6d/55000",
+        box: "yellow"
+    },
+    "triple-406-mki": {
+        name: "Triple 406mm (BL 16\" Mk I)",
+        tier: "B+",
+        source: ["6-3 Drop", "T4/T5 Royal Tech Box", "Gear Lab"],
+        stats: ["FP +45"],
+        ammoType: "Normal",
+        ammoMod: "70% / 100% / 90%",
+        rld: ["24.02s"],
+        linkTab: 3,
+        desc: [""],
+        code: "f/fc/24200",
+        box: "yellow"
+    },
+    "twin-380-skc": {
+        name: "Twin 380mm (SK C/34)",
+        tier: "B+",
+        source: ["Opposite Colored Event Shop", "T4/T5 Ironblood Tech Box", "Gear Lab"],
+        stats: ["FP +45"],
+        ammoType: "AP",
+        ammoMod: "45% / 130% / 110%",
+        rld: ["18.38s"],
+        linkTab: 3,
+        desc: [""],
+        code: "c/c2/44100",
+        box: "yellow"
+    },
+    "triple-406-mk6": {
+        name: "Triple 406mm (16\"/45 Mk 6)",
+        tier: "S-",
+        source: ["6-2, 6-3 Drop", "T3/T4 Eagle Tech Box", "Gear Lab"],
+        stats: ["FP +25"],
+        ammoType: "HE",
+        ammoMod: "140% / 110% / 90%",
+        rld: ["24.02s"],
+        linkTab: 3,
+        desc: [""],
+        code: "9/9b/14300",
+        box: "purple"
+    },
+    "twin-410-t3k": {
+        name: "Twin 410mm (3rd Year Type) Kai",
+        tier: "B+",
+        source: ["Gear Lab"],
+        stats: ["FP +25"],
+        ammoType: "HE",
+        ammoMod: "140% / 110% / 90%",
+        rld: ["19.97s"],
+        linkTab: 0,
+        desc: [""],
+        code: "a/a3/34300",
+        box: "purple"
+    },
+    "twin-410-t3": {
+        name: "Twin 410mm (3rd Year Type)",
+        tier: "B+",
+        source: ["6-3, 7-3, 12-4, 14-1 Drop", "T3/T4 Sakura Tech Box", "Gear Lab"],
+        stats: ["FP +25"],
+        ammoType: "HE",
+        ammoMod: "140% / 110% / 90%",
+        rld: ["20.02s"],
+        linkTab: 3,
+        desc: [""],
+        code: "d/d8/34100",
+        box: "purple"
+    },
+    "triple-283-skc-bb": {
+        name: "Triple 283mm (SK C/34)",
+        tier: "B+",
+        source: ["T3/T4 Ironblood Tech Box"],
+        stats: ["FP +25"],
+        ammoType: "Normal",
+        ammoMod: "70% / 100% / 90%",
+        rld: ["16.63s"],
+        linkTab: 3,
+        desc: [""],
+        code: "8/8a/44000",
+        box: "purple"
+    },
+    "twin-406-mk8": {
+        name: "Twin 406mm (16\"/45 Mk 8)",
+        tier: "B",
+        source: ["Gear Lab"],
+        stats: ["FP +25"],
+        ammoType: "AP",
+        ammoMod: "45% / 130% / 110%",
+        rld: ["19.93s"],
+        linkTab: 0,
+        desc: [""],
+        code: "8/87/14260",
+        box: "purple"
+    },
+    "twin-356-mkvii": {
+        name: "Twin 356mm (BL 14\" Mk VII)",
+        tier: "B",
+        source: ["Gear Lab"],
+        stats: ["FP +25"],
+        ammoType: "HE",
+        ammoMod: "140% / 110% / 90%",
+        rld: ["17.56s"],
+        linkTab: 0,
+        desc: [""],
+        code: "0/09/24060",
+        box: "purple"
+    },
+    "quad-356-mkvii": {
+        name: "Quadruple 356mm (BL 14\" Mk VII)",
+        tier: "C",
+        source: ["T4/T5 Royal Tech Box", "Gear Lab"],
+        stats: ["FP +45"],
+        ammoType: "HE",
+        ammoMod: "140% / 110% / 90%",
+        rld: ["29.19s"],
+        linkTab: 3,
+        desc: [""],
+        code: "2/2d/24000",
+        box: "yellow"
+    },
 };
