@@ -3,9 +3,6 @@ equipData["CL-gun"] = {
         { id: "cl-ap", name: "AP CL Gun" }
     ],
     tierlists: {
-        "cl-ap": {
-            "SS": ["quad-152"]
-        }
     }
 };
 

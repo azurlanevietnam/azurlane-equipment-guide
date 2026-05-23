@@ -33,7 +33,7 @@ equipData["BB-gun"] = {
 equipDetails["BB-gun"] = {
     "twin-410-t3s": {
         name: "Twin 410mm (Type 3 Shell)",
-        source: ["Visitors Dyed in Red Event Shop", "PR1/2 Research", "Gear Lab"],
+        source: ["PR1/2 Research", "Gear Lab"],
         tier: "EX",
         stats: ["FP +25", "AA +25"],
         ammoType: "Beehive",
@@ -86,7 +86,7 @@ equipDetails["BB-gun"] = {
     "triple-406-mk7": {
         name: "Triple 406mm (16\"/50 Mk 7)",
         tier: "S+",
-        source: ["Mirror Involution Event Shop", "Gear Lab"],
+        source: ["Gear Lab"],
         stats: ["FP +65"],
         ammoType: "HE",
         ammoMod: "140% / 110% / 90%",
