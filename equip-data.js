@@ -10,6 +10,8 @@ window.equipDetails = {};
 const dataFiles = [
     'bb-gun-data.js',
     'cl-gun-data.js',
+    'dd-gun-data.js',
+    'ca-gun-data.js',
 ];
 
 dataFiles.push('equip-script.js');

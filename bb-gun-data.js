@@ -72,7 +72,7 @@ equipDetails["BB-gun"] = {
     },
     "triple-406-im1940": {
         name: "Triple 406mm (Improved Model 1940 Prototype)",
-        tier: "S+",
+        tier: "S++",
         source: ["Paradiso of Shackled Light Event Shop"],
         stats: ["FP +65"],
         ammoType: "SAP",
@@ -85,7 +85,7 @@ equipDetails["BB-gun"] = {
     },
     "triple-406-mk7": {
         name: "Triple 406mm (16\"/50 Mk 7)",
-        tier: "S+",
+        tier: "S++",
         source: ["Gear Lab"],
         stats: ["FP +65"],
         ammoType: "HE",
@@ -98,7 +98,7 @@ equipDetails["BB-gun"] = {
     },
     "twin-457-mka": {
         name: "Twin 457mm (Mark A Prototype)",
-        tier: "S",
+        tier: "S+",
         source: ["PR2 Research", "Gear Lab", "Prototype Shop"],
         stats: ["FP +65"],
         ammoType: "AP+",
@@ -111,7 +111,7 @@ equipDetails["BB-gun"] = {
     },
     "triple-460-t94": {
         name: "Triple 460mm (Type 94)",
-        tier: "S",
+        tier: "S+",
         source: ["Violet Tempest, Blooming Lycoris Event Shop"],
         stats: ["FP +65"],
         ammoType: "AP",
@@ -124,7 +124,7 @@ equipDetails["BB-gun"] = {
     },
     "triple-406-mle": {
         name: "Triple 406mm (Mle 1938 Prototype)",
-        tier: "S",
+        tier: "S+",
         source: ["PR3 Research", "Gear Lab"],
         stats: ["FP +45"],
         ammoType: "AP^",
@@ -137,7 +137,7 @@ equipDetails["BB-gun"] = {
     },
     "triple-380-mle": {
         name: "Triple 380mm (Mle 1935 Prototype)",
-        tier: "S",
+        tier: "S+",
         source: ["PR6 Research"],
         stats: ["FP +45"],
         ammoType: "AP^",
@@ -150,7 +150,7 @@ equipDetails["BB-gun"] = {
     },
     "triple-406-mk1": {
         name: "Triple 406mm (MK-1)",
-        tier: "S-",
+        tier: "S",
         source: ["Snowrealm Peregrination Event Shop"],
         stats: ["FP +45"],
         ammoType: "AP",
@@ -163,7 +163,7 @@ equipDetails["BB-gun"] = {
     },
     "triple-406-m1940": {
         name: "Triple 406mm (Model 1940 Prototype)",
-        tier: "S-",
+        tier: "S",
         source: ["PR4 Research", "Gear Lab"],
         stats: ["FP +45"],
         ammoType: "SAP",
@@ -176,7 +176,7 @@ equipDetails["BB-gun"] = {
     },
     "triple-381-mkiii": {
         name: "Triple 381mm (BL 15\" Mk III Prototype)",
-        tier: "S-",
+        tier: "S",
         source: ["PR1 Research", "Gear Lab"],
         stats: ["FP +45"],
         ammoType: "HE",
@@ -189,7 +189,7 @@ equipDetails["BB-gun"] = {
     },
     "twin-406-mk4": {
         name: "Twin 406mm (16\"/56 Mk 4 Prototype)",
-        tier: "S-",
+        tier: "S",
         source: ["Gear Lab"],
         stats: ["FP +45"],
         ammoType: "AP",
@@ -202,7 +202,7 @@ equipDetails["BB-gun"] = {
     },
     "triple-380-skc": {
         name: "Triple 380mm (SKC Prototype)",
-        tier: "S-",
+        tier: "S",
         source: ["Gear Lab"],
         stats: ["FP +45"],
         ammoType: "HE",
@@ -215,7 +215,7 @@ equipDetails["BB-gun"] = {
     },
     "triple-406-mkd": {
         name: "Triple 406mm (16\"/50 Mark D Mod 0 Prototype)",
-        tier: "A+",
+        tier: "S-",
         source: ["Gear Lab"],
         stats: ["FP +45"],
         ammoType: "APMKD",
@@ -228,7 +228,7 @@ equipDetails["BB-gun"] = {
     },
     "triple-410-t10": {
         name: "Triple 410mm (10th Year Type Prototype)",
-        tier: "A+",
+        tier: "S-",
         source: ["PR1 Research", "Gear Lab"],
         stats: ["FP +45"],
         ammoType: "AP",
@@ -241,7 +241,7 @@ equipDetails["BB-gun"] = {
     },
     "twin-410-moda": {
         name: "Twin 410mm (Mod.A Prototype)",
-        tier: "A+",
+        tier: "S-",
         source: ["PR7 Research"],
         stats: ["FP +45"],
         ammoType: "AP",
@@ -254,7 +254,7 @@ equipDetails["BB-gun"] = {
     },
     "twin-406-skc": {
         name: "Twin 406mm (SK C/34 Prototype)",
-        tier: "A+",
+        tier: "S-",
         source: ["Tower of Transcendence Event Drop", "PR2 Research", "Gear Lab"],
         stats: ["FP +45"],
         ammoType: "HE",
@@ -267,7 +267,7 @@ equipDetails["BB-gun"] = {
     },
     "triple-305-skc-bb": {
         name: "Triple 305mm (SK C/39 Prototype)",
-        tier: "A+",
+        tier: "S-",
         source: ["PR3 Research", "Gear Lab"],
         stats: ["FP +45"],
         ammoType: "HE",
@@ -279,7 +279,7 @@ equipDetails["BB-gun"] = {
     },
     "triple-406/45-mk7": {
         name: "Triple 406mm/45 (Mk 7 Prototype)",
-        tier: "A",
+        tier: "A+",
         source: ["PR8 Research"],
         stats: ["FP +45"],
         ammoType: "AP",
@@ -292,7 +292,7 @@ equipDetails["BB-gun"] = {
     },
     "triple-406-mk6p": {
         name: "Triple 406mm (Mk 6 Prototype)",
-        tier: "A",
+        tier: "A+",
         source: ["PR6 Research"],
         stats: ["FP +45"],
         ammoType: "HE",
@@ -305,7 +305,7 @@ equipDetails["BB-gun"] = {
     },
     "twin-381-mkii": {
         name: "Twin 381mm (BL 15\" Mk II)",
-        tier: "A",
+        tier: "A+",
         source: ["PR1/2/3 Research", "Fight On, Royal Maids! Event Reward", "Aurora Noctis Event Drop", "Gear Lab"],
         stats: ["FP +45"],
         ammoType: "HE",
@@ -318,7 +318,7 @@ equipDetails["BB-gun"] = {
     },
     "quad-380-mle": {
         name: "Quadruple 380mm (Mle 1935)",
-        tier: "A-",
+        tier: "A",
         source: ["Core Exchange Shop", "Gear Lab"],
         stats: ["FP +45"],
         ammoType: "HE",
@@ -331,7 +331,7 @@ equipDetails["BB-gun"] = {
     },
     "triple-381-m1934": {
         name: "Triple 381mm (Model 1934)",
-        tier: "A-",
+        tier: "A",
         source: ["Empyreal Tragicomedy Event Shop", "The Flame-Touched Dagger Event Drop", "Gear Lab"],
         stats: ["FP +45"],
         ammoType: "AP*",
@@ -370,7 +370,7 @@ equipDetails["BB-gun"] = {
     },
     "triple-406-mk6": {
         name: "Triple 406mm (16\"/45 Mk 6)",
-        tier: "S-",
+        tier: "S",
         source: ["6-2, 6-3 Drop", "T3/T4 Eagle Tech Box", "Gear Lab"],
         stats: ["FP +25"],
         ammoType: "HE",
