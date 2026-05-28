@@ -30,9 +30,8 @@
 }
 
 .equip-top-section {
-    display: grid;
-    grid-template-columns: 250px 1.5fr;
-    gap: 30px;
+    display: flex;
+    flex-direction: column;
     background: #fff;
     padding: 30px;
     border-radius: 12px;
@@ -322,26 +321,34 @@
 
 .equip-extra-filters {
     display: flex;
-    justify-content: center;
+    justify-content: center; 
     gap: 15px;
-    margin-top: -20px;
-    margin-bottom: -20px;
+    margin-top: -10px;
+    padding-bottom: 20px; 
+    margin-bottom: 20px; 
+    border-bottom: 2px dashed #eee;
 }
 
 .extra-filter-btn {
-    padding: 10px 20px;
+    padding: 12px 20px;
     background: #f7f9fa;
     border: 2px solid #cbd5e1;
-    border-radius: 8px;
+    border-radius: 6px;
     font-weight: bold;
-    color: #333;
+    color: #555;
     cursor: pointer;
     transition: all 0.2s;
-    font-size: 16px;
+    font-size: 18px;
 }
 
 .extra-filter-btn.active, .extra-filter-btn:hover {
     background: #2c3e50;
     color: #fff;
     border-color: #1a252f;
+}
+
+.equip-tierlist-layout {
+    display: grid;
+    grid-template-columns: 250px 1.5fr;
+    gap: 30px;
 }
