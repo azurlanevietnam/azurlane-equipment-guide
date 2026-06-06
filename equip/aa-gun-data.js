@@ -40,8 +40,7 @@ equipDetails["AA-gun"] = {
         rld: ["1.15s", "Volley Time: 0.52s"],
         linkTab: 0,
         desc: [""],
-        code: "",
-        linkEx: "https://cdn.imgchest.com/files/7651e12a4c48.png",
+        code: "9/95/50660",
         box: "yellow"
     },
     "twin-113-mki": {
@@ -92,6 +91,42 @@ equipDetails["AA-gun"] = {
         code: "3/3d/46360",
         box: "yellow"
     },
+    "twin-90-m1939": {
+        name: "Twin 90mm AA (Model 1939 Prototype)",
+        tier: "S",
+        source: ["Gear Lab"],
+        stats: ["AA +45"],
+        range: "31",
+        rld: ["1.03s", "Volley Time: 0.54s"],
+        linkTab: 0,
+        desc: [""],
+        code: "6/65/55160",
+        box: "yellow"
+    },
+    "twin-76-mk27": {
+        name: "Twin 76mm AA (Mk 27 Mount)",
+        tier: "S",
+        source: ["Gear Lab"],
+        stats: ["AA +45"],
+        range: "30",
+        rld: ["0.72s", "Volley Time: 0.61s"],
+        linkTab: 0,
+        desc: [""],
+        code: "6/60/16080",
+        box: "yellow"
+    },
+    "sextuple-40": {
+        name: "Sextuple 40mm Bofors",
+        tier: "S",
+        source: ["PR3 Research", "Gear Lab"],
+        stats: ["AA +45"],
+        range: "28",
+        rld: ["1.18s", "Volley Time: 0.51s"],
+        linkTab: 0,
+        desc: [""],
+        code: "4/4d/26660",
+        box: "yellow"
+    },
     "twin-127-t89-m2": {
         name: "Twin 127mm AA (Type 89 A1 Mod 2)",
         tier: "S-",
@@ -116,6 +151,18 @@ equipDetails["AA-gun"] = {
         code: "9/9b/46420",
         box: "yellow"
     },
+    "quad-40-mk2": {
+        name: "Quadruple 40mm Bofors (Mk 2 Mount)",
+        tier: "A+",
+        source: ["5-4, 11-3, 14-1 Drop", "T4/T5 Eagle Tech Box", "Gear Lab"],
+        stats: ["AA +45"],
+        range: "28",
+        rld: ["1.04s", "Volley Time: 0.54s"],
+        linkTab: 3,
+        desc: [""],
+        code: "c/c1/16400",
+        box: "yellow"
+    },
     "twin-40-t5": {
         name: "Twin 40mm Bofors (Type 5)",
         tier: "A",
@@ -128,6 +175,30 @@ equipDetails["AA-gun"] = {
         code: "0/06/36700",
         box: "yellow"
     },
+    "quad-30": {
+        name: "Prototype Quadruple 30mm AA Gun Mount",
+        tier: "A",
+        source: ["PR5 Research", "Gear Lab"],
+        stats: ["AA +45"],
+        range: "30",
+        rld: ["0.90s", "Volley Time: 0.57s"],
+        linkTab: 0,
+        desc: [""],
+        code: "8/8d/46400",
+        box: "yellow"
+    },
+    "sextuple-20-m1941": {
+        name: "Prototype Sextuple 20mm Scotti AA Gun (Model 1941)",
+        tier: "A",
+        source: ["PR8 Research"],
+        stats: ["AA +45"],
+        range: "25",
+        rld: ["1.00s", "Volley Time: 0.55s"],
+        linkTab: 0,
+        desc: [""],
+        code: "1/12/56260",
+        box: "yellow"
+    },
     "twin-80": {
         name: "Twin 80mm AA (Type 98)",
         tier: "B+",
@@ -136,8 +207,32 @@ equipDetails["AA-gun"] = {
         range: "29",
         rld: ["1.28s", "Volley Time: 0.49s"],
         linkTab: 0,
-        desc: ["khi trang bị trên tàu vanguard của Sakura Empire, tàu +5% FP, giảm còn +2.5% FP trong 3s khi AA-gun khai hỏa."],
+        desc: ["Khi trang bị trên tàu vanguard của Sakura Empire, tàu +5% FP, giảm còn +2.5% FP trong 3s khi AA-gun khai hỏa."],
         code: "4/48/36740",
+        box: "yellow"
+    },
+    "twin-37-mle": {
+        name: "Twin 37mm ACAD (Mle 1936)",
+        tier: "B+",
+        source: ["PR2 Research", "Gear Lab"],
+        stats: ["AA +45"],
+        range: "28",
+        rld: ["0.73s", "Volley Time: 0.60s"],
+        linkTab: 0,
+        desc: [""],
+        code: "a/a8/50600",
+        box: "yellow"
+    },
+    "triple-25-t96": {
+        name: "Triple 25mm AA (Type 96 Blast Shield)",
+        tier: "B+",
+        source: ["PR2 Research", "Gear Lab"],
+        stats: ["AA +45"],
+        range: "28",
+        rld: ["0.56s", "Volley Time: 0.64s"],
+        linkTab: 0,
+        desc: [""],
+        code: "6/63/36360",
         box: "yellow"
     },
     "octuple-40": {
