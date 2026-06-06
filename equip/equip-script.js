@@ -4,7 +4,7 @@ const tierlistViewContainer = document.getElementById('tierlistView');
 const detailsViewContainer = document.getElementById('detailsView');
 const extraFiltersView = document.getElementById('extraFiltersView');
 
-let currentMainTab = categories[3];
+let currentMainTab = "AA-gun";
 let currentSubTab = "";
 let currentFilterConfig = null;
 let currentFilterValue = 'all';
@@ -257,8 +257,15 @@ function renderDetailsView(equipList) {
         let statsHTML = equipInfo.stats ? equipInfo.stats.join('<br>') : '';
         let descHTML = equipInfo.desc ? equipInfo.desc.map(d => `<div>${d}</div>`).join('') : '';
 
+        let ammoLabel = "Loại đạn";
         let ammoTypeHTML = equipInfo.ammoType || "-";
-        let ammoModHTML = equipInfo.ammoMod || "-";
+        let ammoModHTML = equipInfo.ammoMod || "";
+
+        if (currentMainTab === "AA-gun") {
+            ammoLabel = "Tầm bắn";
+            ammoTypeHTML = equipInfo.range || "-";
+            ammoModHTML = "";
+        }
         let rldHTML = equipInfo.rld 
             ? equipInfo.rld.map(r => `<div class="rld-item">${r}</div>`).join('') 
             : "-";
@@ -311,7 +318,7 @@ function renderDetailsView(equipList) {
             </div>
             
             <div class="col-ammo">
-                <div class="label-style">Loại đạn</div>
+                <div class="label-style">${ammoLabel}</div>
                 <div class="ammo-container">
                     <div class="ammo-type-value">${ammoTypeHTML}</div>
                     <div class="ammo-mod-value">${ammoModHTML}</div>

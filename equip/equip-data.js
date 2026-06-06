@@ -12,9 +12,11 @@ const dataFiles = [
     'cl-gun-data.js',
     'dd-gun-data.js',
     'ca-gun-data.js',
+    'aa-gun-data.js',
 ];
 
 dataFiles.push('equip-script.js');
+dataFiles.push('plugin-linkex.js');
 
 dataFiles.forEach(fileName => {
     let script = document.createElement('script');
