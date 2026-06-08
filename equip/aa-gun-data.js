@@ -139,6 +139,54 @@ equipDetails["AA-gun"] = {
         code: "0/06/36660",
         box: "yellow"
     },
+    "twin-105-skc": {
+        name: "Twin 105mm AA (SK C/33)",
+        tier: "S-",
+        source: ["9-1, 10-1 Drop", "T4/T4 Ironblood Gear Box", "Gear Lab"],
+        stats: ["AA +45"],
+        range: "32",
+        rld: ["1.24s", "Volley Time: 0.50s"],
+        linkTab: 3,
+        desc: [""],
+        code: "e/e6/46300",
+        box: "yellow"
+    },
+    "twin-100-t98-aa": {
+        name: "Twin 100mm AA (Type 98)",
+        tier: "S-",
+        source: ["PR1 Research"],
+        stats: ["AA +45"],
+        range: "32",
+        rld: ["1.28s", "Volley Time: 0.49s"],
+        linkTab: 0,
+        desc: [""],
+        code: "2/20/36560",
+        box: "yellow"
+    },
+    "single-90-m1939": {
+        name: "Single 90mm AA (Model 1939)",
+        tier: "S-",
+        source: ["Gear Lab"],
+        stats: ["AA +45"],
+        range: "31",
+        rld: ["0.90s", "Volley Time: 0.57s"],
+        linkTab: 3,
+        desc: [""],
+        code: "f/fd/55100",
+        box: "yellow"
+    },
+    "twin-40-haze": {
+        name: "Twin 40mm Bofors Hazemeyer",
+        tier: "S-",
+        source: ["PR2/3/4/5/6/7 Research", "Gear Lab"],
+        stats: ["AA +45", "ACC +5"],
+        range: "30",
+        rld: ["0.87s", "Volley Time: 0.58s"],
+        linkTab: 0,
+        desc: [""],
+        code: "2/2f/26620",
+        box: "yellow"
+    },
     "single-55": {
         name: "Single 55mm Gerät 58 AA (Prototype)",
         tier: "A+",
