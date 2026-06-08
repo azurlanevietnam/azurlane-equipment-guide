@@ -1,8 +1,14 @@
 equipData["AA-gun"] = {
     subCategories: [
-        { id: "aa-dps", name: "DPS Thuần" }
+        { id: "aa-dps", name: "DPS Thuần" },
+        { id: "aa-stat", name: "Cộng Chỉ Số"},
+        { id: "aa-rr", name: "Kéo Range/Reload"}
     ],
     tierlists: {
+        "aa-dps": {
+            "SS": ["twin-57-mle"],
+            "SS-": ["twin-76-mk37"]
+        },
     }
 };
 
