@@ -109,21 +109,9 @@ function selectSubTab(subId) {
 }
 
 const tierColors = [
-    "#FF5252",
-    "#FF7043",
-    "#FFA726",
-    "#FFCA28",
-    "#FFEE58",
-    "#9CCC65",
-    "#4CAF50",
-    "#009688",
-    "#00BCD4",
-    "#2196F3",
-    "#3F51B5",
-    "#673AB7",
-    "#9C27B0",
-    "#E91E63",
-    "#9E9E9E"
+    "#FF5252", "#FF7043", "#FFA726", "#FFCA28", "#FFEE58", "#9CCC65",
+    "#4CAF50", "#009688", "#00BCD4", "#2196F3", "#3F51B5", "#673AB7",
+    "#9C27B0", "#E91E63", "#9E9E9E"
 ];
 
 const tierPriority = [
@@ -257,18 +245,30 @@ function renderDetailsView(equipList) {
         let statsHTML = equipInfo.stats ? equipInfo.stats.join('<br>') : '';
         let descHTML = equipInfo.desc ? equipInfo.desc.map(d => `<div>${d}</div>`).join('') : '';
 
-        let ammoLabel = "Loại đạn";
-        let ammoTypeHTML = equipInfo.ammoType || "-";
-        let ammoModHTML = equipInfo.ammoMod || "";
-
-        if (currentMainTab === "AA-gun") {
-            ammoLabel = "Tầm bắn";
-            ammoTypeHTML = equipInfo.range || "-";
-            ammoModHTML = "";
+        // Xử lý Cột Loại đạn (Ammo), Sát thương (Dmg), Xuyên giáp (Armor Mod) và Hệ số (Coef)
+        let ammoTypeHTML = equipInfo.ammoType || "Normal";
+        
+        let dmgRaw = equipInfo.dmg;
+        let dmgText = "-";
+        if (Array.isArray(dmgRaw)) {
+            dmgText = dmgRaw.length === 1 ? `1 x ${dmgRaw[0]}` : dmgRaw.join(" x ");
+        } else if (dmgRaw !== undefined && dmgRaw !== null) {
+            dmgText = `1 x ${dmgRaw}`; // Tương thích ngược với bảng AA-gun
         }
+
+        let ammoModHTML = equipInfo.ammoMod ? `
+            <div class="ammo-mod-wrapper">
+                <div class="armor-mod-label">Hiệu chỉnh giáp:</div>
+                <div class="ammo-mod-value">${equipInfo.ammoMod}</div>
+            </div>` : "";
+            
+        let coefHTML = equipInfo.coef ? `<div class="ammo-coef-value">Coefficient: ${equipInfo.coef}</div>` : "";
+
         let rldHTML = equipInfo.rld 
             ? equipInfo.rld.map(r => `<div class="rld-item">${r}</div>`).join('') 
             : "-";
+            
+        let rangeHTML = equipInfo.range || "-";
 
         let sourceHTML = equipInfo.source
             ? equipInfo.source.map(src => `<div class="source-item">${src}</div>`).join('')
@@ -318,16 +318,25 @@ function renderDetailsView(equipList) {
             </div>
             
             <div class="col-ammo">
-                <div class="label-style">${ammoLabel}</div>
+                <div class="label-style">Loại đạn</div>
                 <div class="ammo-container">
-                    <div class="ammo-type-value">${ammoTypeHTML}</div>
-                    <div class="ammo-mod-value">${ammoModHTML}</div>
+                    <div class="ammo-type-wrapper">
+                        <div class="ammo-type-value">${ammoTypeHTML}</div>
+                        <div class="ammo-dmg-value">${dmgText}</div>
+                    </div>
+                    ${ammoModHTML}
+                    ${coefHTML}
                 </div>
             </div>
             
             <div class="col-rld">
                 <div class="label-style">Reload</div>
                 <div class="rld-value-container">${rldHTML}</div>
+            </div>
+            
+            <div class="col-range">
+                <div class="label-style">Tầm bắn</div>
+                <div class="range-value">${rangeHTML}</div>
             </div>
             
             <div class="col-desc">${descHTML}</div>

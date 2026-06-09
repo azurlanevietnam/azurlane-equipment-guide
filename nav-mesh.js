@@ -1,6 +1,7 @@
 const navLinks = [
     { name: "HEALER LIST", url: "index.html" },
-    { name: "EQUIPMENT LIST", url: "equip.html" }
+    { name: "EQUIPMENT LIST", url: "equip.html" },
+    { name: "AA CALCULATOR", url: "aa-caculate.html" }
 ];
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -28,15 +29,12 @@ document.addEventListener("DOMContentLoaded", () => {
             <a href="index.html" class="nav-logo">
                 <img src="https://cdn2.steamgriddb.com/icon_thumb/db261d4f615f0e982983be499e57ccda.png" alt="Logo">
             </a>
-            
             <div class="nav-direct-links">
                 ${navButtonsHtml}
             </div>
         </div>
         <div class="nav-right">
-            <a href="https://pbs.twimg.com/media/HI1tqekXwAAQKWo?format=jpg&name=4096x4096" target="_blank" class="rickroll-btn">
-                TIER ZÚ!
-            </a>
+            <a href="#" class="rickroll-btn">TIER ZÚ</a>
         </div>
     `;
 });
