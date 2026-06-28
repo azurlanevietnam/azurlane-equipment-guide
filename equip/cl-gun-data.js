@@ -8,7 +8,7 @@ equipData["CL-gun"] = {
 
 equipDetails["CL-gun"] = {
     "single-152-p1892": {
-        name: "PSingle 152mm (6\"/45 Pattern 1892)",
+        name: "Single 152mm (6\"/45 Pattern 1892)",
         tier: "EX",
         source: ["3-2 Drop", "Gear Lab"],
         stats: ["FP +12"],

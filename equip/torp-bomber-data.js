@@ -1,4 +1,4 @@
-equipData["Torp-bomber"] = {
+equipData["Torp-Bomber"] = {
     subCategories: [
         { id: "tb-light", name: "Giáp Light đơn" }
     ],
@@ -6,26 +6,26 @@ equipData["Torp-bomber"] = {
     }
 };
 
-equipDetails["Torp-bomber"] = {
-    "single-152-p1892": {
-        name: "PSingle 152mm (6\"/45 Pattern 1892)",
-        tier: "EX",
-        source: ["3-2 Drop", "Gear Lab"],
-        stats: ["FP +12"],
-        ammoType: "Normal",
-        ammoMod: "100% / 75% / 40%",
-        rld: ["2.43s", "Volley Time: 0.40s"],
-        dmg: ["1", "100"],
+equipDetails["Torp-Bomber"] = {
+    "spearfish": {
+        name: "Fairey Spearfish (Prototype)",
+        tier: "N/A",
+        source: ["Gear Lab"],
+        stats: ["AVI +65"],
+        ammoType: "Para Torp",
+        ammoMod: "80% / 110% / 130%",
+        rld: ["10.70s"],
+        dmg: ["4", "288/340"],
         range: "50",
         coef: 1.00,
         linkTab: 3,
         desc: [""],
-        code: "c/c0/7000",
-        box: "blue"
+        code: "5/5f/28420",
+        box: "rainbow"
     },
     "quad-152": {
         name: "Prototype Quadruple 152mm Main Gun Mount",
-        tier: "SS-",
+        tier: "N/A",
         source: ["PR5 Research", "Gear Lab", "Prototype Shop"],
         stats: ["FP +65"],
         ammoType: "AP+",
