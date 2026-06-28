@@ -116,7 +116,7 @@ const tierColors = [
 
 const tierPriority = [
     "EX", "SS+", "SS", "SS-",
-    "S++", "S+", "S", "S-", "A+", "A", "A-", "B+", "B", "C", "D", "E", "F"
+    "S++", "S+", "S", "S-", "A+", "A", "A-", "B+", "B", "C", "D", "E", "F", "N/A"
 ];
 
 function renderTierlistView(equipListWithTiers) {
