@@ -1,12 +1,12 @@
-equipData["Torpedo Bomber"] = {
+equipData["Dive Bomber"] = {
     subCategories: [
-        { id: "tb-light", name: "Giáp Light đơn" }
+        { id: "db-light", name: "Giáp Light đơn" }
     ],
     tierlists: {
     }
 };
 
-equipDetails["Torpedo Bomber"] = {
+equipDetails["Dive Bomber"] = {
     "spearfish": {
         name: "Fairey Spearfish (Prototype)",
         tier: "S++",

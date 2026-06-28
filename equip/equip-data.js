@@ -1,7 +1,7 @@
 const categories = [
     "DD-gun", "CL-gun", "CA-gun", "BB-gun", "AA-gun", 
     "Surface Torpedo", "Submerged Torpedo", "Fighter", 
-    "Dive Bomber", "Torp-Bomber", "ASW", "Auxiliary", "Augmentation"
+    "Dive Bomber", "Torpedo Bomber", "Seaplane", "ASW", "Auxiliary", "Augmentation"
 ];
 
 window.equipData = {};
@@ -13,6 +13,8 @@ const dataFiles = [
     'dd-gun-data.js',
     'ca-gun-data.js',
     'aa-gun-data.js',
+    'fighter-data.js',
+    'dive-bomber-data.js',
     'torp-bomber-data.js',
 ];
 

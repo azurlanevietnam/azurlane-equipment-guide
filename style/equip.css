@@ -400,3 +400,20 @@
     grid-template-columns: 250px 1.5fr;
     gap: 30px;
 }
+
+.row-card-equip.plane-layout {
+    grid-template-columns: 180px 80px 150px 70px 180px 140px 140px 100px 1fr;
+}
+
+.row-card-equip.plane-layout .col-cannon .ammo-type-value {
+    font-size: 16px;
+    color: #e67e22;
+    white-space: pre-wrap;
+    line-height: 1.2;
+}
+
+.row-card-equip.plane-layout .rld-item {
+    font-size: 16px;
+    font-weight: 500;
+    color: #27ae60; 
+}
