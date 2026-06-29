@@ -405,7 +405,7 @@
 
 .row-card-equip.plane-layout {
     /* 8 Cột: Info Tier Source Stat Pháo Vũ_khí Reload Desc */
-    grid-template-columns: 180px 100px 150px 75px 170px 170px 120px 1fr;
+    grid-template-columns: 180px 100px 150px 75px 180px 180px 120px 1fr;
     padding-bottom: 15px;
     align-items: stretch;
 }

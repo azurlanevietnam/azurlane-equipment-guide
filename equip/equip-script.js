@@ -329,7 +329,7 @@ function renderDetailsView(equipList) {
                             <div class="weapon-popup">
                                 <div class="popup-close-btn" onclick="handleWeaponClose(event, this)">×</div>
                                 <table class="weapon-details-table">
-                                    <tr><th>Sát thương</th><td style="color: #c0392b; font-weight: 900;">${cDmg}</td></tr>
+                                    <tr><th>Damage</th><td style="color: #c0392b; font-weight: 900;">${cDmg}</td></tr>
                                     <tr><th>Reload</th><td style="color: #27ae60; font-weight: bold;">${cRld}</td></tr>
                                     <tr><th>Range</th><td style="color: #2980b9; font-weight: bold;">${cRange}</td></tr>
                                     ${angleRow}
