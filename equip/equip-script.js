@@ -279,14 +279,14 @@ function renderDetailsView(equipList) {
             let speedRow = speed ? `<tr><th>Speed</th><td style="font-weight: bold;">${speed}</td></tr>` : "";
 
             return `
-                <div class="weapon-popup-wrapper" onmouseenter="handleWeaponHover(this, true)" onmouseleave="handleWeaponHover(this, false)" style="position:relative; z-index: 10; display: flex; flex-direction: column; align-items: center;">
+                <div class="weapon-popup-wrapper" onmouseenter="handleWeaponHover(this, true)" onmouseleave="handleWeaponHover(this, false)" style="position:relative; z-index: 10; display: flex; flex-direction: column; align-items: center; width: max-content; margin: 0 auto;">
                     <div class="weapon-trigger" onclick="handleWeaponClick(this)" style="font-size: 16px; font-weight: bold; color: #e67e22; text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 4px; cursor: pointer;">
                         ${typeHTML}
                     </div>
                     <div class="weapon-popup">
                         <div class="popup-close-btn" onclick="handleWeaponClose(event, this)">×</div>
                         <table class="weapon-details-table">
-                            <tr><th>Damage</th><td style="color: #c0392b; font-weight: 900;">${dmgText}</td></tr>
+                            <tr><th>Sát thương</th><td style="color: #c0392b; font-weight: 900;">${dmgText}</td></tr>
                             <tr><th>Ammo Mod</th><td style="font-weight: bold;">${modHTML}</td></tr>
                             <tr><th>Coef</th><td style="color: #8e44ad; font-weight: bold;">${formattedCoef}</td></tr>
                             ${spreadRow}
@@ -322,14 +322,14 @@ function renderDetailsView(equipList) {
                     let angleRow = cAngle ? `<tr><th>Angle</th><td style="font-weight: bold;">${cAngle}</td></tr>` : "";
                     
                     return `
-                        <div class="weapon-popup-wrapper" onmouseenter="handleWeaponHover(this, true)" onmouseleave="handleWeaponHover(this, false)" style="position:relative; z-index: 10; display: flex; flex-direction: column; align-items: center;">
+                        <div class="weapon-popup-wrapper" onmouseenter="handleWeaponHover(this, true)" onmouseleave="handleWeaponHover(this, false)" style="position:relative; z-index: 10; display: flex; flex-direction: column; align-items: center; width: max-content; margin: 0 auto;">
                             <div class="weapon-trigger" onclick="handleWeaponClick(this)" style="font-size: 16px; font-weight: bold; color: #e67e22; text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 4px; cursor: pointer;">
                                 ${type}
                             </div>
                             <div class="weapon-popup">
                                 <div class="popup-close-btn" onclick="handleWeaponClose(event, this)">×</div>
                                 <table class="weapon-details-table">
-                                    <tr><th>Damage</th><td style="color: #c0392b; font-weight: 900;">${cDmg}</td></tr>
+                                    <tr><th>Sát thương</th><td style="color: #c0392b; font-weight: 900;">${cDmg}</td></tr>
                                     <tr><th>Reload</th><td style="color: #27ae60; font-weight: bold;">${cRld}</td></tr>
                                     <tr><th>Range</th><td style="color: #2980b9; font-weight: bold;">${cRange}</td></tr>
                                     ${angleRow}
@@ -370,7 +370,10 @@ function renderDetailsView(equipList) {
                 ${w2HTML}
             </div>`;
 
-            let rldHTML = equipInfo.rld ? equipInfo.rld.map(r => `<div class="rld-item">${r}</div>`).join('') : "-";
+            let rldHTML = equipInfo.rld ? equipInfo.rld.map((r, index) => {
+                let displayText = (index === 1) ? `Intercept Rld: ${r}` : r;
+                return `<div class="rld-item">${displayText}</div>`;
+            }).join('') : "-";
             contentCol6 = `<div class="rld-value-container">${rldHTML}</div>`;
         } else {
             let ammoType = equipInfo.ammoType || "Normal";
