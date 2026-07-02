@@ -305,10 +305,16 @@ function renderDetailsView(equipList) {
         let contentCol7 = "";
 
         if (isPlane) {
-            // Xử lý Cột Pháo (Áp dụng Toggle Dotted như vũ khí chính)
-            if (equipInfo.cannonType && equipInfo.cannonType.length > 0) {
-                let cannonsArr = equipInfo.cannonType.map((type, idx) => {
-                    let cDmgRaw = equipInfo.cannonDmg ? equipInfo.cannonDmg[idx] : null;
+            // ==========================================
+            // Xử lý Cột Pháo
+            // ==========================================
+            if (equipInfo.cannons && equipInfo.cannons.length > 0) {
+                let cannonsArr = equipInfo.cannons.map((cannonId) => {
+                    let cData = window.aircraftCannons ? window.aircraftCannons[cannonId] : null;
+                    if (!cData) return ''; 
+
+                    let type = cData.name;
+                    let cDmgRaw = cData.dmg;
                     let cDmg = "-";
                     if (Array.isArray(cDmgRaw) && cDmgRaw.length > 0) {
                         cDmg = cDmgRaw.length === 1 ? `1 x ${cDmgRaw[0]}` : cDmgRaw.join(" x ");
@@ -316,9 +322,9 @@ function renderDetailsView(equipList) {
                         cDmg = `1 x ${cDmgRaw}`; 
                     }
 
-                    let cRld = (equipInfo.cannonRld && equipInfo.cannonRld[idx]) ? equipInfo.cannonRld[idx] : "-";
-                    let cRange = (equipInfo.cannonRange && equipInfo.cannonRange[idx]) ? equipInfo.cannonRange[idx] : "-";
-                    let cAngle = (equipInfo.cannonAngle && equipInfo.cannonAngle[idx]) ? equipInfo.cannonAngle[idx] : null;
+                    let cRld = cData.rld || "-";
+                    let cRange = cData.range || "-";
+                    let cAngle = cData.angle || null;
                     let angleRow = cAngle ? `<tr><th>Angle</th><td style="font-weight: bold;">${cAngle}</td></tr>` : "";
                     
                     return `
@@ -346,30 +352,46 @@ function renderDetailsView(equipList) {
                 contentColCannon = `<div class="ammo-container">-</div>`;
             }
 
-            // Xử lý Cột Vũ Khí (Gộp Vũ khí 1 và 2)
-            let w1Type = equipInfo.weaponType ? equipInfo.weaponType[0] : null;
-            let w1Dmg = equipInfo.dmg ? equipInfo.dmg[0] : null;
-            let w1Mod = equipInfo.weaponMod ? equipInfo.weaponMod[0] : null;
-            let w1Coef = equipInfo.coef ? equipInfo.coef[0] : null;
-            let w1Spread = equipInfo.weaponSpread ? equipInfo.weaponSpread[0] : null;
-            let w1Splash = equipInfo.weaponSplash ? equipInfo.weaponSplash[0] : null;
-            let w1Speed = equipInfo.weaponSpeed ? equipInfo.weaponSpeed[0] : null;
-            let w1HTML = w1Type ? buildAmmoHTML(w1Type, w1Dmg, w1Mod, w1Coef, w1Spread, w1Splash, w1Speed) : "";
+            // ==========================================
+            // Xử lý Cột Vũ Khí
+            // ==========================================
+            const getWeaponData = (wId) => {
+                if (window.aircraftTorpedoes && window.aircraftTorpedoes[wId]) return window.aircraftTorpedoes[wId];
+                if (window.aircraftRockets && window.aircraftRockets[wId]) return window.aircraftRockets[wId];
+                if (window.aircraftBombs && window.aircraftBombs[wId]) return window.aircraftBombs[wId]; 
+                return null;
+            };
 
-            let w2Type = equipInfo.weaponType ? equipInfo.weaponType[1] : null;
-            let w2Dmg = equipInfo.dmg ? equipInfo.dmg[1] : null;
-            let w2Mod = equipInfo.weaponMod ? equipInfo.weaponMod[1] : null;
-            let w2Coef = equipInfo.coef ? equipInfo.coef[1] : null;
-            let w2Spread = equipInfo.weaponSpread ? equipInfo.weaponSpread[1] : null;
-            let w2Splash = equipInfo.weaponSplash ? equipInfo.weaponSplash[1] : null;
-            let w2Speed = equipInfo.weaponSpeed ? equipInfo.weaponSpeed[1] : null;
-            let w2HTML = w2Type ? buildAmmoHTML(w2Type, w2Dmg, w2Mod, w2Coef, w2Spread, w2Splash, w2Speed) : "";
+            let w1HTML = "";
+            let w2HTML = "";
+
+            if (equipInfo.weapons && equipInfo.weapons.length > 0) {
+                const buildWeapon = (wId, count) => {
+                    let wData = getWeaponData(wId);
+                    if (!wData) return "";
+                    
+                    // Ghép số lượng vũ khí vào đầu mảng dmg để tương thích với buildAmmoHTML()
+                    let wDmgArray = wData.dmg ? [...wData.dmg] : [];
+                    if (wDmgArray.length > 0 && count) {
+                        wDmgArray.unshift(count.toString());
+                    }
+                    
+                    return buildAmmoHTML(wData.name, wDmgArray, wData.mod, wData.coef || 1.00, wData.spread, wData.splash, wData.speed);
+                };
+
+                w1HTML = buildWeapon(equipInfo.weapons[0], equipInfo.weaponCount ? equipInfo.weaponCount[0] : null);
+                
+                if (equipInfo.weapons.length > 1) {
+                    w2HTML = buildWeapon(equipInfo.weapons[1], equipInfo.weaponCount ? equipInfo.weaponCount[1] : null);
+                }
+            }
 
             contentCol5 = `<div style="display: flex; flex-direction: column; width: 100%; justify-content: center; gap: 20px;">
                 ${w1HTML}
                 ${w2HTML}
             </div>`;
 
+            // Reload máy bay giữ nguyên
             let rldHTML = equipInfo.rld ? equipInfo.rld.map((r, index) => {
                 let displayText = (index === 1) ? `Intercept Rld: ${r}` : r;
                 return `<div class="rld-item">${displayText}</div>`;

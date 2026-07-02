@@ -8,6 +8,10 @@ window.equipData = {};
 window.equipDetails = {};
 
 const dataFiles = [
+    'aircraft-cannon-data.js',
+    'aircraft-torpedo-data.js',
+    'aircraft-rocket-data.js',
+    'aircraft-bomb-data.js',
     'bb-gun-data.js',
     'cl-gun-data.js',
     'dd-gun-data.js',
