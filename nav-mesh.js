@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
         </div>
         <div class="nav-right">
-            <a href="https://pbs.twimg.com/media/HLpxb1JWgAAzPG_?format=jpg&name=4096x4096" target="_blank" class="rickroll-btn">TIER ZÚ</a>
+            <a href="https://pbs.twimg.com/media/HMIK5ZzXQAANEd_?format=jpg&name=4096x4096" target="_blank" class="rickroll-btn">TIER ZÚ</a>
         </div>
     `;
 });
