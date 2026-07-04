@@ -116,5 +116,33 @@ equipDetails["Torpedo Bomber"] = {
         desc: ["Ngư lôi dạng chụm"],
         code: "2/22/48040",
         box: "yellow"
-    }
+    },
+    "vit-2-vk107": {
+        name: "Prototype VIT-2 (VK-107)",
+        tier: "S",
+        source: ["PR5 Research", "Gear Lab"],
+        stats: ["AVI +45"],
+        cannons: [],
+        weapons: ["torpedo_np_t0"],
+        weaponCount: [6],
+        rld: ["12.50s"],
+        linkTab: 0,
+        desc: ["Ngư lôi song song chia hai hàng"],
+        code: "3/3b/85560",
+        box: "yellow"
+    },
+    "firecrest": {
+        name: "Blackburn Firecrest",
+        tier: "S",
+        source: ["Gear Lab"],
+        stats: ["AVI +45"],
+        cannons: ["4x20_cannon_t0"],
+        weapons: ["torpedo_common_t3"],
+        weaponCount: [3],
+        rld: ["10.51s"],
+        linkTab: 0,
+        desc: [],
+        code: "a/a1/28220",
+        box: "yellow"
+    },
 };
