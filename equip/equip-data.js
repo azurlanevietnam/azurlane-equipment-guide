@@ -20,6 +20,7 @@ const dataFiles = [
     'fighter-data.js',
     'dive-bomber-data.js',
     'torp-bomber-data.js',
+    'seaplane-data.js',
 ];
 
 dataFiles.push('equip-script.js');

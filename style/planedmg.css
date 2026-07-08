@@ -1,0 +1,22 @@
+/* Ghi đè cấu trúc lưới của top-section từ equip.html để dành toàn bộ không gian cho tier list */
+.tierlist-only-layout {
+    display: flex;
+    flex-direction: column;
+    padding: 30px 40px;
+    align-items: center;
+}
+
+.tierlist-only-layout .equip-tierlist-view {
+    width: 100%;
+    max-width: 1200px;
+}
+
+/* Đảm bảo tooltip hiển thị tên máy bay khi hover (dùng thuộc tính title mặc định của HTML) */
+.tierlist-icon {
+    cursor: help;
+}
+
+/* Hiệu ứng focus cho các nút tab */
+.equip-main-tabs {
+    margin-bottom: 30px;
+}

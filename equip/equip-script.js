@@ -260,7 +260,7 @@ function renderDetailsView(equipList) {
         }
 
         // Hàm tiện ích: Đóng gói HTML cho 1 block Vũ khí/Đạn dược (Giao diện Toggle Dotted)
-        function buildAmmoHTML(type, dmgRaw, mod, coef, spread, splash, speed) {
+        function buildAmmoHTML(type, dmgRaw, mod, coef, spread, splash, speed, hitchance) {
             if (!type && !dmgRaw && !mod) return `<div class="ammo-container">-</div>`;
             
             let dmgText = "-";
@@ -273,10 +273,12 @@ function renderDetailsView(equipList) {
             let typeHTML = type || "Normal";
             let modHTML = mod || "-";
             let formattedCoef = coef !== null && coef !== undefined ? (Math.round(Number(coef) * 100) + "%") : "-";
+            let coefLabel = isPlane ? "AVI scale" : "Coef";
 
             let spreadRow = spread ? `<tr><th>Spread</th><td style="font-weight: bold;">${spread}</td></tr>` : "";
             let splashRow = splash ? `<tr><th>Splash</th><td style="font-weight: bold;">${splash}</td></tr>` : "";
             let speedRow = speed ? `<tr><th>Speed</th><td style="font-weight: bold;">${speed}</td></tr>` : "";
+            let hitchanceRow = hitchance ? `<tr><th>Hit Chance</th><td style="color: #f39c12; font-weight: bold;">${hitchance}</td></tr>` : "";
 
             return `
                 <div class="weapon-popup-wrapper" onmouseenter="handleWeaponHover(this, true)" onmouseleave="handleWeaponHover(this, false)" style="position:relative; z-index: 10; display: flex; flex-direction: column; align-items: center; width: max-content; margin: 0 auto;">
@@ -288,10 +290,11 @@ function renderDetailsView(equipList) {
                         <table class="weapon-details-table">
                             <tr><th>Sát thương</th><td style="color: #c0392b; font-weight: 900;">${dmgText}</td></tr>
                             <tr><th>Ammo Mod</th><td style="font-weight: bold;">${modHTML}</td></tr>
-                            <tr><th>Coef</th><td style="color: #8e44ad; font-weight: bold;">${formattedCoef}</td></tr>
+                            <tr><th>${coefLabel}</th><td style="color: #8e44ad; font-weight: bold;">${formattedCoef}</td></tr>
                             ${spreadRow}
                             ${splashRow}
                             ${speedRow}
+                            ${hitchanceRow}
                         </table>
                     </div>
                 </div>
@@ -370,13 +373,26 @@ function renderDetailsView(equipList) {
                     let wData = getWeaponData(wId);
                     if (!wData) return "";
                     
-                    // Ghép số lượng vũ khí vào đầu mảng dmg để tương thích với buildAmmoHTML()
                     let wDmgArray = wData.dmg ? [...wData.dmg] : [];
                     if (wDmgArray.length > 0 && count) {
                         wDmgArray.unshift(count.toString());
                     }
                     
-                    return buildAmmoHTML(wData.name, wDmgArray, wData.mod, wData.coef || 1.00, wData.spread, wData.splash, wData.speed);
+                    let scaleCoef = 1.00;
+                    if (window.aircraftBombs && window.aircraftBombs[wId]) {
+                        scaleCoef = 0.80;
+                    }
+                    
+                    return buildAmmoHTML(
+                        wData.name, 
+                        wDmgArray, 
+                        wData.mod, 
+                        wData.coef || scaleCoef,
+                        wData.spread, 
+                        wData.splash, 
+                        wData.speed, 
+                        wData.hitchance
+                    );
                 };
 
                 w1HTML = buildWeapon(equipInfo.weapons[0], equipInfo.weaponCount ? equipInfo.weaponCount[0] : null);
@@ -403,7 +419,8 @@ function renderDetailsView(equipList) {
             let nsSpread = equipInfo.weaponSpread ? (Array.isArray(equipInfo.weaponSpread) ? equipInfo.weaponSpread[0] : equipInfo.weaponSpread) : null;
             let nsSplash = equipInfo.weaponSplash ? (Array.isArray(equipInfo.weaponSplash) ? equipInfo.weaponSplash[0] : equipInfo.weaponSplash) : null;
             let nsSpeed = equipInfo.weaponSpeed ? (Array.isArray(equipInfo.weaponSpeed) ? equipInfo.weaponSpeed[0] : equipInfo.weaponSpeed) : null;
-            contentCol5 = buildAmmoHTML(ammoType, equipInfo.dmg, equipInfo.ammoMod, equipInfo.coef, nsSpread, nsSplash, nsSpeed);
+            let nsHitChance = equipInfo.hitchance || null; // Lấy hitchance nếu vũ khí bề mặt có lưu
+            contentCol5 = buildAmmoHTML(ammoType, equipInfo.dmg, equipInfo.ammoMod, equipInfo.coef, nsSpread, nsSplash, nsSpeed, nsHitChance);
             
             let rldHTML = equipInfo.rld ? equipInfo.rld.map(r => `<div class="rld-item">${r}</div>`).join('') : "-";
             contentCol6 = `<div class="rld-value-container">${rldHTML}</div>`;

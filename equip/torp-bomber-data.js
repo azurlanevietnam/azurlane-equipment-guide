@@ -15,7 +15,8 @@ equipDetails["Torpedo Bomber"] = {
         weapons: ["torpedo_common_t3", "rocket_rp_3"],
         weaponCount: [4, 4],
         rld: ["10.70s"],
-        linkTab: 3,
+        linkTab: 0,
+        desc: [],
         code: "5/5f/28420",
         box: "rainbow"
     },
@@ -95,7 +96,7 @@ equipDetails["Torpedo Bomber"] = {
         source: ["PR7 Research"],
         stats: ["AVI +45"],
         cannons: [],
-        weapons: ["torpedo_np_t0"],
+        weapons: ["torpedo_np_t01"],
         weaponCount: [4],
         rld: ["11.60s"],
         linkTab: 0,
@@ -143,6 +144,6 @@ equipDetails["Torpedo Bomber"] = {
         linkTab: 0,
         desc: [],
         code: "a/a1/28220",
-        box: "yellow"
+        box: "yellow"   
     },
 };
