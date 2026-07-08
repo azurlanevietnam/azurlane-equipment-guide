@@ -34,6 +34,20 @@ equipDetails["Dive Bomber"] = {
         code: "7/7e/19300",
         box: "rainbow"
     },
+    "su-6": {
+        name: "Prototype Carrier-Based Su-6",
+        tier: "N/A",
+        source: ["Gear Lab"],
+        stats: ["AVI +45"],
+        cannons: [],
+        weapons: ["bomb_skip_su_6"],
+        weaponCount: [2],
+        rld: ["11.80s"],
+        linkTab: 0,
+        desc: [],
+        code: "e/e5/85660",
+        box: "yellow"
+    },
     "ln-401": {
         name: "Loire-Neuport LN.401",
         tier: "N/A",
