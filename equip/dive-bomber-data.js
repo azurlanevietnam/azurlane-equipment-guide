@@ -34,6 +34,20 @@ equipDetails["Dive Bomber"] = {
         code: "7/7e/19300",
         box: "rainbow"
     },
+    "ta-152c-1r14": {
+        name: "Prototype Carrier-Based Ta 152C-1/R14",
+        tier: "N/A",
+        source: ["PR9 Research"],
+        stats: ["AVI +65"],
+        cannons: [],
+        weapons: ["bomb_skip_ta_152c"],
+        weaponCount: [3],
+        rld: ["12.20s"],
+        linkTab: 0,
+        desc: [],
+        linkEx: "https://cdn.imgchest.com/files/a02cd5c43eb2.png",
+        box: "rainbow"
+    },
     "su-6": {
         name: "Prototype Carrier-Based Su-6",
         tier: "N/A",

@@ -1,6 +1,7 @@
 window.aircraftBombs = {
     "bomb_skip_t0": { name: "Bomb (Skip) T0", dmg: ["200->236"], mod: "80% / 85% / 100%", spread: "0x0", splash: "8", hitchance: "100%" },
     "bomb_skip_su_6": { name: "Bomb (Skip) Su-6", dmg: ["354->418"], mod: "80% / 100% / 130%", spread: "0x0", splash: "8", hitchance: "100%" },
+    "bomb_skip_ta_152c": { name: "Bomb (Skip) Ta 152C", dmg: ["325->384"], mod: "80% / 100% / 130%", spread: "0x0", splash: "10", hitchance: "100%" },
     
     "bomb_100lb_t1": { name: "100lb Bomb T1", dmg: ["144->170"], mod: "80% / 85% / 100%", spread: "33x33", splash: "16", hitchance: "46.2%" },
     "bomb_100lb_t2": { name: "100lb Bomb T2", dmg: ["159->188"], mod: "80% / 85% / 100%", spread: "33x33", splash: "16", hitchance: "46.2%" },
