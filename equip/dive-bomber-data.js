@@ -35,17 +35,17 @@ equipDetails["Dive Bomber"] = {
         box: "rainbow"
     },
     "ta-152c-1r14": {
-        name: "Prototype Carrier-Based Ta 152C-1/R14",
-        tier: "N/A",
+        name: "Focke-Wulf Ta 152 C-1/R14 (Carrier-based Prototype)",
+        tier: "S+",
         source: ["PR9 Research"],
         stats: ["AVI +65"],
         cannons: [],
-        weapons: ["bomb_skip_ta_152c"],
+        weapons: ["bomb_skip_ta_152"],
         weaponCount: [3],
         rld: ["12.20s"],
         linkTab: 0,
         desc: [],
-        linkEx: "https://cdn.imgchest.com/files/a02cd5c43eb2.png",
+        code: "4/49/49080",
         box: "rainbow"
     },
     "su-6": {
@@ -74,6 +74,34 @@ equipDetails["Dive Bomber"] = {
         linkTab: 0,
         desc: [],
         code: "1/1f/51340",
+        box: "yellow"
+    },
+    "f4u-vbf94": {
+        name: "F4U (VBF-94 Squadron)",
+        tier: "N/A",
+        source: ["A Note Through the Firmament Event Shop"],
+        stats: ["AVI +45"],
+        cannons: ["6x12_7_mg_t0"],
+        weapons: ["bomb_1000lb_vbf_94"],
+        weaponCount: [2],
+        rld: ["9.80s"],
+        linkTab: 0,
+        desc: ["Bom có 24% tỉ lệ gây Armour Break lên BB/BBV"],
+        code: "0/0d/17280",
+        box: "yellow"
+    },
+    "susei-m12a": {
+        name: "Yokosuka Suisei Model 12A",
+        tier: "N/A",
+        source: ["Gear Lab"],
+        stats: ["AVI +45"],
+        cannons: ["2x7_7_mg_t3"],
+        weapons: ["bomb_1000lb_suisei", "bomb_100lb_t0"],
+        weaponCount: [1, 2],
+        rld: ["9.98s"],
+        linkTab: 0,
+        desc: [],
+        code: "a/a3/39160",
         box: "yellow"
     },
 };

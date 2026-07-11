@@ -45,7 +45,7 @@ function calculatePlaneDamage(planeId, armorTypeIndex) {
     });
 
     if (plane.box === "rainbow") {
-        totalDamage += (1065 / 1045 * 760 - 760) * 3;
+        totalDamage += (1057 / 1037 * 840 - 840) * 3;
     }
     return Math.round(totalDamage); 
 }
