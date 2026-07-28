@@ -2,7 +2,8 @@ const navLinks = [
     { name: "HEALER LIST", url: "index.html" },
     { name: "EQUIPMENT LIST", url: "equip.html" },
     { name: "AA CALCULATOR", url: "aa-caculate.html" },
-    { name: "PLANE DMG BURST TIERLIST", url: "planedmg.html" }
+    { name: "PLANE DMG BURST TIERLIST", url: "planedmg.html" },
+    { name: "FLEET BUILDER", url: "fleet-builder.html" }
 ];
 
 document.addEventListener("DOMContentLoaded", () => {
