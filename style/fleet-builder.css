@@ -1,0 +1,7 @@
+#fleet-builder-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    width: 100%;
+    min-height: 50vh;
+}
