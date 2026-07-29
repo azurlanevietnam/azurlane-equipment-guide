@@ -20,12 +20,27 @@
 
     <div class="container">
         <h1 class="main-title">FLEET BUILDER</h1>
-        <div id="fleet-builder-container">
+        
+        <!-- Vùng chứa 3 Box Đội hình -->
+        <div id="fleet-builder-container" class="fleet-box-wrapper"></div>
+    </div>
+
+    <!-- Popup (Modal) Chọn Tàu -->
+    <div id="shipSelectionModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>CHỌN TÀU</h2>
+                <span class="close-modal-btn" onclick="closeShipModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="shipModalGrid">
+                <!-- Danh sách icon tàu sẽ được JS đổ vào đây -->
+            </div>
         </div>
     </div>
 
     <script src="nav-mesh.js"></script>
-    <script src="fleet-builder-script.js"></script>
+    
+    <!-- Chỉ cần gọi file Data Loader, nó sẽ tự động nạp các file còn lại -->
+    <script src="fleet-builder/fleet-builder-data.js"></script>
 </body>
-
 </html>
