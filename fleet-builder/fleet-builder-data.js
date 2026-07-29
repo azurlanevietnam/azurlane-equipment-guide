@@ -1,25 +1,26 @@
-// Khởi tạo Object gốc để chứa toàn bộ dữ liệu tàu
-window.shipDetails = {};
-
-// Danh sách các file dữ liệu tàu nằm trong thư mục 'ship/'
-const shipDataFiles = [
-    'aircraft-carrier-data.js',
-    // Sau này bạn có thể thêm:
-    // 'battleship-data.js',
-    // 'cruiser-data.js',
-    // 'destroyer-data.js'
+// Danh sách các file cần load theo đúng thứ tự logic với đường dẫn thư mục chuẩn xác
+const fleetDataFiles = [
+    // 1. TẢI TỪ ĐIỂN VÀ TOÀN BỘ KHỞI TẠO TỪ THƯ MỤC "equip"
+    'equip/equip-data.js',
+    
+    // 2. TẢI DỮ LIỆU TỪNG LOẠI TÀU TỪ THƯ MỤC "ship"
+    'ship/aircraft-carrier-data.js',
+    // Sau này bạn có thể bỏ comment để thêm các loại tàu khác:
+    // 'ship/battleship-data.js',
+    // 'ship/cruiser-data.js',
+    // 'ship/destroyer-data.js',
+    
+    // 3. TẢI SCRIPT XỬ LÝ GIAO DIỆN TỪ THƯ MỤC "fleet-builder" CUỐI CÙNG
+    'fleet-builder/fleet-builder-script.js'
 ];
 
-// 1. Nạp toàn bộ dữ liệu tàu
-shipDataFiles.forEach(fileName => {
+// Tiến hành nạp toàn bộ dữ liệu và script tuần tự
+fleetDataFiles.forEach(fileName => {
     let script = document.createElement('script');
-    script.src = 'ship/' + fileName;
-    script.async = false; // Nạp tuần tự để đảm bảo thứ tự dữ liệu
+    script.src = fileName; 
+    
+    // Thuộc tính async = false ép trình duyệt load đúng thứ tự trong mảng, tránh bị lỗi mất liên kết dữ liệu
+    script.async = false; 
+    
     document.head.appendChild(script);
 });
-
-// 2. Nạp script xử lý giao diện của Fleet Builder sau khi data đã load
-let script = document.createElement('script');
-script.src = 'fleet-builder/fleet-builder-script.js';
-script.async = false;
-document.head.appendChild(script);

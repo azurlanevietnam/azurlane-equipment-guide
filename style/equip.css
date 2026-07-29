@@ -525,3 +525,37 @@
 .row-card-equip.plane-layout .col-rld > div {
     transform: translateX(0);
 }
+
+/* ========================================================
+   AUXILIARY & AUGMENTATION LAYOUT
+======================================================== */
+.row-card-equip.aux-layout {
+    /* Chia làm 5 cột: Info (180px) | Tier (100px) | Source (160px) | Stat (140px) | Desc (1fr - tự co giãn) */
+    grid-template-columns: 180px 100px 160px 140px 1fr;
+    align-items: stretch;
+}
+
+/* Biến cột Desc thành lưới 2 hàng (tiêu đề và nội dung) giống hệt các cột khác */
+.row-card-equip.aux-layout .col-desc {
+    display: grid;
+    grid-template-rows: 35px 1fr;
+    gap: 0;
+    padding: 0;
+    padding-left: 20px; /* Tạo khoảng trống để chữ không dính sát vào vạch kẻ */
+    border-left: 1px solid #eee; /* Thêm vạch kẻ phân cách với cột Stat */
+}
+
+/* Định dạng cho tiêu đề "HIỆU ỨNG TRANG BỊ" nằm trên cùng */
+.row-card-equip.aux-layout .col-desc .label-style {
+    align-self: end;
+    justify-self: center; /* Căn giữa tiêu đề giống các cột khác */
+    padding-bottom: 8px;
+    margin: 0;
+}
+
+/* Định dạng cho phần chữ nội dung hiệu ứng bên dưới */
+.row-card-equip.aux-layout .col-desc > div:not(.label-style) {
+    align-self: center; /* Căn giữa nội dung theo chiều dọc */
+    text-align: justify;
+    padding-right: 10px;
+}

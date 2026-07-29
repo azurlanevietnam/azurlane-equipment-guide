@@ -1,38 +1,55 @@
 equipData["Auxiliary"] = {
-
+    subCategories: [
+        { id: "aux-ultility", name: "Đa dụng" }
+    ],
+    tierlists: {}
 };
 
 equipDetails["Auxiliary"] = {
-    "single-152-p1892": {
-        name: "Single 152mm (6\"/45 Pattern 1892)",
-        tier: "EX",
-        source: ["3-2 Drop", "Gear Lab"],
-        stats: ["FP +12"],
-        ammoType: "Normal",
-        ammoMod: "100% / 75% / 40%",
-        rld: ["2.43s", "Volley Time: 0.40s"],
-        dmg: ["1", "100"],
-        range: "50",
-        coef: 1.00,
+    "frontier_medal": {
+        name: "Frontier Medal",
+        tier: "N/A",
+        source: ["Collection Reward"],
+        stats: ["AVI +118", "HP + 72"],
+        equipable: ["CV", "CVL"],
+        linkTab: 0,
+        desc: ["Trong chế độ Exercise (PvP), khi được trang bị trên flagship: Tăng 10% sát thương gây ra của CV/CVL hai phe & giảm 10%  sát thương gây ra của BB/BC hai phe."],
+        code: "2/22/820",
+        box: "yellow"
+    },
+    "steam_catapult": {
+        name: "Steam Catapult",
+        tier: "N/A",
+        source: ["T4/T5 Tech Box"],
+        stats: ["AVI +118", "HP + 90"],
+        equipable: ["CV", "CVL", "BBV"],
         linkTab: 3,
         desc: [""],
-        code: "c/c0/7000",
-        box: "blue"
+        code: "9/96/1400",
+        box: "yellow"
     },
-    "quad-152": {
-        name: "Prototype Quadruple 152mm Main Gun Mount",
-        tier: "SS-",
-        source: ["PR5 Research", "Gear Lab", "Prototype Shop"],
-        stats: ["FP +65"],
-        ammoType: "AP+",
-        ammoMod: "110% / 90% / 70%",
-        rld: ["3.10s", "Volley Time: 0.00s"],
-        dmg: ["1", "100"],
-        range: "50",
-        coef: 1.00,
+    "homing_beacon": {
+        name: "Homing Beacon",
+        tier: "N/A",
+        source: ["Core Data Shop"],
+        stats: ["AVI +65"],
+        equipable: ["CV", "CVL", "BBV"],
+        limit: 1,
         linkTab: 0,
-        desc: [""],
-        code: "3/37/22280",
-        box: "rainbow"
-    }
+        desc: ["Giảm 4% thời gian reload không kích."],
+        code: "2/24/680",
+        box: "purple"
+    },
+    "aviation_manjuu": {
+        name: "Elite Aviation Maintenance Manjuu",
+        tier: "N/A",
+        source: ["Core Data Shop"],
+        stats: ["AVI +65"],
+        equipable: ["CV", "CVL", "BBV"],
+        limit: 1,
+        linkTab: 0,
+        desc: ["Tăng 4% sát thương không kích, nhưng đồng thời tăng 4% thời gian reload không kích."],
+        code: "c/c9/3940",
+        box: "purple"
+    },
 };

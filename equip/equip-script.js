@@ -245,6 +245,8 @@ function renderDetailsView(equipList) {
         // ==========================================
         let isPlane = ["Fighter", "Dive Bomber", "Torpedo Bomber", "Seaplane"].includes(currentMainTab);
 
+        let isAuxOrAug = ["Auxiliary", "Augmentation"].includes(currentMainTab);
+
         let labelColCannon = "";
         let labelCol5 = "Loại đạn";
         let labelCol6 = "Reload";
@@ -441,6 +443,8 @@ function renderDetailsView(equipList) {
 
         let rowClass = isPlane ? "row-card-equip plane-layout" : "row-card-equip";
 
+        if (isAuxOrAug) rowClass = "row-card-equip aux-layout";
+
         finalHTML += `
         <div class="${rowClass}">
             <div class="col-equip-info">
@@ -469,6 +473,7 @@ function renderDetailsView(equipList) {
             </div>
             ` : ""}
             
+            ${!isAuxOrAug ? `
             <div class="col-ammo">
                 <div class="label-style">${labelCol5}</div>
                 <div class="ammo-container">
@@ -479,14 +484,19 @@ function renderDetailsView(equipList) {
                 <div class="label-style">${labelCol6}</div>
                 ${contentCol6}
             </div>
-            ${!isPlane ? `
+            ` : ""}
+            
+            ${(!isPlane && !isAuxOrAug) ? `
             <div class="col-range">
                 <div class="label-style">${labelCol7}</div>
                 ${contentCol7}
             </div>
             ` : ""}
             
-            <div class="col-desc">${descHTML}</div>
+            <div class="col-desc">
+                ${isAuxOrAug ? `<div class="label-style">Hiệu ứng trang bị</div>` : ""}
+                ${descHTML}
+            </div>
         </div>
         `;
     });
