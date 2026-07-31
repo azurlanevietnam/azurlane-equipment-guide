@@ -10,20 +10,19 @@ let selectingEquipSlotIndex = -1; // Vị trí ô trang bị (0 - 5)
 
 function initFleetBuilder() {
     injectEquipModal(); // Tự động tạo popup chọn trang bị vào DOM
+    injectConfirmModal(); // Tự động tạo popup xác nhận reset
     injectResetButton(); // Tự động tạo nút Reset vào bên dưới
     
-    // Đảm bảo đợi dữ liệu trang bị và tàu load xong rồi mới render để hiển thị chính xác trang bị từ cache
     waitForDataAndRender();
 }
 
 function waitForDataAndRender() {
     const checkDataReady = setInterval(() => {
-        // Kiểm tra xem hệ thống đã load xong window.shipDetails và window.equipDetails chưa
         if (window.shipDetails && window.equipDetails && Object.keys(window.equipDetails).length > 0) {
             clearInterval(checkDataReady);
             renderFleet();
         }
-    }, 50); // Kiểm tra mỗi 50ms
+    }, 50);
 }
 
 // ==========================================
@@ -37,51 +36,128 @@ function saveFleetState() {
     }
 }
 
+// Lấy thông số mặc định của TÀU
+function getDefaultShipSettings() {
+    try {
+        const savedDefault = localStorage.getItem('azur_lane_ship_defaults');
+        if (savedDefault) return JSON.parse(savedDefault);
+    } catch (e) {}
+    return { level: 1, affinity: 'Stranger' };
+}
+
+function saveDefaultShipSettings(level, affinity) {
+    try {
+        localStorage.setItem('azur_lane_ship_defaults', JSON.stringify({ level, affinity }));
+    } catch (e) {}
+}
+
+// Lấy thông số mặc định ENHANCE LEVEL của TRANG BỊ (Mặc định gốc: +0)
+function getDefaultEquipEnhance() {
+    try {
+        const savedDefault = localStorage.getItem('azur_lane_equip_default_enhance');
+        if (savedDefault !== null) return parseInt(savedDefault, 10);
+    } catch (e) {}
+    return 0;
+}
+
+function saveDefaultEquipEnhance(enhanceLevel) {
+    try {
+        localStorage.setItem('azur_lane_equip_default_enhance', enhanceLevel.toString());
+    } catch (e) {}
+}
+
 function loadFleetState() {
+    const defaultShipSettings = getDefaultShipSettings();
     try {
         const saved = localStorage.getItem('azur_lane_fleet_state');
         if (saved) {
-            return JSON.parse(saved);
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed) && parsed.length === 3) {
+                return parsed.map(slot => ({
+                    shipId: slot.shipId || null,
+                    level: slot.level !== undefined ? slot.level : defaultShipSettings.level,
+                    affinity: slot.affinity || defaultShipSettings.affinity,
+                    equips: Array.isArray(slot.equips) ? slot.equips.map(eq => {
+                        if (!eq) return null;
+                        return {
+                            id: eq.id,
+                            category: eq.category,
+                            enhance: eq.enhance !== undefined ? eq.enhance : 0
+                        };
+                    }) : [null, null, null, null, null, null]
+                }));
+            }
         }
     } catch (e) {
         console.error("Không thể đọc cache đội hình:", e);
     }
-    // Mặc định ban đầu nếu chưa có dữ liệu
+    
     return [
-        { shipId: null, equips: [null, null, null, null, null, null] },
-        { shipId: null, equips: [null, null, null, null, null, null] },
-        { shipId: null, equips: [null, null, null, null, null, null] }
+        { shipId: null, level: defaultShipSettings.level, affinity: defaultShipSettings.affinity, equips: [null, null, null, null, null, null] },
+        { shipId: null, level: defaultShipSettings.level, affinity: defaultShipSettings.affinity, equips: [null, null, null, null, null, null] },
+        { shipId: null, level: defaultShipSettings.level, affinity: defaultShipSettings.affinity, equips: [null, null, null, null, null, null] }
     ];
 }
 
-function resetFleetState() {
-    if (confirm("Bạn có chắc chắn muốn xóa toàn bộ đội hình và trang bị đã chọn không?")) {
-        fleetState = [
-            { shipId: null, equips: [null, null, null, null, null, null] },
-            { shipId: null, equips: [null, null, null, null, null, null] },
-            { shipId: null, equips: [null, null, null, null, null, null] }
-        ];
-        saveFleetState();
-        renderFleet();
+// ==========================================
+// POPUP XÁC NHẬN RESET ĐỘI HÌNH
+// ==========================================
+function injectConfirmModal() {
+    if (!document.getElementById('confirmResetModal')) {
+        const confirmModalHtml = `
+        <div id="confirmResetModal" class="modal-overlay" style="display:none;">
+            <div class="modal-content reset-modal-content">
+                <div class="modal-header">
+                    <h2>XÁC NHẬN RESET</h2>
+                    <span class="close-modal-btn" onclick="closeConfirmModal()">×</span>
+                </div>
+                <div class="modal-body reset-modal-body">
+                    <p>Bạn có chắc chắn muốn xóa toàn bộ đội hình, trang bị và đưa thiết lập mặc định về ban đầu không?</p>
+                    <div class="reset-modal-actions">
+                        <button class="reset-confirm-btn" onclick="executeResetFleet()">Đồng ý</button>
+                        <button class="reset-cancel-btn" onclick="closeConfirmModal()">Hủy</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', confirmModalHtml);
     }
 }
 
-// Tự động chèn nút Reset xuống dưới khung đội hình nếu chưa có
+function openConfirmModal() {
+    const modal = document.getElementById('confirmResetModal');
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeConfirmModal() {
+    const modal = document.getElementById('confirmResetModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function executeResetFleet() {
+    saveDefaultShipSettings(1, 'Stranger');
+    saveDefaultEquipEnhance(0);
+
+    fleetState = [
+        { shipId: null, level: 1, affinity: 'Stranger', equips: [null, null, null, null, null, null] },
+        { shipId: null, level: 1, affinity: 'Stranger', equips: [null, null, null, null, null, null] },
+        { shipId: null, level: 1, affinity: 'Stranger', equips: [null, null, null, null, null, null] }
+    ];
+
+    saveFleetState();
+    renderFleet();
+    closeConfirmModal();
+}
+
 function injectResetButton() {
     if (!document.getElementById('fleetResetBtn')) {
         const resetBtnHtml = `
         <div style="display: flex; justify-content: center; margin-top: 15px;">
-            <button id="fleetResetBtn" onclick="resetFleetState()" style="
-                background-color: #e74c3c;
-                color: white;
-                border: none;
-                padding: 10px 20px;
-                font-size: 14px;
-                font-weight: bold;
-                letter-spacing: 1px;
-                cursor: pointer;
-                border-radius: 4px;
-                transition: background 0.2s;
+            <button id="fleetResetBtn" onclick="openConfirmModal()" style="
+                background-color: #e74c3c; color: white; border: none; padding: 10px 20px;
+                font-size: 14px; font-weight: bold; letter-spacing: 1px; cursor: pointer;
+                border-radius: 4px; transition: background 0.2s;
             " onmouseover="this.style.backgroundColor='#c0392b'" onmouseout="this.style.backgroundColor='#e74c3c'">
                 RESET ĐỘI HÌNH
             </button>
@@ -93,7 +169,6 @@ function injectResetButton() {
     }
 }
 
-// Tìm loại tàu (VD: "CV") và Dữ liệu tàu dựa vào shipId
 function getShipTypeAndData(shipId) {
     if (!window.shipDetails) return null;
     for (let type in window.shipDetails) {
@@ -104,13 +179,36 @@ function getShipTypeAndData(shipId) {
     return null;
 }
 
-// Xây dựng URL hình ảnh dựa vào ID tàu
 function getShipIconUrl(shipId, shipData) {
     if (shipId.endsWith('_kai')) {
         return `https://cdn.nagami.moe/squareicon/${shipData.code}.png`;
     } else {
         const formattedName = shipData.name.replace(/ /g, '_');
         return `https://azurlane.netojuu.com/images/${shipData.code}/${formattedName}Icon.png`;
+    }
+}
+
+function getAffinityDisplay(affinityKey) {
+    switch (affinityKey) {
+        case 'Stranger': return '50♥';
+        case 'Friendly': return '61♥';
+        case 'Crush':    return '81♥';
+        case 'Love':     return '100♥';
+        case 'Oath':     return '100💍';
+        case 'Oath200':  return '200💍';
+        default:         return '50♥';
+    }
+}
+
+// Giới hạn Enhance tối đa theo màu phẩm chất (Box)
+function getMaxEnhanceByBox(boxColor) {
+    switch (boxColor) {
+        case 'rainbow':
+        case 'yellow': return 13;
+        case 'purple':  return 11;
+        case 'blue':    return 7;
+        case 'grey':    return 3;
+        default:        return 13;
     }
 }
 
@@ -124,11 +222,16 @@ function renderFleet() {
         let shipInfo = slot.shipId ? getShipTypeAndData(slot.shipId) : null;
         let shipHtml = "";
         
-        // 1. Box Đầu (Tàu)
+        // 1. Box Tàu
         if (shipInfo) {
             let iconUrl = getShipIconUrl(slot.shipId, shipInfo.data);
             let boxClass = shipInfo.data.box ? `box-${shipInfo.data.box}` : "box-grey";
+            let affText = getAffinityDisplay(slot.affinity || 'Stranger');
+            let shipLevel = slot.level !== undefined ? slot.level : 1;
+
             shipHtml = `<div class="square-slot ship-slot ${boxClass}" onclick="openShipModal(${index})">
+                            <span class="ship-badge-level">Lv.${shipLevel}</span>
+                            <span class="ship-badge-affinity">${affText}</span>
                             <img src="${iconUrl}" class="slot-image" alt="${shipInfo.data.name}">
                         </div>`;
         } else {
@@ -143,19 +246,19 @@ function renderFleet() {
             let isShipSelected = slot.shipId !== null;
             let eqSave = slot.equips[i];
             
-            // Nếu slot đã có trang bị được chọn
             if (isShipSelected && eqSave && eqSave.id && window.equipDetails[eqSave.category] && window.equipDetails[eqSave.category][eqSave.id]) {
                 let eqData = window.equipDetails[eqSave.category][eqSave.id];
                 let boxClass = eqData.box ? `box-${eqData.box}` : "box-grey";
                 let iconUrl = `https://azurlane.netojuu.com/images/${eqData.code}.png`;
+                let enhanceVal = eqSave.enhance !== undefined ? eqSave.enhance : 0;
                 
                 equipsHtml += `
                     <div class="square-slot equip-slot ${boxClass}" onclick="openEquipModal(${index}, ${i})">
+                        <span class="equip-badge-enhance">+${enhanceVal}</span>
                         <img src="${iconUrl}" class="slot-image">
                     </div>
                 `;
             } else {
-                // Trạng thái trống hoặc disabled
                 let equipClass = isShipSelected ? "box-grey" : "disabled"; 
                 let onClickEvent = isShipSelected ? `onclick="openEquipModal(${index}, ${i})"` : "";
 
@@ -179,6 +282,39 @@ function renderFleet() {
 function openShipModal(slotIndex) {
     selectingSlotIndex = slotIndex;
     
+    const defaultSettings = getDefaultShipSettings();
+    let currentSlot = fleetState[slotIndex];
+
+    let curLevel = defaultSettings.level;
+    let curAffinity = defaultSettings.affinity;
+
+    currentSlot.level = curLevel;
+    currentSlot.affinity = curAffinity;
+
+    let controlsHtml = `
+        <div class="ship-modal-controls">
+            <!-- 1. Hàng Affinity -->
+            <div class="control-group">
+                <label>Affinity:</label>
+                <div class="affinity-btn-group">
+                    <button type="button" class="aff-btn ${curAffinity === 'Stranger' ? 'active' : ''}" onclick="selectAffinity('Stranger', event)">Stranger</button>
+                    <button type="button" class="aff-btn ${curAffinity === 'Friendly' ? 'active' : ''}" onclick="selectAffinity('Friendly', event)">Friendly</button>
+                    <button type="button" class="aff-btn ${curAffinity === 'Crush' ? 'active' : ''}" onclick="selectAffinity('Crush', event)">Crush</button>
+                    <button type="button" class="aff-btn ${curAffinity === 'Love' ? 'active' : ''}" onclick="selectAffinity('Love', event)">Love</button>
+                    <button type="button" class="aff-btn ${curAffinity === 'Oath' ? 'active' : ''}" onclick="selectAffinity('Oath', event)">Oath</button>
+                    <button type="button" class="aff-btn ${curAffinity === 'Oath200' ? 'active' : ''}" onclick="selectAffinity('Oath200', event)">Oath (200)</button>
+                </div>
+            </div>
+            <!-- 2. Hàng Level + Nút Đặt làm mặc định -->
+            <div class="control-group">
+                <label>Level:</label>
+                <input type="number" id="shipLevelInput" min="1" max="125" value="${curLevel}" onchange="handleLevelInputChange(this.value)">
+                <input type="range" id="shipLevelRange" min="1" max="125" value="${curLevel}" oninput="handleLevelRangeChange(this.value)">
+                <button type="button" class="set-default-btn" onclick="handleSetDefaultSettings()">Đặt làm mặc định</button>
+            </div>
+        </div>
+    `;
+
     let gridHtml = `
         <div class="ship-item-wrapper" onmouseleave="handleItemLeave(this)">
             <div class="modal-ship-icon box-grey" onclick="selectShip(null)" style="display:flex; justify-content:center; align-items:center;"
@@ -214,18 +350,76 @@ function openShipModal(slotIndex) {
         }
     }
     
-    shipModalGrid.innerHTML = gridHtml;
+    shipModalGrid.innerHTML = controlsHtml + `<div class="ship-grid-list">${gridHtml}</div>`;
     shipModal.style.display = "flex";
+}
+
+function handleLevelRangeChange(val) {
+    let num = parseInt(val, 10);
+    document.getElementById('shipLevelInput').value = num;
+    if (selectingSlotIndex !== -1) {
+        fleetState[selectingSlotIndex].level = num;
+        saveFleetState();
+        renderFleet();
+    }
+}
+
+function handleLevelInputChange(val) {
+    let inputEl = document.getElementById('shipLevelInput');
+    let rangeEl = document.getElementById('shipLevelRange');
+    let num = parseInt(val, 10);
+
+    if (isNaN(num)) {
+        inputEl.value = fleetState[selectingSlotIndex].level;
+        return;
+    }
+
+    if (num < 1) num = 1;
+    if (num > 125) num = 125;
+
+    inputEl.value = num;
+    rangeEl.value = num;
+
+    if (selectingSlotIndex !== -1) {
+        fleetState[selectingSlotIndex].level = num;
+        saveFleetState();
+        renderFleet();
+    }
+}
+
+function selectAffinity(affKey, evt) {
+    if (selectingSlotIndex !== -1) {
+        fleetState[selectingSlotIndex].affinity = affKey;
+        saveFleetState();
+        renderFleet();
+
+        const btns = document.querySelectorAll('.aff-btn');
+        btns.forEach(btn => btn.classList.remove('active'));
+        if (evt && evt.target) {
+            evt.target.classList.add('active');
+        }
+    }
+}
+
+function handleSetDefaultSettings() {
+    if (selectingSlotIndex !== -1) {
+        const curLevel = fleetState[selectingSlotIndex].level || 1;
+        const curAff = fleetState[selectingSlotIndex].affinity || 'Stranger';
+        
+        saveDefaultShipSettings(curLevel, curAff);
+        saveFleetState();
+        renderFleet();
+        closeShipModal();
+    }
 }
 
 function selectShip(shipId) {
     if (selectingSlotIndex !== -1) {
-        // Nếu chọn tàu mới hoặc bỏ chọn, reset toàn bộ trang bị của hàng đó
         if (fleetState[selectingSlotIndex].shipId !== shipId) {
             fleetState[selectingSlotIndex].shipId = shipId;
             fleetState[selectingSlotIndex].equips = [null, null, null, null, null, null];
         }
-        saveFleetState(); // Lưu vào cache
+        saveFleetState();
         renderFleet();
     }
     closeShipModal();
@@ -237,8 +431,10 @@ function closeShipModal() {
 }
 
 // ==========================================
-// ĐIỀU KHIỂN POPUP CHỌN TRANG BỊ
+// ĐIỀU KHIỂN POPUP CHỌN TRANG BỊ & ENHANCE
 // ==========================================
+let currentEquipEnhanceVal = 0; // Lưu tạm giá trị Enhance đang thao tác trong Modal Trang bị
+
 function injectEquipModal() {
     if (!document.getElementById('equipSelectionModal')) {
         const equipModalHtml = `
@@ -262,21 +458,38 @@ function openEquipModal(fleetIndex, slotIndex) {
     selectingEquipSlotIndex = slotIndex;
     
     let shipInfo = getShipTypeAndData(fleetState[fleetIndex].shipId);
-    if (!shipInfo) return; // Bảo vệ an toàn
+    if (!shipInfo) return;
 
-    // QUY TẮC PHÂN BỔ SLOT TRANG BỊ
     let allowedCategories = [];
     if (slotIndex === 5) {
         allowedCategories = ["Augmentation"];
     } else if (slotIndex === 3 || slotIndex === 4) {
         allowedCategories = ["Auxiliary"];
     } else {
-        // Cắt tối đa 3 mảng đầu tiên để áp dụng cho ô 0, 1, 2
         let mainSlots = shipInfo.data.equipSlot.slice(0, 3);
         allowedCategories = mainSlots[slotIndex] || [];
     }
 
-    // Lấy danh sách các ID trang bị có limit: 1 mà tàu này ĐÃ ĐƯỢC CHỌN ở các slot khác (trừ slot hiện tại đang mở)
+    // Đọc Enhance Level mặc định
+    let existingEquip = fleetState[fleetIndex].equips[slotIndex];
+    if (existingEquip && existingEquip.enhance !== undefined) {
+        currentEquipEnhanceVal = existingEquip.enhance;
+    } else {
+        currentEquipEnhanceVal = getDefaultEquipEnhance();
+    }
+
+    // Hàng điều khiển Enhance Level tương tự Level của Tàu
+    let controlsHtml = `
+        <div class="ship-modal-controls">
+            <div class="control-group">
+                <label>Enhance:</label>
+                <input type="number" id="equipEnhanceInput" min="0" max="13" value="${currentEquipEnhanceVal}" onchange="handleEquipEnhanceInputChange(this.value)">
+                <input type="range" id="equipEnhanceRange" min="0" max="13" value="${currentEquipEnhanceVal}" oninput="handleEquipEnhanceRangeChange(this.value)">
+                <button type="button" class="set-default-btn" onclick="handleSetDefaultEquipEnhance()">Đặt làm mặc định</button>
+            </div>
+        </div>
+    `;
+
     let currentEquips = fleetState[fleetIndex].equips;
     let limitedEquipsSelected = new Set();
     currentEquips.forEach((eq, idx) => {
@@ -288,7 +501,6 @@ function openEquipModal(fleetIndex, slotIndex) {
         }
     });
 
-    // HTML Nút Bỏ chọn trang bị
     let gridHtml = `
         <div class="ship-item-wrapper" onmouseleave="handleItemLeave(this)">
             <div class="modal-ship-icon box-grey" onclick="selectEquip(null, null)" style="display:flex; justify-content:center; align-items:center;"
@@ -301,15 +513,12 @@ function openEquipModal(fleetIndex, slotIndex) {
         </div>
     `;
 
-    // Lặp qua từng category được phép lắp ở slot này (Hỗ trợ 1 slot lắp nhiều loại đồ)
     allowedCategories.forEach(category => {
         if (window.equipDetails && window.equipDetails[category]) {
             for (let eqId in window.equipDetails[category]) {
                 let eqData = window.equipDetails[category][eqId];
                 
-                // BỘ LỌC DÀNH CHO AUXILIARY VÀ AUGMENTATION
                 if (category === "Auxiliary" || category === "Augmentation") {
-                    // Nếu item có mảng equipable nhưng không chứa loại tàu hiện tại (VD: "CV") -> Bỏ qua
                     if (eqData.equipable && !eqData.equipable.includes(shipInfo.type)) {
                         continue; 
                     }
@@ -319,12 +528,10 @@ function openEquipModal(fleetIndex, slotIndex) {
                 let iconUrl = `https://azurlane.netojuu.com/images/${eqData.code}.png`;
                 let boxClass = eqData.box ? `box-${eqData.box}` : "box-grey";
 
-                // Kiểm tra xem trang bị này có bị giới hạn (limit: 1) và đã được chọn trước đó chưa
                 let isLimitedAndSelected = limitedEquipsSelected.has(eqId);
                 let itemClass = isLimitedAndSelected ? "modal-ship-icon equip-disabled" : `modal-ship-icon ${boxClass}`;
                 let clickAction = isLimitedAndSelected ? "" : `onclick="selectEquip('${eqId}', '${category}')"`;
 
-                // Sử dụng lại class hiển thị của Ship để đảm bảo đồng bộ 100% UI
                 gridHtml += `
                     <div class="ship-item-wrapper" onmouseleave="handleItemLeave(this)">
                         <div class="${itemClass}" title="${safeName}" ${clickAction}
@@ -340,20 +547,76 @@ function openEquipModal(fleetIndex, slotIndex) {
         }
     });
 
-    document.getElementById('equipModalGrid').innerHTML = gridHtml;
+    document.getElementById('equipModalGrid').innerHTML = controlsHtml + `<div class="ship-grid-list">${gridHtml}</div>`;
     document.getElementById('equipSelectionModal').style.display = "flex";
+}
+
+// Xử lý kéo thanh Range Enhance
+function handleEquipEnhanceRangeChange(val) {
+    currentEquipEnhanceVal = parseInt(val, 10);
+    document.getElementById('equipEnhanceInput').value = currentEquipEnhanceVal;
+}
+
+// Xử lý nhập Input Enhance (Giới hạn [0, 13])
+function handleEquipEnhanceInputChange(val) {
+    let inputEl = document.getElementById('equipEnhanceInput');
+    let rangeEl = document.getElementById('equipEnhanceRange');
+    let num = parseInt(val, 10);
+
+    if (isNaN(num)) {
+        inputEl.value = currentEquipEnhanceVal;
+        return;
+    }
+
+    if (num < 0) num = 0;
+    if (num > 13) num = 13;
+
+    currentEquipEnhanceVal = num;
+    inputEl.value = num;
+    rangeEl.value = num;
+}
+
+// Bấm "Đặt làm mặc định" cho Trang bị
+function handleSetDefaultEquipEnhance() {
+    // 1. Lưu giá trị Enhance làm mặc định mới hệ thống
+    saveDefaultEquipEnhance(currentEquipEnhanceVal);
+
+    // 2. Nếu tại ô đang mở đã có sẵn trang bị, cập nhật ngay chỉ số Enhance mới cho trang bị đó
+    if (selectingSlotIndex !== -1 && selectingEquipSlotIndex !== -1) {
+        let currentEq = fleetState[selectingSlotIndex].equips[selectingEquipSlotIndex];
+        if (currentEq && currentEq.id) {
+            let eqData = window.equipDetails[currentEq.category] && window.equipDetails[currentEq.category][currentEq.id];
+            let maxEnhance = eqData ? getMaxEnhanceByBox(eqData.box) : 13;
+
+            // Ép về mốc tối đa cho phép theo phẩm chất màu của trang bị đó
+            currentEq.enhance = Math.min(currentEquipEnhanceVal, maxEnhance);
+            saveFleetState();
+            renderFleet();
+        }
+    }
+
+    closeEquipModal();
 }
 
 function selectEquip(eqId, category) {
     if (selectingSlotIndex !== -1 && selectingEquipSlotIndex !== -1) {
         if (eqId && category) {
-            fleetState[selectingSlotIndex].equips[selectingEquipSlotIndex] = { id: eqId, category: category };
+            let eqData = window.equipDetails[category] && window.equipDetails[category][eqId];
+            let maxEnhance = eqData ? getMaxEnhanceByBox(eqData.box) : 13;
+            
+            // Tự động ép về mốc giới hạn gần nhất dựa trên màu phẩm chất
+            let finalEnhance = Math.min(currentEquipEnhanceVal, maxEnhance);
+
+            fleetState[selectingSlotIndex].equips[selectingEquipSlotIndex] = { 
+                id: eqId, 
+                category: category,
+                enhance: finalEnhance
+            };
         } else {
-            // Trường hợp bấm Bỏ chọn
             fleetState[selectingSlotIndex].equips[selectingEquipSlotIndex] = null;
         }
-        saveFleetState(); // Lưu vào cache
-        renderFleet();    // Cập nhật và hiển thị giao diện ngay lập tức
+        saveFleetState();
+        renderFleet();
     }
     closeEquipModal();
 }
@@ -368,7 +631,6 @@ function closeEquipModal() {
 // CÁC HIỆU ỨNG VÀ EVENT CHUNG
 // ==========================================
 
-// Xử lý khi hover vào Icon: Kích hoạt phóng to, tính toán né viền màn hình và ngắt chữ chạy
 function handleIconHover(iconEl, isHover) {
     const wrapper = iconEl.closest('.ship-item-wrapper');
     const nameBox = wrapper.querySelector('.ship-name-box');
@@ -400,7 +662,6 @@ function handleIconHover(iconEl, isHover) {
     }
 }
 
-// Xử lý khi hover vào Box Tên: Kích hoạt phóng to, chống tràn và chạy chữ với tốc độ đều đặn
 function handleNameHover(nameBoxEl, isHover) {
     const wrapper = nameBoxEl.closest('.ship-item-wrapper');
     const textEl = wrapper.querySelector('.ship-name-text');
@@ -432,7 +693,6 @@ function handleNameHover(nameBoxEl, isHover) {
     }
 }
 
-// Xử lý khi chuột rời khỏi toàn bộ thẻ bọc ngoài (Wrapper)
 function handleItemLeave(wrapper) {
     const nameBox = wrapper.querySelector('.ship-name-box');
     const textEl = wrapper.querySelector('.ship-name-text');
@@ -446,12 +706,13 @@ function handleItemLeave(wrapper) {
     nameBox.style.removeProperty('--shift-x');
 }
 
-// Bấm ra ngoài khoảng đen để tắt Modal
 window.onclick = function(event) {
     if (event.target === shipModal) closeShipModal();
-    
     let eqModal = document.getElementById('equipSelectionModal');
     if (eqModal && event.target === eqModal) closeEquipModal();
+
+    let confirmModal = document.getElementById('confirmResetModal');
+    if (confirmModal && event.target === confirmModal) closeConfirmModal();
 };
 
 if (document.readyState === 'loading') {

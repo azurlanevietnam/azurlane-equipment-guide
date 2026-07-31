@@ -311,3 +311,246 @@
     transform: none !important;
     box-shadow: none !important;
 }
+
+/* ========================================================
+   BADGE HIỂN THỊ CẤP ĐỘ VÀ AFFINITY ĐÈ TRÊN FRAME TÀU
+======================================================== */
+.square-slot.ship-slot {
+    position: relative;
+}
+
+/* Badge Cấp độ (Góc trên cùng bên trái) */
+.ship-badge-level {
+    position: absolute;
+    top: 3px;
+    left: 4px;
+    z-index: 8;
+    background: rgba(0, 0, 0, 0.45);
+    color: #ffd700;
+    font-size: 15px;
+    font-weight: 800;
+    padding: 0px 1px;
+    border-radius: 3px;
+    pointer-events: none;
+    line-height: 1.1;
+    text-shadow: 1px 1px 2px #000;
+}
+
+/* Badge Affinity (Góc dưới cùng bên trái) */
+.ship-badge-affinity {
+    position: absolute;
+    bottom: 3px;
+    left: 4px;
+    z-index: 8;
+    background: rgba(0, 0, 0, 0.45);
+    color: #ff7675;
+    font-size: 15px;
+    font-weight: 800;
+    padding: 0px 1px;
+    border-radius: 3px;
+    pointer-events: none;
+    line-height: 1.1;
+    text-shadow: 1px 1px 2px #000;
+}
+
+/* ========================================================
+   BẢNG ĐIỀU KHIỂN LEVEL VÀ AFFINITY TRONG MODAL CHỌN TÀU
+======================================================== */
+.ship-modal-controls {
+    width: 100%;
+    background: #16222e;
+    padding: 18px 22px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    box-sizing: border-box;
+}
+
+.ship-modal-controls .control-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #fff;
+    font-size: 18px;
+}
+
+/* ĐÃ SỬA: Giảm min-width của Label xuống 60px */
+.ship-modal-controls label {
+    min-width: 60px;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+/* Ô Nhập Input Level */
+.ship-modal-controls input[type="number"] {
+    width: 80px;
+    height: 38px;
+    font-size: 20px;
+    padding: 2px 8px;
+    background: #2c3e50;
+    border: 2px solid #34495e;
+    color: #ffd700;
+    border-radius: 6px;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Thanh kéo Level (Rút ngắn để nhường chỗ cho Nút Đặt làm mặc định) */
+.ship-modal-controls input[type="range"] {
+    flex: 1;
+    height: 8px;
+    cursor: pointer;
+    min-width: 100px;
+}
+
+.affinity-btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* TĂNG MẠNH CỠ NÚT AFFINITY */
+.aff-btn {
+    background: #2c3e50;
+    color: #cbd5e1;
+    border: 2px solid #34495e;
+    padding: 8px 16px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.aff-btn:hover {
+    background: #34495e;
+    color: #fff;
+}
+
+.aff-btn.active {
+    background: #e74c3c;
+    color: #fff;
+    border-color: #ff7675;
+    font-weight: bold;
+    box-shadow: 0 0 8px rgba(231, 76, 60, 0.6);
+}
+
+/* NÚT ĐẶT LÀM MẶC ĐỊNH: Kế thừa kiểu dáng y hệt .aff-btn, chỉ giữ màu xanh lá */
+.set-default-btn {
+    background: #27ae60;
+    color: #fff;
+    border: 2px solid #219653;
+    padding: 8px 16px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.set-default-btn:hover {
+    background: #219653;
+    border-color: #27ae60;
+    box-shadow: 0 0 8px rgba(39, 174, 96, 0.6);
+}
+
+.ship-grid-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px 15px;
+    justify-content: center;
+    width: 100%;
+}
+
+/* Trạng thái trang bị bị vô hiệu hóa do chạm ngưỡng limit: 1 */
+.modal-ship-icon.equip-disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+    filter: grayscale(80%);
+}
+
+.modal-ship-icon.equip-disabled:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* ========================================================
+   POPUP XÁC NHẬN RESET ĐỘI HÌNH
+======================================================== */
+.reset-modal-content {
+    max-width: 480px;
+}
+
+.reset-modal-body {
+    padding: 25px;
+    text-align: center;
+}
+
+.reset-modal-body p {
+    color: #cbd5e1;
+    font-size: 16px;
+    line-height: 1.5;
+    margin: 0 0 20px 0;
+}
+
+.reset-modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.reset-confirm-btn {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    font-size: 15px;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.reset-confirm-btn:hover {
+    background-color: #c0392b;
+}
+
+.reset-cancel-btn {
+    background-color: #34495e;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    font-size: 15px;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.reset-cancel-btn:hover {
+    background-color: #2c3e50;
+}
+
+/* Badge Enhance Level (Góc trên cùng bên trái của Trang bị) */
+.square-slot.equip-slot {
+    position: relative;
+}
+
+.equip-badge-enhance {
+    position: absolute;
+    bottom: 3px;
+    left: 4px;
+    z-index: 8;
+    background: rgba(0, 0, 0, 0.45);
+    color: #fff; /* Màu xanh neon làm nổi bật chỉ số Enhance */
+    font-size: 16px;
+    font-weight: 800;
+    padding: 0px 3px;
+    border-radius: 3px;
+    pointer-events: none;
+    line-height: 1.1;
+    text-shadow: 1px 1px 2px #000;
+}
