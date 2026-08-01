@@ -36,7 +36,6 @@ function saveFleetState() {
     }
 }
 
-// Lấy thông số mặc định của TÀU
 function getDefaultShipSettings() {
     try {
         const savedDefault = localStorage.getItem('azur_lane_ship_defaults');
@@ -51,7 +50,6 @@ function saveDefaultShipSettings(level, affinity) {
     } catch (e) {}
 }
 
-// Lấy thông số mặc định ENHANCE LEVEL của TRANG BỊ (Mặc định gốc: +0)
 function getDefaultEquipEnhance() {
     try {
         const savedDefault = localStorage.getItem('azur_lane_equip_default_enhance');
@@ -200,8 +198,8 @@ function getAffinityDisplay(affinityKey) {
     }
 }
 
-// Giới hạn Enhance tối đa theo màu phẩm chất (Box)
-function getMaxEnhanceByBox(boxColor) {
+function getMaxEnhanceByBox(boxColor, category) {
+    if (category === "Augmentation") return 10;
     switch (boxColor) {
         case 'rainbow':
         case 'yellow': return 13;
@@ -246,6 +244,22 @@ function renderFleet() {
             let isShipSelected = slot.shipId !== null;
             let eqSave = slot.equips[i];
             
+            let slotInfoBadge = "";
+            if (isShipSelected && i < 3 && shipInfo.data) {
+                let rawEff = (shipInfo.data.slotEff && shipInfo.data.slotEff[i]) ? shipInfo.data.slotEff[i] : "";
+                let effVal = rawEff.toString().replace('%', '');
+                let amountVal = (shipInfo.data.slotAmount && shipInfo.data.slotAmount[i]) ? shipInfo.data.slotAmount[i] : "";
+
+                if (effVal || amountVal) {
+                    slotInfoBadge = `
+                        <span class="equip-slot-info-badge">
+                            <span class="eff-line">${effVal}%</span>
+                            <span class="amount-line">x${amountVal}</span>
+                        </span>
+                    `;
+                }
+            }
+
             if (isShipSelected && eqSave && eqSave.id && window.equipDetails[eqSave.category] && window.equipDetails[eqSave.category][eqSave.id]) {
                 let eqData = window.equipDetails[eqSave.category][eqSave.id];
                 let boxClass = eqData.box ? `box-${eqData.box}` : "box-grey";
@@ -255,6 +269,7 @@ function renderFleet() {
                 equipsHtml += `
                     <div class="square-slot equip-slot ${boxClass}" onclick="openEquipModal(${index}, ${i})">
                         <span class="equip-badge-enhance">+${enhanceVal}</span>
+                        ${slotInfoBadge}
                         <img src="${iconUrl}" class="slot-image">
                     </div>
                 `;
@@ -264,6 +279,7 @@ function renderFleet() {
 
                 equipsHtml += `
                     <div class="square-slot equip-slot ${equipClass}" ${onClickEvent}>
+                        ${slotInfoBadge}
                         ${isShipSelected ? '<span class="plus-sign">+</span>' : ''}
                     </div>
                 `;
@@ -291,6 +307,7 @@ function openShipModal(slotIndex) {
     currentSlot.level = curLevel;
     currentSlot.affinity = curAffinity;
 
+    // Đã thêm onwheel="handleLevelInputWheel(event)"
     let controlsHtml = `
         <div class="ship-modal-controls">
             <!-- 1. Hàng Affinity -->
@@ -308,7 +325,9 @@ function openShipModal(slotIndex) {
             <!-- 2. Hàng Level + Nút Đặt làm mặc định -->
             <div class="control-group">
                 <label>Level:</label>
-                <input type="number" id="shipLevelInput" min="1" max="125" value="${curLevel}" onchange="handleLevelInputChange(this.value)">
+                <input type="number" id="shipLevelInput" min="1" max="125" value="${curLevel}" 
+                       onchange="handleLevelInputChange(this.value)"
+                       onwheel="handleLevelInputWheel(event)">
                 <input type="range" id="shipLevelRange" min="1" max="125" value="${curLevel}" oninput="handleLevelRangeChange(this.value)">
                 <button type="button" class="set-default-btn" onclick="handleSetDefaultSettings()">Đặt làm mặc định</button>
             </div>
@@ -319,7 +338,7 @@ function openShipModal(slotIndex) {
         <div class="ship-item-wrapper" onmouseleave="handleItemLeave(this)">
             <div class="modal-ship-icon box-grey" onclick="selectShip(null)" style="display:flex; justify-content:center; align-items:center;"
                  onmouseenter="handleIconHover(this, true)">
-                <span style="font-size: 96px; color: #e74c3c; font-weight: 300; display: inline-block; transform: rotate(45deg);">+</span>
+                <span style="font-size: 80px; color: #e74c3c; font-weight: 300; display: flex; align-items: center; justify-content: center; transform: rotate(45deg) translate(0px, -1px); line-height: 1;">+</span>
             </div>
             <div class="ship-name-box" onmouseenter="handleNameHover(this, true)">
                 <span class="ship-name-text">Bỏ chọn</span>
@@ -387,6 +406,18 @@ function handleLevelInputChange(val) {
     }
 }
 
+// Hàm lăn chuột tăng/giảm Level Tàu
+function handleLevelInputWheel(e) {
+    e.preventDefault(); // Tránh cuộn toàn bộ trang web
+    let currentVal = parseInt(e.target.value, 10) || 1;
+    if (e.deltaY < 0) {
+        currentVal += 1; // Cuộn lên -> Tăng
+    } else {
+        currentVal -= 1; // Cuộn xuống -> Giảm
+    }
+    handleLevelInputChange(currentVal);
+}
+
 function selectAffinity(affKey, evt) {
     if (selectingSlotIndex !== -1) {
         fleetState[selectingSlotIndex].affinity = affKey;
@@ -433,7 +464,7 @@ function closeShipModal() {
 // ==========================================
 // ĐIỀU KHIỂN POPUP CHỌN TRANG BỊ & ENHANCE
 // ==========================================
-let currentEquipEnhanceVal = 0; // Lưu tạm giá trị Enhance đang thao tác trong Modal Trang bị
+let currentEquipEnhanceVal = 0;
 
 function injectEquipModal() {
     if (!document.getElementById('equipSelectionModal')) {
@@ -470,7 +501,6 @@ function openEquipModal(fleetIndex, slotIndex) {
         allowedCategories = mainSlots[slotIndex] || [];
     }
 
-    // Đọc Enhance Level mặc định
     let existingEquip = fleetState[fleetIndex].equips[slotIndex];
     if (existingEquip && existingEquip.enhance !== undefined) {
         currentEquipEnhanceVal = existingEquip.enhance;
@@ -478,12 +508,14 @@ function openEquipModal(fleetIndex, slotIndex) {
         currentEquipEnhanceVal = getDefaultEquipEnhance();
     }
 
-    // Hàng điều khiển Enhance Level tương tự Level của Tàu
+    // Đã thêm onwheel="handleEquipEnhanceInputWheel(event)"
     let controlsHtml = `
         <div class="ship-modal-controls">
             <div class="control-group">
                 <label>Enhance:</label>
-                <input type="number" id="equipEnhanceInput" min="0" max="13" value="${currentEquipEnhanceVal}" onchange="handleEquipEnhanceInputChange(this.value)">
+                <input type="number" id="equipEnhanceInput" min="0" max="13" value="${currentEquipEnhanceVal}" 
+                       onchange="handleEquipEnhanceInputChange(this.value)"
+                       onwheel="handleEquipEnhanceInputWheel(event)">
                 <input type="range" id="equipEnhanceRange" min="0" max="13" value="${currentEquipEnhanceVal}" oninput="handleEquipEnhanceRangeChange(this.value)">
                 <button type="button" class="set-default-btn" onclick="handleSetDefaultEquipEnhance()">Đặt làm mặc định</button>
             </div>
@@ -505,7 +537,7 @@ function openEquipModal(fleetIndex, slotIndex) {
         <div class="ship-item-wrapper" onmouseleave="handleItemLeave(this)">
             <div class="modal-ship-icon box-grey" onclick="selectEquip(null, null)" style="display:flex; justify-content:center; align-items:center;"
                  onmouseenter="handleIconHover(this, true)">
-                <span style="font-size: 96px; color: #e74c3c; font-weight: 300; display: inline-block; transform: rotate(45deg);">+</span>
+                <span style="font-size: 80px; color: #e74c3c; font-weight: 300; display: flex; align-items: center; justify-content: center; transform: rotate(45deg) translate(0px, -1px); line-height: 1;">+</span>
             </div>
             <div class="ship-name-box" onmouseenter="handleNameHover(this, true)">
                 <span class="ship-name-text">Bỏ chọn</span>
@@ -519,7 +551,7 @@ function openEquipModal(fleetIndex, slotIndex) {
                 let eqData = window.equipDetails[category][eqId];
                 
                 if (category === "Auxiliary" || category === "Augmentation") {
-                    if (eqData.equipable && !eqData.equipable.includes(shipInfo.type)) {
+                    if (eqData.equippable && !eqData.equippable.includes(shipInfo.type)) {
                         continue; 
                     }
                 }
@@ -551,13 +583,11 @@ function openEquipModal(fleetIndex, slotIndex) {
     document.getElementById('equipSelectionModal').style.display = "flex";
 }
 
-// Xử lý kéo thanh Range Enhance
 function handleEquipEnhanceRangeChange(val) {
     currentEquipEnhanceVal = parseInt(val, 10);
     document.getElementById('equipEnhanceInput').value = currentEquipEnhanceVal;
 }
 
-// Xử lý nhập Input Enhance (Giới hạn [0, 13])
 function handleEquipEnhanceInputChange(val) {
     let inputEl = document.getElementById('equipEnhanceInput');
     let rangeEl = document.getElementById('equipEnhanceRange');
@@ -576,19 +606,27 @@ function handleEquipEnhanceInputChange(val) {
     rangeEl.value = num;
 }
 
-// Bấm "Đặt làm mặc định" cho Trang bị
+// Hàm lăn chuột tăng/giảm Enhance Trang bị
+function handleEquipEnhanceInputWheel(e) {
+    e.preventDefault(); // Tránh cuộn toàn bộ trang web
+    let currentVal = parseInt(e.target.value, 10) || 0;
+    if (e.deltaY < 0) {
+        currentVal += 1; // Cuộn lên -> Tăng
+    } else {
+        currentVal -= 1; // Cuộn xuống -> Giảm
+    }
+    handleEquipEnhanceInputChange(currentVal);
+}
+
 function handleSetDefaultEquipEnhance() {
-    // 1. Lưu giá trị Enhance làm mặc định mới hệ thống
     saveDefaultEquipEnhance(currentEquipEnhanceVal);
 
-    // 2. Nếu tại ô đang mở đã có sẵn trang bị, cập nhật ngay chỉ số Enhance mới cho trang bị đó
     if (selectingSlotIndex !== -1 && selectingEquipSlotIndex !== -1) {
         let currentEq = fleetState[selectingSlotIndex].equips[selectingEquipSlotIndex];
         if (currentEq && currentEq.id) {
             let eqData = window.equipDetails[currentEq.category] && window.equipDetails[currentEq.category][currentEq.id];
-            let maxEnhance = eqData ? getMaxEnhanceByBox(eqData.box) : 13;
+            let maxEnhance = eqData ? getMaxEnhanceByBox(eqData.box, currentEq.category) : 13;
 
-            // Ép về mốc tối đa cho phép theo phẩm chất màu của trang bị đó
             currentEq.enhance = Math.min(currentEquipEnhanceVal, maxEnhance);
             saveFleetState();
             renderFleet();
@@ -602,9 +640,8 @@ function selectEquip(eqId, category) {
     if (selectingSlotIndex !== -1 && selectingEquipSlotIndex !== -1) {
         if (eqId && category) {
             let eqData = window.equipDetails[category] && window.equipDetails[category][eqId];
-            let maxEnhance = eqData ? getMaxEnhanceByBox(eqData.box) : 13;
+            let maxEnhance = eqData ? getMaxEnhanceByBox(eqData.box, category) : 13;
             
-            // Tự động ép về mốc giới hạn gần nhất dựa trên màu phẩm chất
             let finalEnhance = Math.min(currentEquipEnhanceVal, maxEnhance);
 
             fleetState[selectingSlotIndex].equips[selectingEquipSlotIndex] = { 

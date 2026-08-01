@@ -8,7 +8,7 @@ shipDetails["CV"] = {
         box: "rainbow",
         equipSlot: [[FT, TB], [DB], [DB, TB]],
         slotAmount: [3, 4, 2],
-        slotEff: ["125%", "150%", "130%"]
+        slotEff: ["125", "150", "130"]
     },
     "max_immelmann": {
         name: "Max Immelmann",
@@ -19,7 +19,7 @@ shipDetails["CV"] = {
         box: "rainbow",
         equipSlot: [[FT], [DB, TB], [FT, TB]],
         slotAmount: [3, 3, 3],
-        slotEff: ["160%", "160%", "160%"]
+        slotEff: ["160", "160", "160"]
 
     },
     "admiral_nakhimov": {
@@ -31,7 +31,7 @@ shipDetails["CV"] = {
         box: "rainbow",
         equipSlot: [[FT], [FT, DB, TB], [TB]],
         slotAmount: [3, 3, 3],
-        slotEff: ["140%", "140%", "140%"]
+        slotEff: ["140", "140", "140"]
     },
     "essex_kai": {
         name: "Essex Kai",
@@ -42,6 +42,6 @@ shipDetails["CV"] = {
         box: "rainbow",
         equipSlot: [[FT], [FT, DB, TB], [TB]],
         slotAmount: [3, 3, 2],
-        slotEff: ["145%", "135%", "130%"]
+        slotEff: ["145", "135", "130"]
     }
 };

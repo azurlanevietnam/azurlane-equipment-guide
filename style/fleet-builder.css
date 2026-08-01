@@ -1,17 +1,14 @@
 /* ========================================================
-   CSS dành riêng cho trang FLEET BUILDER
+   1. BỐ CỤC CHÍNH VÀ CÁC HÀNG ĐỘI HÌNH (FLEET BUILDER)
 ======================================================== */
-
-/* Container chính của đội hình */
 .fleet-box-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 0px; 
+    gap: 0; 
     align-items: center;
     margin-top: 20px;
 }
 
-/* Định dạng cơ bản cho các hàng */
 .fleet-row {
     display: flex;
     gap: 4px; 
@@ -20,39 +17,33 @@
     border-radius: 0; 
 }
 
-/* Xử lý riêng hàng ĐẦU TIÊN */
 .fleet-row:first-child {
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     padding-bottom: 2px; 
 }
 
-/* Xử lý riêng hàng CUỐI CÙNG */
 .fleet-row:last-child {
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
     padding-top: 2px; 
 }
 
-/* Xử lý hàng Ở GIỮA */
 .fleet-row:not(:first-child):not(:last-child) {
     padding-top: 2px;
     padding-bottom: 2px;
 }
 
 /* ========================================================
-   7 Ô VUÔNG NHỎ VÀ HIỆU ỨNG HOVER
+   2. CÁC Ô VUÔNG TRANG BỊ / TÀU VÀ HIỆU ỨNG HOVER
 ======================================================== */
 .square-slot {
     width: 84px;
     height: 84px;
     position: relative;
     background-color: #2c3e50;
-    
     box-shadow: inset 0 0 0 2px #34495e; 
-    
-    border-radius: 0; /* ĐÃ SỬA: Loại bỏ góc bo tròn */
-    
+    border-radius: 0; 
     display: flex;
     align-items: center;
     justify-content: center;
@@ -61,15 +52,12 @@
     z-index: 1; 
 }
 
-/* CẬP NHẬT HIỆU ỨNG HOVER */
 .square-slot:hover {
-    transform: scale(1.25); /* Phóng to lên 1.25 */
+    transform: scale(1.25);
     z-index: 10;
-    /* Bóng đổ tỏa ra ngoài tạo layer tối cho các không gian xung quanh */
-    box-shadow: 0 0 30px 15px rgba(0,0,0,0.7); 
+    box-shadow: 0 0 30px 15px rgba(0, 0, 0, 0.7); 
 }
 
-/* Ô Tàu (Box đầu tiên) */
 .ship-slot .plus-sign {
     font-size: 48px;
     color: #cbd5e1;
@@ -77,7 +65,6 @@
     z-index: 6;
 }
 
-/* Ô Trang bị (6 Box sau) */
 .equip-slot {
     background-color: #34495e;
 }
@@ -89,7 +76,7 @@
     z-index: 6;
 }
 
-/* Trạng thái Disable (Chưa chọn tàu) */
+/* Trạng thái chưa chọn tàu (Disabled) */
 .equip-slot.disabled {
     cursor: not-allowed;
     background-color: #22303d;
@@ -114,11 +101,11 @@
     display: none;
 }
 
-/* Hình ảnh Tàu / Trang bị */
 .slot-image {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain; /* Thay đổi từ cover -> contain để vừa vặn khung ảnh */
+    object-position: center; /* Đảm bảo hình ảnh luôn nằm căn giữa ô */
     display: block;
     position: relative;
     z-index: 2;
@@ -126,17 +113,116 @@
 }
 
 /* ========================================================
-   FRAME MẶC ĐỊNH LẤY TỪ THƯ MỤC BG 
+   3. KHUNG FRAME PHẨM CHẤT TÀU & TRANG BỊ (BACKGROUNDS)
 ======================================================== */
-.square-slot.box-grey::before, .modal-ship-icon.box-grey::before { content:''; position:absolute; top:0;left:0;right:0;bottom:0; background: url('../bg/fr1.png') center/100% 100% no-repeat; z-index:4; pointer-events:none; border-radius:inherit;}
-.square-slot.box-blue::before, .modal-ship-icon.box-blue::before { content:''; position:absolute; top:0;left:0;right:0;bottom:0; background: url('../bg/fr2.png') center/100% 100% no-repeat; z-index:4; pointer-events:none; border-radius:inherit;}
-.square-slot.box-purple::before, .modal-ship-icon.box-purple::before { content:''; position:absolute; top:0;left:0;right:0;bottom:0; background: url('../bg/fr3.png') center/100% 100% no-repeat; z-index:4; pointer-events:none; border-radius:inherit;}
-.square-slot.box-yellow::before, .modal-ship-icon.box-yellow::before { content:''; position:absolute; top:0;left:0;right:0;bottom:0; background: url('../bg/fr4.png') center/100% 100% no-repeat; z-index:4; pointer-events:none; border-radius:inherit;}
-.square-slot.box-rainbow::before, .modal-ship-icon.box-rainbow::before { content:''; position:absolute; top:0;left:0;right:0;bottom:0; background: url('../bg/fr5.png') center/100% 100% no-repeat; z-index:4; pointer-events:none; border-radius:inherit;}
-
+.square-slot.box-grey::before, 
+.modal-ship-icon.box-grey::before { 
+    content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
+    background: url('../bg/fr1.png') center/100% 100% no-repeat; z-index: 4; pointer-events: none; border-radius: inherit;
+}
+.square-slot.box-blue::before, 
+.modal-ship-icon.box-blue::before { 
+    content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
+    background: url('../bg/fr2.png') center/100% 100% no-repeat; z-index: 4; pointer-events: none; border-radius: inherit;
+}
+.square-slot.box-purple::before, 
+.modal-ship-icon.box-purple::before { 
+    content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
+    background: url('../bg/fr3.png') center/100% 100% no-repeat; z-index: 4; pointer-events: none; border-radius: inherit;
+}
+.square-slot.box-yellow::before, 
+.modal-ship-icon.box-yellow::before { 
+    content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
+    background: url('../bg/fr4.png') center/100% 100% no-repeat; z-index: 4; pointer-events: none; border-radius: inherit;
+}
+.square-slot.box-rainbow::before, 
+.modal-ship-icon.box-rainbow::before { 
+    content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
+    background: url('../bg/fr5.png') center/100% 100% no-repeat; z-index: 4; pointer-events: none; border-radius: inherit;
+}
 
 /* ========================================================
-   POPUP (MODAL) ĐỂ CHỌN TÀU VÀ HIỆU ỨNG THẺ TÊN
+   4. BADGE THÔNG TIN TRÊN Ô TÀU & TRANG BỊ
+======================================================== */
+.square-slot.ship-slot,
+.square-slot.equip-slot {
+    position: relative;
+}
+
+/* Badge Cấp độ Tàu (Góc trên-trái) */
+.ship-badge-level {
+    position: absolute;
+    top: 3px;
+    left: 4px;
+    z-index: 8;
+    background: rgba(0, 0, 0, 0.45);
+    color: #ffd700;
+    font-size: 15px;
+    font-weight: 800;
+    padding: 0 1px;
+    border-radius: 3px;
+    pointer-events: none;
+    line-height: 1.1;
+    text-shadow: 1px 1px 2px #000;
+}
+
+/* Badge Affinity Tàu (Góc dưới-trái) */
+.ship-badge-affinity {
+    position: absolute;
+    bottom: 3px;
+    left: 4px;
+    z-index: 8;
+    background: rgba(0, 0, 0, 0.45);
+    color: #ff7675;
+    font-size: 15px;
+    font-weight: 800;
+    padding: 0 1px;
+    border-radius: 3px;
+    pointer-events: none;
+    line-height: 1.1;
+    text-shadow: 1px 1px 2px #000;
+}
+
+/* Badge Enhance Trang bị (Góc dưới-trái) */
+.equip-badge-enhance {
+    position: absolute;
+    bottom: 3px;
+    left: 4px;
+    z-index: 8;
+    background: rgba(0, 0, 0, 0.45);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 800;
+    padding: 0 3px;
+    border-radius: 3px;
+    pointer-events: none;
+    line-height: 1.1;
+    text-shadow: 1px 1px 2px #000;
+}
+
+/* Badge Slot Efficiency & Amount (Góc trên-phải) */
+.equip-slot-info-badge {
+    position: absolute;
+    top: 3px;
+    right: 5px;
+    z-index: 8;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    pointer-events: none;
+    line-height: 1.1;
+    text-shadow: 1px 1px 2px #000, 0 0 4px #000;
+}
+
+.equip-slot-info-badge .eff-line,
+.equip-slot-info-badge .amount-line {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+/* ========================================================
+   5. POPUP CHỌN TÀU VÀ TRANG BỊ (MODAL OVERLAY & CONTENT)
 ======================================================== */
 .modal-overlay {
     display: none;
@@ -154,7 +240,7 @@
 .modal-content {
     background-color: #1a252f;
     width: 90%;
-    max-width: 800px;
+    max-width: 1600px;
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     display: flex;
@@ -195,11 +281,120 @@
     overflow-x: hidden;
     display: flex;
     flex-wrap: wrap;
-    gap: 4px 10px; /* Tăng khoảng cách dọc để lấy chỗ cho box tên */
+    gap: 4px 10px;
     justify-content: center;
 }
 
-/* Thẻ bọc ngoài Icon và Box Tên */
+/* ========================================================
+   6. BẢNG ĐIỀU KHIỂN LEVEL, AFFINITY VÀ ENHANCE TRONG MODAL
+======================================================== */
+.ship-modal-controls {
+    width: 100%;
+    background: #16222e;
+    padding: 18px 22px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    box-sizing: border-box;
+}
+
+.ship-modal-controls .control-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #fff;
+    font-size: 18px;
+}
+
+.ship-modal-controls label {
+    min-width: 70px;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.ship-modal-controls input[type="number"] {
+    width: 80px;
+    height: 38px;
+    font-size: 20px;
+    padding: 2px 8px;
+    background: #2c3e50;
+    border: 2px solid #34495e;
+    color: #ffd700;
+    border-radius: 6px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.ship-modal-controls input[type="range"] {
+    flex: 1;
+    height: 8px;
+    cursor: pointer;
+    max-width: 797px;
+}
+
+.affinity-btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.aff-btn {
+    background: #2c3e50;
+    color: #cbd5e1;
+    border: 2px solid #34495e;
+    padding: 8px 52px;
+    font-size: 20px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.aff-btn:hover {
+    background: #34495e;
+    color: #fff;
+}
+
+.aff-btn.active {
+    background: #e74c3c;
+    color: #fff;
+    border-color: #ff7675;
+    font-weight: bold;
+    box-shadow: 0 0 8px rgba(231, 76, 60, 0.6);
+}
+
+.set-default-btn {
+    background: #27ae60;
+    color: #fff;
+    border: 2px solid #219653;
+    padding: 8px 16px;
+    font-size: 20px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.set-default-btn:hover {
+    background: #219653;
+    border-color: #27ae60;
+    box-shadow: 0 0 8px rgba(39, 174, 96, 0.6);
+}
+
+/* ========================================================
+   7. DANH SÁCH ITEM HOVER VÀ BỘ CHẠY CHỮ TÊN (MARQUEE)
+======================================================== */
+.ship-grid-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px 15px;
+    justify-content: center;
+    width: 100%;
+}
+
 .ship-item-wrapper {
     position: relative;
     width: 90px;
@@ -209,11 +404,10 @@
     align-items: center;
 }
 
-/* Icon Tàu trong Popup */
 .modal-ship-icon {
     width: 90px;
     height: 90px;
-    border-radius: 0; /* ĐÃ SỬA: Loại bỏ góc bo tròn */
+    border-radius: 0;
     border: none;
     background-color: #2c3e50; 
     cursor: pointer;
@@ -223,20 +417,20 @@
 
 .modal-ship-icon:hover {
     transform: scale(1.1);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
     z-index: 10;
 }
 
 .modal-ship-image {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain; /* Thay đổi từ cover -> contain */
+    object-position: center;
     border-radius: inherit;
     position: relative;
     z-index: 2; 
 }
 
-/* BOX TÊN BÊN DƯỚI ICON */
 .ship-name-box {
     position: absolute;
     top: 95px; 
@@ -266,14 +460,12 @@
     max-width: 100%;
 }
 
-/* HOVER ICON LÀM MỞ RỘNG BOX TÊN */
 .modal-ship-icon:hover + .ship-name-box {
     width: max-content; 
     min-width: 100%;
     border-color: #29b6f6; 
     z-index: 20; 
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-    /* ĐÃ SỬA: Thêm translateX để nhận lệnh dịch trái/phải từ JS */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
     transform: translateY(4.5px) translateX(var(--shift-x, 0px)); 
 }
 
@@ -283,11 +475,9 @@
     font-size: 16px; 
 }
 
-/* HIỆU ỨNG CHỮ CHẠY KHI HOVER BOX TÊN (Dùng JS gán class) */
 .ship-name-text.marquee-run {
     max-width: none;
     text-overflow: clip; 
-    /* ĐÃ SỬA: Thay 2s cố định bằng biến thời gian động để đồng bộ tốc độ */
     animation: marqueeScroll var(--scroll-duration, 3s) linear infinite; 
 }
 
@@ -301,6 +491,7 @@
     transform: none !important;
 }
 
+/* Item bị vội hiệu hóa (Disabled) */
 .modal-ship-icon.equip-disabled {
     cursor: not-allowed;
     opacity: 0.4;
@@ -313,172 +504,7 @@
 }
 
 /* ========================================================
-   BADGE HIỂN THỊ CẤP ĐỘ VÀ AFFINITY ĐÈ TRÊN FRAME TÀU
-======================================================== */
-.square-slot.ship-slot {
-    position: relative;
-}
-
-/* Badge Cấp độ (Góc trên cùng bên trái) */
-.ship-badge-level {
-    position: absolute;
-    top: 3px;
-    left: 4px;
-    z-index: 8;
-    background: rgba(0, 0, 0, 0.45);
-    color: #ffd700;
-    font-size: 15px;
-    font-weight: 800;
-    padding: 0px 1px;
-    border-radius: 3px;
-    pointer-events: none;
-    line-height: 1.1;
-    text-shadow: 1px 1px 2px #000;
-}
-
-/* Badge Affinity (Góc dưới cùng bên trái) */
-.ship-badge-affinity {
-    position: absolute;
-    bottom: 3px;
-    left: 4px;
-    z-index: 8;
-    background: rgba(0, 0, 0, 0.45);
-    color: #ff7675;
-    font-size: 15px;
-    font-weight: 800;
-    padding: 0px 1px;
-    border-radius: 3px;
-    pointer-events: none;
-    line-height: 1.1;
-    text-shadow: 1px 1px 2px #000;
-}
-
-/* ========================================================
-   BẢNG ĐIỀU KHIỂN LEVEL VÀ AFFINITY TRONG MODAL CHỌN TÀU
-======================================================== */
-.ship-modal-controls {
-    width: 100%;
-    background: #16222e;
-    padding: 18px 22px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    box-sizing: border-box;
-}
-
-.ship-modal-controls .control-group {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    color: #fff;
-    font-size: 18px;
-}
-
-/* ĐÃ SỬA: Giảm min-width của Label xuống 60px */
-.ship-modal-controls label {
-    min-width: 60px;
-    font-weight: bold;
-    font-size: 18px;
-}
-
-/* Ô Nhập Input Level */
-.ship-modal-controls input[type="number"] {
-    width: 80px;
-    height: 38px;
-    font-size: 20px;
-    padding: 2px 8px;
-    background: #2c3e50;
-    border: 2px solid #34495e;
-    color: #ffd700;
-    border-radius: 6px;
-    text-align: center;
-    font-weight: bold;
-}
-
-/* Thanh kéo Level (Rút ngắn để nhường chỗ cho Nút Đặt làm mặc định) */
-.ship-modal-controls input[type="range"] {
-    flex: 1;
-    height: 8px;
-    cursor: pointer;
-    min-width: 100px;
-}
-
-.affinity-btn-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-/* TĂNG MẠNH CỠ NÚT AFFINITY */
-.aff-btn {
-    background: #2c3e50;
-    color: #cbd5e1;
-    border: 2px solid #34495e;
-    padding: 8px 16px;
-    font-size: 15px;
-    font-weight: 600;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.aff-btn:hover {
-    background: #34495e;
-    color: #fff;
-}
-
-.aff-btn.active {
-    background: #e74c3c;
-    color: #fff;
-    border-color: #ff7675;
-    font-weight: bold;
-    box-shadow: 0 0 8px rgba(231, 76, 60, 0.6);
-}
-
-/* NÚT ĐẶT LÀM MẶC ĐỊNH: Kế thừa kiểu dáng y hệt .aff-btn, chỉ giữ màu xanh lá */
-.set-default-btn {
-    background: #27ae60;
-    color: #fff;
-    border: 2px solid #219653;
-    padding: 8px 16px;
-    font-size: 15px;
-    font-weight: 600;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-}
-
-.set-default-btn:hover {
-    background: #219653;
-    border-color: #27ae60;
-    box-shadow: 0 0 8px rgba(39, 174, 96, 0.6);
-}
-
-.ship-grid-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px 15px;
-    justify-content: center;
-    width: 100%;
-}
-
-/* Trạng thái trang bị bị vô hiệu hóa do chạm ngưỡng limit: 1 */
-.modal-ship-icon.equip-disabled {
-    cursor: not-allowed;
-    opacity: 0.4;
-    filter: grayscale(80%);
-}
-
-.modal-ship-icon.equip-disabled:hover {
-    transform: none !important;
-    box-shadow: none !important;
-}
-
-/* ========================================================
-   POPUP XÁC NHẬN RESET ĐỘI HÌNH
+   8. POPUP XÁC NHẬN RESET ĐỘI HÌNH
 ======================================================== */
 .reset-modal-content {
     max-width: 480px;
@@ -534,23 +560,15 @@
     background-color: #2c3e50;
 }
 
-/* Badge Enhance Level (Góc trên cùng bên trái của Trang bị) */
-.square-slot.equip-slot {
-    position: relative;
+/* ========================================================
+   9. TÙY CHỈNH THẺ INPUT NUMBER (ẨN MŨI TÊN LÊN/XUỐNG)
+======================================================== */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
-.equip-badge-enhance {
-    position: absolute;
-    bottom: 3px;
-    left: 4px;
-    z-index: 8;
-    background: rgba(0, 0, 0, 0.45);
-    color: #fff; /* Màu xanh neon làm nổi bật chỉ số Enhance */
-    font-size: 16px;
-    font-weight: 800;
-    padding: 0px 3px;
-    border-radius: 3px;
-    pointer-events: none;
-    line-height: 1.1;
-    text-shadow: 1px 1px 2px #000;
+input[type="number"] {
+    -moz-appearance: textfield;
 }
