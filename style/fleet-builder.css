@@ -104,8 +104,8 @@
 .slot-image {
     width: 100%;
     height: 100%;
-    object-fit: contain; /* Thay đổi từ cover -> contain để vừa vặn khung ảnh */
-    object-position: center; /* Đảm bảo hình ảnh luôn nằm căn giữa ô */
+    object-fit: contain;
+    object-position: center;
     display: block;
     position: relative;
     z-index: 2;
@@ -149,7 +149,6 @@
     position: relative;
 }
 
-/* Badge Cấp độ Tàu (Góc trên-trái) */
 .ship-badge-level {
     position: absolute;
     top: 3px;
@@ -166,7 +165,6 @@
     text-shadow: 1px 1px 2px #000;
 }
 
-/* Badge Affinity Tàu (Góc dưới-trái) */
 .ship-badge-affinity {
     position: absolute;
     bottom: 3px;
@@ -183,7 +181,6 @@
     text-shadow: 1px 1px 2px #000;
 }
 
-/* Badge Enhance Trang bị (Góc dưới-trái) */
 .equip-badge-enhance {
     position: absolute;
     bottom: 3px;
@@ -200,7 +197,6 @@
     text-shadow: 1px 1px 2px #000;
 }
 
-/* Badge Slot Efficiency & Amount (Góc trên-phải) */
 .equip-slot-info-badge {
     position: absolute;
     top: 3px;
@@ -221,20 +217,26 @@
     font-weight: 800;
 }
 
-/* ========================================================
-   5. POPUP CHỌN TÀU VÀ TRANG BỊ (MODAL OVERLAY & CONTENT)
-======================================================== */
+/* ==========================================================
+   5. POPUP CHỌN TÀU VÀ TRANG BỊ (CHỈ DÙNG 1 THANH CUỘN DUY NHẤT)
+========================================================== */
 .modal-overlay {
     display: none;
     position: fixed;
     z-index: 99999;
-    left: 0;
     top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.75);
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
+    padding: 20px 0 40px 0;
+    /* LUÔN HIỂN THỊ THANH CUỘN DUY NHẤT Ở SÁT MÉP PHẢI MÀN HÌNH */
+    overflow-y: scroll !important;
+    box-sizing: border-box;
 }
 
 .modal-content {
@@ -245,7 +247,8 @@
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     display: flex;
     flex-direction: column;
-    max-height: 80vh;
+    max-height: none; /* Giãn theo nội dung để lớp overlay ngoài cuộn */
+    margin: 0 auto;
 }
 
 .modal-header {
@@ -277,8 +280,7 @@
 
 .modal-body {
     padding: 30px;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: visible; /* Bỏ thanh cuộn bên trong pop-up */
     display: flex;
     flex-wrap: wrap;
     gap: 4px 10px;
@@ -331,7 +333,7 @@
     flex: 1;
     height: 8px;
     cursor: pointer;
-    max-width: 797px;
+    max-width: 798px;
 }
 
 .affinity-btn-group {
@@ -344,7 +346,7 @@
     background: #2c3e50;
     color: #cbd5e1;
     border: 2px solid #34495e;
-    padding: 8px 52px;
+    padding: 8px 53px;
     font-size: 20px;
     font-weight: 600;
     border-radius: 6px;
@@ -424,7 +426,7 @@
 .modal-ship-image {
     width: 100%;
     height: 100%;
-    object-fit: contain; /* Thay đổi từ cover -> contain */
+    object-fit: contain;
     object-position: center;
     border-radius: inherit;
     position: relative;
@@ -491,7 +493,6 @@
     transform: none !important;
 }
 
-/* Item bị vội hiệu hóa (Disabled) */
 .modal-ship-icon.equip-disabled {
     cursor: not-allowed;
     opacity: 0.4;
@@ -571,4 +572,160 @@ input[type="number"]::-webkit-inner-spin-button {
 
 input[type="number"] {
     -moz-appearance: textfield;
+}
+
+.modal-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.filter-toggle-btn {
+    background-color: #219653;
+    color: #ffffff;
+    border: 2px solid #27ae60;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 10px;
+    padding-right: 20px;
+    font-size: 20px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    min-width: 190px;
+    text-align: right;
+    transition: all 0.2s;
+    box-sizing: border-box;
+}
+
+.filter-toggle-btn:hover {
+    background-color: #27ae60;
+    color: #fff;
+    box-shadow: 0 0 8px rgba(39, 174, 96, 0.5);
+}
+
+.filter-toggle-btn.active {
+    background-color: #2980b9;
+    color: #fff;
+    border-color: #3498db;
+}
+
+.modal-close-btn {
+    background-color: #e74c3c;
+    color: #fff;
+    border: 2px solid #c0392b;
+    padding: 8px 24px;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    min-width: 110px;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.modal-close-btn:hover {
+    background-color: #c0392b;
+    border-color: #e74c3c;
+    box-shadow: 0 0 8px rgba(231, 76, 60, 0.6);
+}
+
+/* ========================================================
+   10. BẢNG BỘ LỌC TÀU (SHIP FILTER PANEL) - TĂNG CỠ BUTTON
+======================================================== */
+.ship-filter-panel {
+    width: 100%;
+    background: #121a22;
+    padding: 18px 22px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    box-sizing: border-box;
+    border: 1px solid #2c3e50;
+}
+
+.ship-filter-panel .filter-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ship-filter-panel .filter-title {
+    color: #e0e6ed;
+    font-size: 18px;
+    font-weight: bold;
+    border-bottom: 1px solid #243447;
+    padding-bottom: 6px;
+}
+
+.ship-filter-panel .filter-btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Nút bộ lọc kích thước lớn: Font size 20px */
+.filter-btn {
+    background: #2c3e50;
+    color: #cbd5e1;
+    border: 2px solid #34495e;
+    padding: 8px 20px;
+    font-size: 20px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.filter-btn:hover {
+    background: #34495e;
+    color: #fff;
+}
+
+.filter-btn.active {
+    background: #2980b9;
+    color: #fff;
+    border-color: #3498db;
+    font-weight: bold;
+    box-shadow: 0 0 8px rgba(41, 128, 185, 0.6);
+}
+
+.filter-btn.rarity-decisive.active,
+.filter-btn.rarity-ur.active {
+    background: linear-gradient(135deg, #e74c3c, #9b59b6, #3498db, #2ecc71, #f1c40f);
+    color: #fff;
+    border-color: #fff;
+    text-shadow: 1px 1px 2px #000;
+}
+
+.filter-btn.rarity-priority.active,
+.filter-btn.rarity-sr.active {
+    background: #f1c40f;
+    color: #000;
+    border-color: #f39c12;
+    font-weight: bold;
+}
+
+.filter-btn.rarity-elite.active {
+    background: #9b59b6;
+    color: #fff;
+    border-color: #8e44ad;
+}
+
+.filter-btn.rarity-rare.active {
+    background: #3498db;
+    color: #fff;
+    border-color: #2980b9;
+}
+
+.filter-btn.rarity-normal.active {
+    background: #7f8c8d;
+    color: #fff;
+    border-color: #95a5a6;
+}
+
+html {
+    overflow-y: auto;
 }
