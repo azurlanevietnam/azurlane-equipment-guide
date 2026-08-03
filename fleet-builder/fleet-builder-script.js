@@ -17,9 +17,9 @@ let shipFilterRarity = new Set(['ALL']);
 let isShipFilterOpen = false;
 
 function initFleetBuilder() {
-    injectEquipModal(); // Tự động tạo popup chọn trang bị vào DOM
-    injectConfirmModal(); // Tự động tạo popup xác nhận reset
-    injectResetButton(); // Tự động tạo nút Reset vào bên dưới
+    injectEquipModal();
+    injectConfirmModal();
+    injectResetButton();
     
     waitForDataAndRender();
 }
@@ -34,7 +34,7 @@ function waitForDataAndRender() {
 }
 
 // ==========================================
-// QUẢN LÝ LOCALSTORAGE (CACHE NGƯỜI DÙNG)
+// QUẢN LÝ LOCALSTORAGE THEO TỪNG FLEET (1, 2, 3)
 // ==========================================
 function saveFleetState() {
     try {
@@ -44,17 +44,22 @@ function saveFleetState() {
     }
 }
 
-function getDefaultShipSettings() {
+function getFleetGroupIndex(slotIndex) {
+    if (slotIndex < 0) return 0;
+    return Math.floor(slotIndex / 3);
+}
+
+function getDefaultShipSettingsForFleet(fleetGroupIndex) {
     try {
-        const savedDefault = localStorage.getItem('azur_lane_ship_defaults');
+        const savedDefault = localStorage.getItem(`azur_lane_ship_defaults_fleet_${fleetGroupIndex}`);
         if (savedDefault) return JSON.parse(savedDefault);
     } catch (e) {}
     return { level: 1, affinity: 'Stranger' };
 }
 
-function saveDefaultShipSettings(level, affinity) {
+function saveDefaultShipSettingsForFleet(fleetGroupIndex, level, affinity) {
     try {
-        localStorage.setItem('azur_lane_ship_defaults', JSON.stringify({ level, affinity }));
+        localStorage.setItem(`azur_lane_ship_defaults_fleet_${fleetGroupIndex}`, JSON.stringify({ level, affinity }));
     } catch (e) {}
 }
 
@@ -73,25 +78,28 @@ function saveDefaultEquipEnhance(enhanceLevel) {
 }
 
 function loadFleetState() {
-    const defaultShipSettings = getDefaultShipSettings();
     try {
         const saved = localStorage.getItem('azur_lane_fleet_state');
         if (saved) {
             const parsed = JSON.parse(saved);
             if (Array.isArray(parsed) && parsed.length === 9) {
-                return parsed.map(slot => ({
-                    shipId: slot.shipId || null,
-                    level: slot.level !== undefined ? slot.level : defaultShipSettings.level,
-                    affinity: slot.affinity || defaultShipSettings.affinity,
-                    equips: Array.isArray(slot.equips) ? slot.equips.map(eq => {
-                        if (!eq) return null;
-                        return {
-                            id: eq.id,
-                            category: eq.category,
-                            enhance: eq.enhance !== undefined ? eq.enhance : 0
-                        };
-                    }) : [null, null, null, null, null, null]
-                }));
+                return parsed.map((slot, idx) => {
+                    const fleetGroup = getFleetGroupIndex(idx);
+                    const defaultSettings = getDefaultShipSettingsForFleet(fleetGroup);
+                    return {
+                        shipId: slot.shipId || null,
+                        level: slot.level !== undefined ? slot.level : defaultSettings.level,
+                        affinity: slot.affinity || defaultSettings.affinity,
+                        equips: Array.isArray(slot.equips) ? slot.equips.map(eq => {
+                            if (!eq) return null;
+                            return {
+                                id: eq.id,
+                                category: eq.category,
+                                enhance: eq.enhance !== undefined ? eq.enhance : 0
+                            };
+                        }) : [null, null, null, null, null, null]
+                    };
+                });
             }
         }
     } catch (e) {
@@ -100,10 +108,12 @@ function loadFleetState() {
     
     let defaultSlots = [];
     for (let i = 0; i < 9; i++) {
+        const fleetGroup = getFleetGroupIndex(i);
+        const defaultSettings = getDefaultShipSettingsForFleet(fleetGroup);
         defaultSlots.push({
             shipId: null,
-            level: defaultShipSettings.level,
-            affinity: defaultShipSettings.affinity,
+            level: defaultSettings.level,
+            affinity: defaultSettings.affinity,
             equips: [null, null, null, null, null, null]
         });
     }
@@ -155,16 +165,17 @@ function closeConfirmModal() {
 }
 
 function executeResetFleet() {
-    saveDefaultShipSettings(1, 'Stranger');
+    for (let g = 0; g < 3; g++) {
+        saveDefaultShipSettingsForFleet(g, 1, 'Stranger');
+    }
     saveDefaultEquipEnhance(0);
 
-    let defaultShipSettings = { level: 1, affinity: 'Stranger' };
     fleetState = [];
     for (let i = 0; i < 9; i++) {
         fleetState.push({
             shipId: null,
-            level: defaultShipSettings.level,
-            affinity: defaultShipSettings.affinity,
+            level: 1,
+            affinity: 'Stranger',
             equips: [null, null, null, null, null, null]
         });
     }
@@ -224,7 +235,11 @@ function getAffinityDisplay(affinityKey) {
     }
 }
 
-function getMaxEnhanceByBox(boxColor) {
+function getMaxEnhanceByBox(boxColor, category) {
+    if (category === "Augmentation" || selectingEquipSlotIndex === 5) {
+        return 10;
+    }
+
     switch (boxColor) {
         case 'rainbow':
         case 'yellow': return 13;
@@ -235,9 +250,6 @@ function getMaxEnhanceByBox(boxColor) {
     }
 }
 
-// ==========================================
-// HÀM BÙ PADDING-RIGHT CHỐNG DỊCH CHUYỂN LAYOUT
-// ==========================================
 function getScrollbarWidth() {
     return window.innerWidth - document.documentElement.clientWidth;
 }
@@ -256,7 +268,7 @@ function applyAntiShiftPadding(isModalOpen) {
 }
 
 // ==========================================
-// RENDER GIAO DIỆN CHÍNH (3 FLEET BOX WRAPPER - TỔNG 9 HÀNG)
+// RENDER GIAO DIỆN CHÍNH
 // ==========================================
 function renderFleet() {
     let fullHtml = "";
@@ -270,7 +282,6 @@ function renderFleet() {
             let shipInfo = slot.shipId ? getShipTypeAndData(slot.shipId) : null;
             let shipHtml = "";
             
-            // 1. Box Tàu
             if (shipInfo) {
                 let iconUrl = getShipIconUrl(slot.shipId, shipInfo.data);
                 let boxClass = shipInfo.data.box ? `box-${shipInfo.data.box}` : "box-grey";
@@ -288,7 +299,6 @@ function renderFleet() {
                             </div>`;
             }
 
-            // 2. Box Trang Bị (6 Box)
             let equipsHtml = "";
             for (let i = 0; i < 6; i++) {
                 let isShipSelected = slot.shipId !== null;
@@ -540,18 +550,12 @@ function isShipMatchingFilter(shipCatKey, shipData) {
     return true;
 }
 
-// HÀM QUY ĐỔI ĐỘ HIẾM THÀNH THỨ BẬC CẤP ĐỘ
 function getRarityTierRank(rarityStr) {
     if (!rarityStr) return 99;
     const r = rarityStr.toLowerCase();
     
-    // Cấp 0: Gộp chung Decisive & Ultra Rare
     if (r === 'decisive' || r === 'ultra rare') return 0;
-    
-    // Cấp 1: Gộp chung Priority & Super Rare
     if (r === 'priority' || r === 'super rare') return 1;
-    
-    // Các cấp độ tiếp theo
     if (r === 'elite') return 2;
     if (r === 'rare') return 3;
     if (r === 'normal') return 4;
@@ -595,28 +599,23 @@ function renderShipListOnly() {
         }
     }
 
-    // LOGIC SẮP XẾP ĐÃ ĐƯỢC CẬP NHẬT GỘP NÓM ĐỘ HIẾM
     allShipsList.sort((a, b) => {
-        // 1. Theo Nhóm Độ Hiếm (Decisive+UR -> Priority+SR -> Elite -> Rare -> Normal)
         let rA = getRarityTierRank(a.data.rarity);
         let rB = getRarityTierRank(b.data.rarity);
         if (rA !== rB) return rA - rB;
 
-        // 2. Theo Faction
         let fA = factionOrder.indexOf(a.data.faction);
         let fB = factionOrder.indexOf(b.data.faction);
         if (fA === -1) fA = 99;
         if (fB === -1) fB = 99;
         if (fA !== fB) return fA - fB;
 
-        // 3. Theo Loại Tàu (Type)
         let tA = typeOrder.indexOf(a.cat.toUpperCase());
         let tB = typeOrder.indexOf(b.cat.toUpperCase());
         if (tA === -1) tA = 99;
         if (tB === -1) tB = 99;
         if (tA !== tB) return tA - tB;
 
-        // 4. Theo Bảng Chữ Cái (A-Z)
         return a.displayName.localeCompare(b.displayName);
     });
 
@@ -649,7 +648,8 @@ function renderShipListOnly() {
 function openShipModal(slotIndex) {
     selectingSlotIndex = slotIndex;
     
-    const defaultSettings = getDefaultShipSettings();
+    const fleetGroupIndex = getFleetGroupIndex(slotIndex);
+    const defaultSettings = getDefaultShipSettingsForFleet(fleetGroupIndex);
     let currentSlot = fleetState[slotIndex];
 
     let curLevel = currentSlot.level !== undefined ? currentSlot.level : defaultSettings.level;
@@ -748,21 +748,49 @@ function selectAffinity(affKey, evt) {
 
 function handleSetDefaultSettings() {
     if (selectingSlotIndex !== -1) {
-        const curLevel = fleetState[selectingSlotIndex].level || 1;
+        const levelInput = document.getElementById('shipLevelInput');
+        const curLevel = levelInput ? parseInt(levelInput.value, 10) : (fleetState[selectingSlotIndex].level || 1);
         const curAff = fleetState[selectingSlotIndex].affinity || 'Stranger';
         
-        saveDefaultShipSettings(curLevel, curAff);
+        const fleetGroupIndex = getFleetGroupIndex(selectingSlotIndex);
+        
+        // 1. Chỉ lưu cấu hình mặc định riêng cho Fleet hiện tại
+        saveDefaultShipSettingsForFleet(fleetGroupIndex, curLevel, curAff);
+        
+        // 2. Chỉ áp dụng cho ô tàu đang chỉnh sửa hiện tại
+        fleetState[selectingSlotIndex].level = curLevel;
+        fleetState[selectingSlotIndex].affinity = curAff;
+        
         saveFleetState();
         renderFleet();
         closeShipModal();
     }
 }
 
+// CẬP NHẬT: KHI BỎ CHỌN HOẶC CHỌN TÀU MỚI, NẾU LÀ Ô TRỐNG HOẶC ĐỔI TÀU THÌ KHÔI PHỤC VỀ CHỈ SỐ MẶC ĐỊNH MỚI NHẤT
 function selectShip(shipId) {
     if (selectingSlotIndex !== -1) {
-        if (fleetState[selectingSlotIndex].shipId !== shipId) {
-            fleetState[selectingSlotIndex].shipId = shipId;
+        const fleetGroupIndex = getFleetGroupIndex(selectingSlotIndex);
+        const defaultSettings = getDefaultShipSettingsForFleet(fleetGroupIndex);
+
+        if (shipId === null) {
+            // Khi chọn "Bỏ chọn": Reset shipId, trang bị, VÀ RESET CHỈ SỐ VỀ MẶC ĐỊNH MỚI NHẤT
+            fleetState[selectingSlotIndex].shipId = null;
             fleetState[selectingSlotIndex].equips = [null, null, null, null, null, null];
+            fleetState[selectingSlotIndex].level = defaultSettings.level;
+            fleetState[selectingSlotIndex].affinity = defaultSettings.affinity;
+        } else {
+            if (fleetState[selectingSlotIndex].shipId !== shipId) {
+                // Nếu thay đổi sang tàu khác: Cập nhật tàu và reset trang bị
+                fleetState[selectingSlotIndex].shipId = shipId;
+                fleetState[selectingSlotIndex].equips = [null, null, null, null, null, null];
+                
+                // Nếu ô này trước đó đang trống (chưa có tàu), gán chỉ số mặc định mới
+                if (!fleetState[selectingSlotIndex].shipId) {
+                    fleetState[selectingSlotIndex].level = defaultSettings.level;
+                    fleetState[selectingSlotIndex].affinity = defaultSettings.affinity;
+                }
+            }
         }
         saveFleetState();
         renderFleet();
@@ -841,19 +869,21 @@ function openEquipModal(fleetIndex, slotIndex) {
         allowedCategories = mainSlots[slotIndex] || [];
     }
 
+    let maxAllowedEnhance = (slotIndex === 5 || allowedCategories.includes("Augmentation")) ? 10 : 13;
+
     let existingEquip = fleetState[fleetIndex].equips[slotIndex];
     if (existingEquip && existingEquip.enhance !== undefined) {
-        currentEquipEnhanceVal = existingEquip.enhance;
+        currentEquipEnhanceVal = Math.min(existingEquip.enhance, maxAllowedEnhance);
     } else {
-        currentEquipEnhanceVal = getDefaultEquipEnhance();
+        currentEquipEnhanceVal = Math.min(getDefaultEquipEnhance(), maxAllowedEnhance);
     }
 
     let controlsHtml = `
         <div class="ship-modal-controls">
             <div class="control-group">
                 <label>Enhance:</label>
-                <input type="number" id="equipEnhanceInput" min="0" max="13" value="${currentEquipEnhanceVal}" onchange="handleEquipEnhanceInputChange(this.value)">
-                <input type="range" id="equipEnhanceRange" min="0" max="13" value="${currentEquipEnhanceVal}" oninput="handleEquipEnhanceRangeChange(this.value)">
+                <input type="number" id="equipEnhanceInput" min="0" max="${maxAllowedEnhance}" value="${currentEquipEnhanceVal}" onchange="handleEquipEnhanceInputChange(this.value)">
+                <input type="range" id="equipEnhanceRange" min="0" max="${maxAllowedEnhance}" value="${currentEquipEnhanceVal}" oninput="handleEquipEnhanceRangeChange(this.value)">
                 <button type="button" class="set-default-btn" onclick="handleSetDefaultEquipEnhance()">Đặt làm mặc định</button>
             </div>
         </div>
@@ -926,7 +956,8 @@ function openEquipModal(fleetIndex, slotIndex) {
 }
 
 function handleEquipEnhanceRangeChange(val) {
-    currentEquipEnhanceVal = parseInt(val, 10);
+    let maxAllowed = (selectingEquipSlotIndex === 5) ? 10 : 13;
+    currentEquipEnhanceVal = Math.min(parseInt(val, 10), maxAllowed);
     document.getElementById('equipEnhanceInput').value = currentEquipEnhanceVal;
 }
 
@@ -934,6 +965,7 @@ function handleEquipEnhanceInputChange(val) {
     let inputEl = document.getElementById('equipEnhanceInput');
     let rangeEl = document.getElementById('equipEnhanceRange');
     let num = parseInt(val, 10);
+    let maxAllowed = (selectingEquipSlotIndex === 5) ? 10 : 13;
 
     if (isNaN(num)) {
         inputEl.value = currentEquipEnhanceVal;
@@ -941,7 +973,7 @@ function handleEquipEnhanceInputChange(val) {
     }
 
     if (num < 0) num = 0;
-    if (num > 13) num = 13;
+    if (num > maxAllowed) num = maxAllowed;
 
     currentEquipEnhanceVal = num;
     inputEl.value = num;
@@ -949,15 +981,18 @@ function handleEquipEnhanceInputChange(val) {
 }
 
 function handleSetDefaultEquipEnhance() {
-    saveDefaultEquipEnhance(currentEquipEnhanceVal);
+    let maxAllowed = (selectingEquipSlotIndex === 5) ? 10 : 13;
+    let finalDefault = Math.min(currentEquipEnhanceVal, maxAllowed);
+    
+    saveDefaultEquipEnhance(finalDefault);
 
     if (selectingSlotIndex !== -1 && selectingEquipSlotIndex !== -1) {
         let currentEq = fleetState[selectingSlotIndex].equips[selectingEquipSlotIndex];
         if (currentEq && currentEq.id) {
             let eqData = window.equipDetails[currentEq.category] && window.equipDetails[currentEq.category][currentEq.id];
-            let maxEnhance = eqData ? getMaxEnhanceByBox(eqData.box) : 13;
+            let maxEnhance = eqData ? getMaxEnhanceByBox(eqData.box, currentEq.category) : maxAllowed;
 
-            currentEq.enhance = Math.min(currentEquipEnhanceVal, maxEnhance);
+            currentEq.enhance = Math.min(finalDefault, maxEnhance);
             saveFleetState();
             renderFleet();
         }
@@ -970,7 +1005,7 @@ function selectEquip(eqId, category) {
     if (selectingSlotIndex !== -1 && selectingEquipSlotIndex !== -1) {
         if (eqId && category) {
             let eqData = window.equipDetails[category] && window.equipDetails[category][eqId];
-            let maxEnhance = eqData ? getMaxEnhanceByBox(eqData.box) : 13;
+            let maxEnhance = eqData ? getMaxEnhanceByBox(eqData.box, category) : ((selectingEquipSlotIndex === 5) ? 10 : 13);
             
             let finalEnhance = Math.min(currentEquipEnhanceVal, maxEnhance);
 
