@@ -2,19 +2,30 @@ const fleetContainer = document.getElementById('fleet-builder-container');
 const shipModal = document.getElementById('shipSelectionModal');
 const shipModalGrid = document.getElementById('shipModalGrid');
 
-// Trạng thái của 9 vị trí tàu trong 3 bảng đội hình (Mỗi bảng 3 hàng)
+const MAX_FLEETS = 36; // Giới hạn tối đa 36 hạm đội
+
+// Trạng thái mảng hạm đội động (Mỗi Fleet chứa 9 slot: 3 Main, 3 Vanguard, 3 Submarine)
 let fleetState = loadFleetState();
 
-let selectingSlotIndex = -1; // Vị trí hàng tàu (0 - 8)
-let selectingEquipSlotIndex = -1; // Vị trí ô trang bị (0 - 5)
+let selectingSlotIndex = -1; 
+let selectingEquipSlotIndex = -1; 
 
 // ==========================================
-// TRẠNG THÁI BỘ LỌC TÀU
+// TRẠNG THÁI BỘ LỌC TÀU & TRANG BỊ
 // ==========================================
 let shipFilterFaction = new Set(['ALL']);
 let shipFilterType = new Set(['ALL']);
 let shipFilterRarity = new Set(['ALL']);
 let isShipFilterOpen = false;
+
+let equipFilterCategory = new Set(['ALL']);
+let equipFilterFaction = new Set(['ALL']);
+let equipFilterRarity = new Set(['ALL']);
+let isEquipFilterOpen = false;
+
+// Mã loại tàu phân khu
+const VANGUARD_SHIP_TYPES = ["DD", "CL", "CA", "CB", "DDG", "MS", "SFV"];
+const SUBMARINE_SHIP_TYPES = ["SS", "SSV", "SFS"];
 
 function initFleetBuilder() {
     injectEquipModal();
@@ -33,20 +44,25 @@ function waitForDataAndRender() {
     }, 50);
 }
 
-// ==========================================
-// QUẢN LÝ LOCALSTORAGE THEO TỪNG FLEET (1, 2, 3)
-// ==========================================
-function saveFleetState() {
-    try {
-        localStorage.setItem('azur_lane_fleet_state', JSON.stringify(fleetState));
-    } catch (e) {
-        console.error("Không thể lưu cache đội hình:", e);
-    }
+// Xác định loại slot (0-2: Main | 3-5: Vanguard | 6-8: Submarine)
+function getSlotCategoryType(slotIndex) {
+    let rowInGroup = slotIndex % 9;
+    if (rowInGroup >= 6) return "SUB";
+    if (rowInGroup >= 3) return "VANGUARD";
+    return "MAIN";
 }
 
 function getFleetGroupIndex(slotIndex) {
     if (slotIndex < 0) return 0;
-    return Math.floor(slotIndex / 3);
+    return Math.floor(slotIndex / 9);
+}
+
+function saveFleetState() {
+    try {
+        localStorage.setItem('azur_lane_fleet_state_v4', JSON.stringify(fleetState));
+    } catch (e) {
+        console.error("Không thể lưu cache đội hình:", e);
+    }
 }
 
 function getDefaultShipSettingsForFleet(fleetGroupIndex) {
@@ -63,26 +79,40 @@ function saveDefaultShipSettingsForFleet(fleetGroupIndex, level, affinity) {
     } catch (e) {}
 }
 
-function getDefaultEquipEnhance() {
+function getDefaultEquipEnhanceForFleet(fleetGroupIndex) {
     try {
-        const savedDefault = localStorage.getItem('azur_lane_equip_default_enhance');
+        const savedDefault = localStorage.getItem(`azur_lane_equip_default_enhance_fleet_${fleetGroupIndex}`);
         if (savedDefault !== null) return parseInt(savedDefault, 10);
     } catch (e) {}
     return 0;
 }
 
-function saveDefaultEquipEnhance(enhanceLevel) {
+function saveDefaultEquipEnhanceForFleet(fleetGroupIndex, enhanceLevel) {
     try {
-        localStorage.setItem('azur_lane_equip_default_enhance', enhanceLevel.toString());
+        localStorage.setItem(`azur_lane_equip_default_enhance_fleet_${fleetGroupIndex}`, JSON.stringify(enhanceLevel));
     } catch (e) {}
+}
+
+function createEmptyFleetGroup(fleetGroupIndex) {
+    const defaultSettings = getDefaultShipSettingsForFleet(fleetGroupIndex);
+    let slots = [];
+    for (let i = 0; i < 9; i++) {
+        slots.push({
+            shipId: null,
+            level: defaultSettings.level,
+            affinity: defaultSettings.affinity,
+            equips: [null, null, null, null, null, null]
+        });
+    }
+    return slots;
 }
 
 function loadFleetState() {
     try {
-        const saved = localStorage.getItem('azur_lane_fleet_state');
+        const saved = localStorage.getItem('azur_lane_fleet_state_v4');
         if (saved) {
             const parsed = JSON.parse(saved);
-            if (Array.isArray(parsed) && parsed.length === 9) {
+            if (Array.isArray(parsed) && parsed.length > 0 && parsed.length % 9 === 0) {
                 return parsed.map((slot, idx) => {
                     const fleetGroup = getFleetGroupIndex(idx);
                     const defaultSettings = getDefaultShipSettingsForFleet(fleetGroup);
@@ -106,18 +136,64 @@ function loadFleetState() {
         console.error("Không thể đọc cache đội hình:", e);
     }
     
-    let defaultSlots = [];
-    for (let i = 0; i < 9; i++) {
-        const fleetGroup = getFleetGroupIndex(i);
-        const defaultSettings = getDefaultShipSettingsForFleet(fleetGroup);
-        defaultSlots.push({
-            shipId: null,
-            level: defaultSettings.level,
-            affinity: defaultSettings.affinity,
-            equips: [null, null, null, null, null, null]
-        });
+    // MẶC ĐỊNH KHI LOCAL STORAGE RỖNG CHỈ CÓ NHÁT 1 FLEET (9 SLOTS)
+    return createEmptyFleetGroup(0);
+}
+
+// ==========================================
+// QUẢN LÝ TÍNH NĂNG THÊM & XÓA HẠM ĐỘI
+// ==========================================
+function addNewFleet(insertAfterGroupIndex) {
+    const totalFleets = Math.floor(fleetState.length / 9);
+    
+    // ĐẢM BẢO KHÔNG THỂ THÊM KHI ĐÃ ĐẠT 36 FLEET (KỂ CẢ DEVTOOLS)
+    if (totalFleets >= MAX_FLEETS) {
+        console.warn(`Đã đạt giới hạn tối đa ${MAX_FLEETS} hạm đội!`);
+        return;
     }
-    return defaultSlots;
+
+    const newGroupIndex = insertAfterGroupIndex + 1;
+    const newFleetSlots = createEmptyFleetGroup(newGroupIndex);
+
+    const insertPosition = newGroupIndex * 9;
+    fleetState.splice(insertPosition, 0, ...newFleetSlots);
+
+    saveFleetState();
+    renderFleet();
+}
+
+function deleteFleet(groupIndexToDelete) {
+    const totalFleets = Math.floor(fleetState.length / 9);
+
+    // ĐẢM BẢO NẾU CHỈ CÒN 1 FLEET DUY NHẤT THÌ KHÔNG THỂ XÓA (KỂ CẢ DEVTOOLS)
+    if (totalFleets <= 1) {
+        console.warn("Không thể xóa khi chỉ còn 1 hạm đội duy nhất!");
+        return;
+    }
+
+    if (groupIndexToDelete < 0 || groupIndexToDelete >= totalFleets) {
+        return;
+    }
+
+    // 1. Xóa 9 slot của hạm đội này khỏi mảng fleetState
+    const startPosition = groupIndexToDelete * 9;
+    fleetState.splice(startPosition, 9);
+
+    // 2. Dịch chuyển mặc định của các Fleet nằm phía sau lên 1 nấc
+    for (let g = groupIndexToDelete; g < totalFleets - 1; g++) {
+        const nextShipDef = getDefaultShipSettingsForFleet(g + 1);
+        const nextEquipDef = getDefaultEquipEnhanceForFleet(g + 1);
+
+        saveDefaultShipSettingsForFleet(g, nextShipDef.level, nextShipDef.affinity);
+        saveDefaultEquipEnhanceForFleet(g, nextEquipDef);
+    }
+
+    // Reset thiết lập mặc định của slot cuối cùng về mức thấp nhất
+    saveDefaultShipSettingsForFleet(totalFleets - 1, 1, 'Stranger');
+    saveDefaultEquipEnhanceForFleet(totalFleets - 1, 0);
+
+    saveFleetState();
+    renderFleet();
 }
 
 // ==========================================
@@ -165,20 +241,13 @@ function closeConfirmModal() {
 }
 
 function executeResetFleet() {
-    for (let g = 0; g < 3; g++) {
+    for (let g = 0; g < MAX_FLEETS; g++) {
         saveDefaultShipSettingsForFleet(g, 1, 'Stranger');
+        saveDefaultEquipEnhanceForFleet(g, 0);
     }
-    saveDefaultEquipEnhance(0);
 
-    fleetState = [];
-    for (let i = 0; i < 9; i++) {
-        fleetState.push({
-            shipId: null,
-            level: 1,
-            affinity: 'Stranger',
-            equips: [null, null, null, null, null, null]
-        });
-    }
+    // RESET VỀ DUY NHẤT 1 HẠM ĐỘI BẮT ĐẦU
+    fleetState = createEmptyFleetGroup(0);
 
     saveFleetState();
     renderFleet();
@@ -270,85 +339,139 @@ function applyAntiShiftPadding(isModalOpen) {
 // ==========================================
 // RENDER GIAO DIỆN CHÍNH
 // ==========================================
+function renderFleetSlotRow(index) {
+    let slot = fleetState[index];
+    let shipInfo = slot.shipId ? getShipTypeAndData(slot.shipId) : null;
+    let shipHtml = "";
+    
+    if (shipInfo) {
+        let iconUrl = getShipIconUrl(slot.shipId, shipInfo.data);
+        let boxClass = shipInfo.data.box ? `box-${shipInfo.data.box}` : "box-grey";
+        let affText = getAffinityDisplay(slot.affinity || 'Stranger');
+        let shipLevel = slot.level !== undefined ? slot.level : 1;
+
+        shipHtml = `<div class="square-slot ship-slot ${boxClass}" onclick="openShipModal(${index})">
+                        <span class="ship-badge-level">Lv.${shipLevel}</span>
+                        <span class="ship-badge-affinity">${affText}</span>
+                        <img src="${iconUrl}" class="slot-image" alt="${shipInfo.data.name}">
+                    </div>`;
+    } else {
+        shipHtml = `<div class="square-slot ship-slot box-grey" onclick="openShipModal(${index})">
+                        <span class="plus-sign">+</span>
+                    </div>`;
+    }
+
+    let equipsHtml = "";
+    for (let i = 0; i < 6; i++) {
+        let isShipSelected = slot.shipId !== null;
+        let eqSave = slot.equips[i];
+
+        let slotInfoBadgeHtml = "";
+        if (isShipSelected && shipInfo && shipInfo.data && i < 3) {
+            let eff = (shipInfo.data.slotEff && shipInfo.data.slotEff[i]) ? `${shipInfo.data.slotEff[i]}%` : "";
+            let amt = (shipInfo.data.slotAmount && shipInfo.data.slotAmount[i]) ? `x${shipInfo.data.slotAmount[i]}` : "";
+            
+            if (eff || amt) {
+                slotInfoBadgeHtml = `
+                    <div class="equip-slot-info-badge">
+                        ${eff ? `<span class="eff-line">${eff}</span>` : ''}
+                        ${amt ? `<span class="amount-line">${amt}</span>` : ''}
+                    </div>
+                `;
+            }
+        }
+        
+        if (isShipSelected && eqSave && eqSave.id && window.equipDetails[eqSave.category] && window.equipDetails[eqSave.category][eqSave.id]) {
+            let eqData = window.equipDetails[eqSave.category][eqSave.id];
+            let boxClass = eqData.box ? `box-${eqData.box}` : "box-grey";
+            let iconUrl = `https://azurlane.netojuu.com/images/${eqData.code}.png`;
+            let enhanceVal = eqSave.enhance !== undefined ? eqSave.enhance : 0;
+            
+            equipsHtml += `
+                <div class="square-slot equip-slot ${boxClass}" onclick="openEquipModal(${index}, ${i})">
+                    ${slotInfoBadgeHtml}
+                    <span class="equip-badge-enhance">+${enhanceVal}</span>
+                    <img src="${iconUrl}" class="slot-image">
+                </div>
+            `;
+        } else {
+            let equipClass = isShipSelected ? "box-grey" : "disabled"; 
+            let onClickEvent = isShipSelected ? `onclick="openEquipModal(${index}, ${i})"` : "";
+
+            equipsHtml += `
+                <div class="square-slot equip-slot ${equipClass}" ${onClickEvent}>
+                    ${slotInfoBadgeHtml}
+                    ${isShipSelected ? '<span class="plus-sign">+</span>' : ''}
+                </div>
+            `;
+        }
+    }
+
+    return `<div class="fleet-row">${shipHtml}${equipsHtml}</div>`;
+}
+
 function renderFleet() {
     let fullHtml = "";
+    const totalFleets = Math.floor(fleetState.length / 9);
+    
+    const isMaxReached = totalFleets >= MAX_FLEETS;
+    const isOnlyOneFleet = totalFleets <= 1;
 
-    for (let group = 0; group < 3; group++) {
-        let groupRowsHtml = "";
+    for (let group = 0; group < totalFleets; group++) {
+        // Trạng thái nút Hạm Đội Mới (Ẩn/Kèm thuộc tính khi đạt 36)
+        const addBtnAttr = isMaxReached ? 'disabled class="fleet-add-btn hidden"' : 'class="fleet-add-btn"';
         
-        for (let rowInGroup = 0; rowInGroup < 3; rowInGroup++) {
-            let index = group * 3 + rowInGroup;
-            let slot = fleetState[index];
-            let shipInfo = slot.shipId ? getShipTypeAndData(slot.shipId) : null;
-            let shipHtml = "";
-            
-            if (shipInfo) {
-                let iconUrl = getShipIconUrl(slot.shipId, shipInfo.data);
-                let boxClass = shipInfo.data.box ? `box-${shipInfo.data.box}` : "box-grey";
-                let affText = getAffinityDisplay(slot.affinity || 'Stranger');
-                let shipLevel = slot.level !== undefined ? slot.level : 1;
+        // Trạng thái nút Xóa (Ẩn/Kèm thuộc tính khi chỉ còn 1 Fleet)
+        const deleteBtnAttr = isOnlyOneFleet ? 'disabled class="fleet-delete-btn hidden"' : 'class="fleet-delete-btn"';
 
-                shipHtml = `<div class="square-slot ship-slot ${boxClass}" onclick="openShipModal(${index})">
-                                <span class="ship-badge-level">Lv.${shipLevel}</span>
-                                <span class="ship-badge-affinity">${affText}</span>
-                                <img src="${iconUrl}" class="slot-image" alt="${shipInfo.data.name}">
-                            </div>`;
-            } else {
-                shipHtml = `<div class="square-slot ship-slot box-grey" onclick="openShipModal(${index})">
-                                <span class="plus-sign">+</span>
-                            </div>`;
-            }
+        let headerRowHtml = `
+            <div class="fleet-header-row">
+                <div style="display: flex; align-items: center;">
+                    <span class="fleet-title">Hạm Đội ${group + 1}</span>
+                    <button type="button" ${addBtnAttr} onclick="addNewFleet(${group})">Hạm Đội Mới</button>
+                </div>
+                <button type="button" ${deleteBtnAttr} onclick="deleteFleet(${group})">Xóa</button>
+            </div>
+        `;
 
-            let equipsHtml = "";
-            for (let i = 0; i < 6; i++) {
-                let isShipSelected = slot.shipId !== null;
-                let eqSave = slot.equips[i];
+        // HÀNG 2: 2 CỘT x 3 ROWS
+        let leftColumnRows = "";
+        let rightColumnRows = "";
+        for (let r = 0; r < 3; r++) {
+            let leftSlotIndex = group * 9 + r;        
+            let rightSlotIndex = group * 9 + 3 + r;    
 
-                let slotInfoBadgeHtml = "";
-                if (isShipSelected && shipInfo && shipInfo.data && i < 3) {
-                    let eff = (shipInfo.data.slotEff && shipInfo.data.slotEff[i]) ? `${shipInfo.data.slotEff[i]}%` : "";
-                    let amt = (shipInfo.data.slotAmount && shipInfo.data.slotAmount[i]) ? `x${shipInfo.data.slotAmount[i]}` : "";
-                    
-                    if (eff || amt) {
-                        slotInfoBadgeHtml = `
-                            <div class="equip-slot-info-badge">
-                                ${eff ? `<span class="eff-line">${eff}</span>` : ''}
-                                ${amt ? `<span class="amount-line">${amt}</span>` : ''}
-                            </div>
-                        `;
-                    }
-                }
-                
-                if (isShipSelected && eqSave && eqSave.id && window.equipDetails[eqSave.category] && window.equipDetails[eqSave.category][eqSave.id]) {
-                    let eqData = window.equipDetails[eqSave.category][eqSave.id];
-                    let boxClass = eqData.box ? `box-${eqData.box}` : "box-grey";
-                    let iconUrl = `https://azurlane.netojuu.com/images/${eqData.code}.png`;
-                    let enhanceVal = eqSave.enhance !== undefined ? eqSave.enhance : 0;
-                    
-                    equipsHtml += `
-                        <div class="square-slot equip-slot ${boxClass}" onclick="openEquipModal(${index}, ${i})">
-                            ${slotInfoBadgeHtml}
-                            <span class="equip-badge-enhance">+${enhanceVal}</span>
-                            <img src="${iconUrl}" class="slot-image">
-                        </div>
-                    `;
-                } else {
-                    let equipClass = isShipSelected ? "box-grey" : "disabled"; 
-                    let onClickEvent = isShipSelected ? `onclick="openEquipModal(${index}, ${i})"` : "";
-
-                    equipsHtml += `
-                        <div class="square-slot equip-slot ${equipClass}" ${onClickEvent}>
-                            ${slotInfoBadgeHtml}
-                            ${isShipSelected ? '<span class="plus-sign">+</span>' : ''}
-                        </div>
-                    `;
-                }
-            }
-
-            groupRowsHtml += `<div class="fleet-row">${shipHtml}${equipsHtml}</div>`;
+            leftColumnRows += renderFleetSlotRow(leftSlotIndex);
+            rightColumnRows += renderFleetSlotRow(rightSlotIndex);
         }
 
-        fullHtml += `<div class="fleet-box-wrapper">${groupRowsHtml}</div>`;
+        let mainContentRowHtml = `
+            <div class="fleet-main-content-row">
+                <div class="fleet-column fleet-column-left">${leftColumnRows}</div>
+                <div class="fleet-column fleet-column-right">${rightColumnRows}</div>
+            </div>
+        `;
+
+        // HÀNG 3: SUBMARINE (1 CỘT x 3 ROWS, MẶC ĐỊNH HIDDEN)
+        let subColumnRows = "";
+        for (let r = 0; r < 3; r++) {
+            let subSlotIndex = group * 9 + 6 + r;     
+            subColumnRows += renderFleetSlotRow(subSlotIndex);
+        }
+
+        let subContentRowHtml = `
+            <div class="fleet-sub-content-row hidden">
+                <div class="fleet-column fleet-column-sub">${subColumnRows}</div>
+            </div>
+        `;
+
+        fullHtml += `
+            <div class="fleet-box-wrapper">
+                ${headerRowHtml}
+                ${mainContentRowHtml}
+                ${subContentRowHtml}
+            </div>
+        `;
     }
 
     fleetContainer.innerHTML = fullHtml;
@@ -377,19 +500,40 @@ function buildShipFilterHtml() {
         "Eagle Union", "Royal Navy", "Heavy Sakura", "Ironblood", 
         "Dragon Empery", "Sardegna Empire", "Northern Parliament", 
         "Iris Libre", "Vichya Dominion", "Kingdom of Tulipia", 
-        "Liga de Pedrería", "META", "Tempesta", "Universal & Collab"
+        "Liga de Pedrería", "META", "Tempesta", "Universal", "Collab"
     ];
 
-    const types = [
-        { label: "Battlecruiser (BC)", code: "BC" },
-        { label: "Battleship (BB)", code: "BB" },
-        { label: "Aviation Battleship (BBV)", code: "BBV" },
-        { label: "Aircraft Carrier (CV)", code: "CV" },
-        { label: "Light Carrier (CVL)", code: "CVL" },
-        { label: "Monitor (BM)", code: "BM" },
-        { label: "Repair Ship (RS)", code: "RS" },
-        { label: "Sailing Frigate M (SF)", code: "SF" }
-    ];
+    let types = [];
+    let slotType = getSlotCategoryType(selectingSlotIndex);
+
+    if (slotType === "SUB") {
+        types = [
+            { label: "Submarine", code: "SS" },
+            { label: "Aviation Submarine", code: "SSV" },
+            { label: "Sailing Frigate S", code: "SFS" }
+        ];
+    } else if (slotType === "VANGUARD") {
+        types = [
+            { label: "Destroyer", code: "DD" },
+            { label: "Light Cruiser", code: "CL" },
+            { label: "Heavy Cruiser", code: "CA" },
+            { label: "Large Cruiser", code: "CB" },
+            { label: "Guided Missile Destroyer", code: "DDG" },
+            { label: "Munition Ship", code: "MS" },
+            { label: "Sailing Frigate V", code: "SFV" }
+        ];
+    } else {
+        types = [
+            { label: "Battlecruiser", code: "BC" },
+            { label: "Battleship", code: "BB" },
+            { label: "Aviation Battleship", code: "BBV" },
+            { label: "Aircraft Carrier", code: "CV" },
+            { label: "Light Carrier", code: "CVL" },
+            { label: "Monitor", code: "BM" },
+            { label: "Repair Ship", code: "RS" },
+            { label: "Sailing Frigate M", code: "SFM" }
+        ];
+    }
 
     const rarities = [
         { label: "Decisive", code: "Decisive", cls: "rarity-decisive" },
@@ -500,17 +644,22 @@ function updateShipFilterUIAndGrid() {
 }
 
 function isShipMatchingFilter(shipCatKey, shipData) {
+    let slotType = getSlotCategoryType(selectingSlotIndex);
+    let catKeyUpper = (shipCatKey || '').toUpperCase();
+
+    if (slotType === "SUB") {
+        if (!SUBMARINE_SHIP_TYPES.includes(catKeyUpper)) return false;
+    } else if (slotType === "VANGUARD") {
+        if (!VANGUARD_SHIP_TYPES.includes(catKeyUpper)) return false;
+    } else {
+        if (VANGUARD_SHIP_TYPES.includes(catKeyUpper) || SUBMARINE_SHIP_TYPES.includes(catKeyUpper)) return false;
+    }
+
     if (!shipFilterFaction.has('ALL')) {
         let shipFaction = shipData.faction || '';
         let matchedFaction = false;
-        
         for (let f of shipFilterFaction) {
-            if (f === "Universal & Collab") {
-                if (shipFaction === "Universal" || shipFaction === "Collab" || shipFaction === "Universal & Collab") {
-                    matchedFaction = true;
-                    break;
-                }
-            } else if (shipFaction === f) {
+            if (shipFaction === f) {
                 matchedFaction = true;
                 break;
             }
@@ -519,9 +668,7 @@ function isShipMatchingFilter(shipCatKey, shipData) {
     }
 
     if (!shipFilterType.has('ALL')) {
-        let catKeyUpper = (shipCatKey || '').toUpperCase();
         let matchedType = false;
-        
         for (let t of shipFilterType) {
             let filterTypeUpper = t.toUpperCase();
             if (catKeyUpper === filterTypeUpper) {
@@ -529,7 +676,9 @@ function isShipMatchingFilter(shipCatKey, shipData) {
                 break;
             }
             if (filterTypeUpper === "RS" && catKeyUpper === "AR") matchedType = true;
-            if (filterTypeUpper === "SF" && catKeyUpper === "IX") matchedType = true;
+            if (filterTypeUpper === "SFM" && (catKeyUpper === "IX" || catKeyUpper === "SF")) matchedType = true;
+            if (filterTypeUpper === "SFV" && catKeyUpper === "SFV") matchedType = true;
+            if (filterTypeUpper === "SFS" && catKeyUpper === "SFS") matchedType = true;
         }
         if (!matchedType) return false;
     }
@@ -537,7 +686,6 @@ function isShipMatchingFilter(shipCatKey, shipData) {
     if (!shipFilterRarity.has('ALL')) {
         let shipRarity = shipData.rarity || '';
         let matchedRarity = false;
-        
         for (let r of shipFilterRarity) {
             if (shipRarity.toLowerCase() === r.toLowerCase()) {
                 matchedRarity = true;
@@ -583,9 +731,18 @@ function renderShipListOnly() {
         "Eagle Union", "Royal Navy", "Heavy Sakura", "Ironblood", 
         "Dragon Empery", "Sardegna Empire", "Northern Parliament", 
         "Iris Libre", "Vichya Dominion", "Kingdom of Tulipia", 
-        "Liga de Pedrería", "META", "Tempesta", "Universal", "Collab", "Universal & Collab"
+        "Liga de Pedrería", "META", "Tempesta", "Universal", "Collab"
     ];
-    const typeOrder = ["BC", "BB", "BBV", "CV", "CVL", "BM", "RS", "AR", "SF", "IX"];
+
+    let slotType = getSlotCategoryType(selectingSlotIndex);
+    let typeOrder = [];
+    if (slotType === "SUB") {
+        typeOrder = ["SS", "SSV", "SFS"];
+    } else if (slotType === "VANGUARD") {
+        typeOrder = ["DD", "CL", "CA", "CB", "DDG", "MS", "SFV"];
+    } else {
+        typeOrder = ["BC", "BB", "BBV", "CV", "CVL", "BM", "RS", "AR", "SFM", "IX"];
+    }
 
     let allShipsList = [];
     if (window.shipDetails) {
@@ -652,8 +809,13 @@ function openShipModal(slotIndex) {
     const defaultSettings = getDefaultShipSettingsForFleet(fleetGroupIndex);
     let currentSlot = fleetState[slotIndex];
 
-    let curLevel = currentSlot.level !== undefined ? currentSlot.level : defaultSettings.level;
-    let curAffinity = currentSlot.affinity || defaultSettings.affinity;
+    let curLevel = (currentSlot.shipId !== null) ? currentSlot.level : defaultSettings.level;
+    let curAffinity = (currentSlot.shipId !== null) ? currentSlot.affinity : defaultSettings.affinity;
+
+    if (currentSlot.shipId === null) {
+        currentSlot.level = curLevel;
+        currentSlot.affinity = curAffinity;
+    }
 
     const shipModalHeaderActions = shipModal.querySelector('.modal-header-actions');
     if (shipModalHeaderActions) {
@@ -754,10 +916,8 @@ function handleSetDefaultSettings() {
         
         const fleetGroupIndex = getFleetGroupIndex(selectingSlotIndex);
         
-        // 1. Chỉ lưu cấu hình mặc định riêng cho Fleet hiện tại
         saveDefaultShipSettingsForFleet(fleetGroupIndex, curLevel, curAff);
         
-        // 2. Chỉ áp dụng cho ô tàu đang chỉnh sửa hiện tại
         fleetState[selectingSlotIndex].level = curLevel;
         fleetState[selectingSlotIndex].affinity = curAff;
         
@@ -767,29 +927,20 @@ function handleSetDefaultSettings() {
     }
 }
 
-// CẬP NHẬT: KHI BỎ CHỌN HOẶC CHỌN TÀU MỚI, NẾU LÀ Ô TRỐNG HOẶC ĐỔI TÀU THÌ KHÔI PHỤC VỀ CHỈ SỐ MẶC ĐỊNH MỚI NHẤT
 function selectShip(shipId) {
     if (selectingSlotIndex !== -1) {
         const fleetGroupIndex = getFleetGroupIndex(selectingSlotIndex);
         const defaultSettings = getDefaultShipSettingsForFleet(fleetGroupIndex);
 
         if (shipId === null) {
-            // Khi chọn "Bỏ chọn": Reset shipId, trang bị, VÀ RESET CHỈ SỐ VỀ MẶC ĐỊNH MỚI NHẤT
             fleetState[selectingSlotIndex].shipId = null;
             fleetState[selectingSlotIndex].equips = [null, null, null, null, null, null];
             fleetState[selectingSlotIndex].level = defaultSettings.level;
             fleetState[selectingSlotIndex].affinity = defaultSettings.affinity;
         } else {
             if (fleetState[selectingSlotIndex].shipId !== shipId) {
-                // Nếu thay đổi sang tàu khác: Cập nhật tàu và reset trang bị
                 fleetState[selectingSlotIndex].shipId = shipId;
                 fleetState[selectingSlotIndex].equips = [null, null, null, null, null, null];
-                
-                // Nếu ô này trước đó đang trống (chưa có tàu), gán chỉ số mặc định mới
-                if (!fleetState[selectingSlotIndex].shipId) {
-                    fleetState[selectingSlotIndex].level = defaultSettings.level;
-                    fleetState[selectingSlotIndex].affinity = defaultSettings.affinity;
-                }
             }
         }
         saveFleetState();
@@ -817,33 +968,15 @@ function closeShipModal() {
 }
 
 // ==========================================
-// ĐIỀU KHIỂN POPUP CHỌN TRANG BỊ & ENHANCE
+// TẠO VÀ XỬ LÝ BỘ LỌC TRANG BỊ
 // ==========================================
-let currentEquipEnhanceVal = 0;
-
-function injectEquipModal() {
-    if (!document.getElementById('equipSelectionModal')) {
-        const equipModalHtml = `
-        <div id="equipSelectionModal" class="modal-overlay" style="display:none;">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>CHỌN TRANG BỊ</h2>
-                    <div class="modal-header-actions">
-                        <button type="button" class="filter-toggle-btn" onclick="toggleFilter(this)">Mở Bộ Lọc ▼</button>
-                        <button type="button" class="modal-close-btn" onclick="closeEquipModal()">Đóng</button>
-                    </div>
-                </div>
-                <div class="modal-body" id="equipModalGrid">
-                </div>
-            </div>
-        </div>
-        `;
-        document.body.insertAdjacentHTML('beforeend', equipModalHtml);
+function toggleEquipFilter(btnEl) {
+    isEquipFilterOpen = !isEquipFilterOpen;
+    const panel = document.getElementById('equipFilterPanel');
+    if (panel) {
+        panel.style.display = isEquipFilterOpen ? 'flex' : 'none';
     }
-}
-
-function toggleFilter(btnEl) {
-    if (btnEl.innerText.includes("Mở")) {
+    if (isEquipFilterOpen) {
         btnEl.innerText = "Đóng Bộ Lọc ▲";
         btnEl.classList.add("active");
     } else {
@@ -852,47 +985,196 @@ function toggleFilter(btnEl) {
     }
 }
 
-function openEquipModal(fleetIndex, slotIndex) {
-    selectingSlotIndex = fleetIndex;
-    selectingEquipSlotIndex = slotIndex;
-    
-    let shipInfo = getShipTypeAndData(fleetState[fleetIndex].shipId);
-    if (!shipInfo) return;
+function resetEquipFilterState() {
+    isEquipFilterOpen = false;
+    equipFilterCategory = new Set(['ALL']);
+    equipFilterFaction = new Set(['ALL']);
+    equipFilterRarity = new Set(['ALL']);
+}
 
-    let allowedCategories = [];
-    if (slotIndex === 5) {
-        allowedCategories = ["Augmentation"];
-    } else if (slotIndex === 3 || slotIndex === 4) {
-        allowedCategories = ["Auxiliary"];
-    } else {
-        let mainSlots = shipInfo.data.equipSlot.slice(0, 3);
-        allowedCategories = mainSlots[slotIndex] || [];
+function buildEquipFilterHtml(allowedCategories) {
+    const factions = [
+        "Universal", "Eagle Union", "Royal Navy", "Heavy Sakura", "Ironblood", 
+        "Dragon Empery", "Sardegna Empire", "Northern Parliament", 
+        "Iris Libre", "Vichya Dominion", "Kingdom of Tulipia", 
+        "Liga de Pedrería", "META", "Tempesta", "Collab"
+    ];
+
+    const rarities = [
+        { label: "Ultra Rare", code: "rainbow", cls: "rarity-decisive" },
+        { label: "Super Rare", code: "yellow", cls: "rarity-sr" },
+        { label: "Elite", code: "purple", cls: "rarity-elite" },
+        { label: "Rare", code: "blue", cls: "rarity-rare" },
+        { label: "Normal", code: "grey", cls: "rarity-normal" }
+    ];
+
+    let categoryBtns = "";
+    if (allowedCategories.length >= 2) {
+        categoryBtns += `<button type="button" class="filter-btn ${equipFilterCategory.has('ALL') ? 'active' : ''}" onclick="selectEquipCategoryFilter('ALL', false)">Hiển Thị Tất Cả</button>`;
+        allowedCategories.forEach(cat => {
+            const active = equipFilterCategory.has(cat) ? 'active' : '';
+            categoryBtns += `<button type="button" class="filter-btn ${active}" onclick="selectEquipCategoryFilter('${cat}', false)">${cat}</button>`;
+        });
+    } else if (allowedCategories.length === 1) {
+        const singleCat = allowedCategories[0];
+        equipFilterCategory.clear();
+        equipFilterCategory.add(singleCat);
+        categoryBtns += `<button type="button" class="filter-btn active" onclick="selectEquipCategoryFilter('${singleCat}', true)">${singleCat}</button>`;
     }
 
-    let maxAllowedEnhance = (slotIndex === 5 || allowedCategories.includes("Augmentation")) ? 10 : 13;
+    let factionBtns = `<button type="button" class="filter-btn ${equipFilterFaction.has('ALL') ? 'active' : ''}" onclick="selectEquipFactionFilter('ALL')">Hiển Thị Tất Cả</button>`;
+    factions.forEach(f => {
+        const active = equipFilterFaction.has(f) ? 'active' : '';
+        factionBtns += `<button type="button" class="filter-btn ${active}" onclick="selectEquipFactionFilter('${f}')">${f}</button>`;
+    });
 
-    let existingEquip = fleetState[fleetIndex].equips[slotIndex];
-    if (existingEquip && existingEquip.enhance !== undefined) {
-        currentEquipEnhanceVal = Math.min(existingEquip.enhance, maxAllowedEnhance);
-    } else {
-        currentEquipEnhanceVal = Math.min(getDefaultEquipEnhance(), maxAllowedEnhance);
-    }
+    let rarityBtns = `<button type="button" class="filter-btn ${equipFilterRarity.has('ALL') ? 'active' : ''}" onclick="selectEquipRarityFilter('ALL')">Hiển Thị Tất Cả</button>`;
+    rarities.forEach(r => {
+        const active = equipFilterRarity.has(r.code) ? `active ${r.cls}` : '';
+        rarityBtns += `<button type="button" class="filter-btn ${r.cls} ${active}" onclick="selectEquipRarityFilter('${r.code}')">${r.label}</button>`;
+    });
 
-    let controlsHtml = `
-        <div class="ship-modal-controls">
-            <div class="control-group">
-                <label>Enhance:</label>
-                <input type="number" id="equipEnhanceInput" min="0" max="${maxAllowedEnhance}" value="${currentEquipEnhanceVal}" onchange="handleEquipEnhanceInputChange(this.value)">
-                <input type="range" id="equipEnhanceRange" min="0" max="${maxAllowedEnhance}" value="${currentEquipEnhanceVal}" oninput="handleEquipEnhanceRangeChange(this.value)">
-                <button type="button" class="set-default-btn" onclick="handleSetDefaultEquipEnhance()">Đặt làm mặc định</button>
+    return `
+        <div id="equipFilterPanel" class="ship-filter-panel" style="display: ${isEquipFilterOpen ? 'flex' : 'none'};">
+            <div class="filter-section">
+                <span class="filter-title">Theo Loại Trang Bị</span>
+                <div class="filter-btn-group">${categoryBtns}</div>
+            </div>
+            <div class="filter-section">
+                <span class="filter-title">Theo Faction</span>
+                <div class="filter-btn-group">${factionBtns}</div>
+            </div>
+            <div class="filter-section">
+                <span class="filter-title">Theo Độ Hiếm</span>
+                <div class="filter-btn-group">${rarityBtns}</div>
             </div>
         </div>
     `;
+}
 
-    let currentEquips = fleetState[fleetIndex].equips;
+function selectEquipCategoryFilter(val, isSingleType) {
+    if (isSingleType) return;
+
+    if (val === 'ALL') {
+        equipFilterCategory.clear();
+        equipFilterCategory.add('ALL');
+    } else {
+        equipFilterCategory.delete('ALL');
+        if (equipFilterCategory.has(val)) {
+            equipFilterCategory.delete(val);
+        } else {
+            equipFilterCategory.add(val);
+        }
+        if (equipFilterCategory.size === 0) {
+            equipFilterCategory.add('ALL');
+        }
+    }
+    updateEquipFilterUIAndGrid();
+}
+
+function selectEquipFactionFilter(val) {
+    if (val === 'ALL') {
+        equipFilterFaction.clear();
+        equipFilterFaction.add('ALL');
+    } else {
+        equipFilterFaction.delete('ALL');
+        if (equipFilterFaction.has(val)) {
+            equipFilterFaction.delete(val);
+        } else {
+            equipFilterFaction.add(val);
+        }
+        if (equipFilterFaction.size === 0) {
+            equipFilterFaction.add('ALL');
+        }
+    }
+    updateEquipFilterUIAndGrid();
+}
+
+function selectEquipRarityFilter(val) {
+    if (val === 'ALL') {
+        equipFilterRarity.clear();
+        equipFilterRarity.add('ALL');
+    } else {
+        equipFilterRarity.delete('ALL');
+        if (equipFilterRarity.has(val)) {
+            equipFilterRarity.delete(val);
+        } else {
+            equipFilterRarity.add(val);
+        }
+        if (equipFilterRarity.size === 0) {
+            equipFilterRarity.add('ALL');
+        }
+    }
+    updateEquipFilterUIAndGrid();
+}
+
+function updateEquipFilterUIAndGrid() {
+    let shipInfo = getShipTypeAndData(fleetState[selectingSlotIndex].shipId);
+    if (!shipInfo) return;
+
+    let allowedCategories = [];
+    if (selectingEquipSlotIndex === 5) {
+        allowedCategories = ["Augmentation"];
+    } else if (selectingEquipSlotIndex === 3 || selectingEquipSlotIndex === 4) {
+        allowedCategories = ["Auxiliary"];
+    } else {
+        let mainSlots = shipInfo.data.equipSlot.slice(0, 3);
+        allowedCategories = mainSlots[selectingEquipSlotIndex] || [];
+    }
+
+    const panel = document.getElementById('equipFilterPanel');
+    if (panel) {
+        panel.outerHTML = buildEquipFilterHtml(allowedCategories);
+    }
+    renderEquipListOnly(allowedCategories, shipInfo);
+}
+
+function isEquipMatchingFilter(category, eqData) {
+    if (!equipFilterCategory.has('ALL') && !equipFilterCategory.has(category)) {
+        return false;
+    }
+
+    if (!equipFilterFaction.has('ALL')) {
+        let eqFaction = eqData.faction || 'Universal';
+        let matchedFaction = false;
+        for (let f of equipFilterFaction) {
+            if (eqFaction === f) {
+                matchedFaction = true;
+                break;
+            }
+        }
+        if (!matchedFaction) return false;
+    }
+
+    if (!equipFilterRarity.has('ALL')) {
+        let eqBox = eqData.box || 'grey';
+        if (!equipFilterRarity.has(eqBox)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function getEquipBoxRank(boxColor) {
+    switch (boxColor) {
+        case 'rainbow': return 0;
+        case 'yellow':  return 1;
+        case 'purple':  return 2;
+        case 'blue':    return 3;
+        case 'grey':    return 4;
+        default:        return 99;
+    }
+}
+
+function renderEquipListOnly(allowedCategories, shipInfo) {
+    let gridListEl = document.querySelector('#equipModalGrid .ship-grid-list');
+    if (!gridListEl) return;
+
+    let currentEquips = fleetState[selectingSlotIndex].equips;
     let limitedEquipsSelected = new Set();
     currentEquips.forEach((eq, idx) => {
-        if (eq && idx !== slotIndex) {
+        if (eq && idx !== selectingEquipSlotIndex) {
             let eqData = window.equipDetails[eq.category] && window.equipDetails[eq.category][eq.id];
             if (eqData && eqData.limit === 1) {
                 limitedEquipsSelected.add(eq.id);
@@ -912,6 +1194,15 @@ function openEquipModal(fleetIndex, slotIndex) {
         </div>
     `;
 
+    const equipFactionOrder = [
+        "Universal", "Eagle Union", "Royal Navy", "Heavy Sakura", "Ironblood", 
+        "Dragon Empery", "Sardegna Empire", "Northern Parliament", 
+        "Iris Libre", "Vichya Dominion", "Kingdom of Tulipia", 
+        "Liga de Pedrería", "META", "Tempesta", "Collab"
+    ];
+
+    let allEquipsList = [];
+
     allowedCategories.forEach(category => {
         if (window.equipDetails && window.equipDetails[category]) {
             for (let eqId in window.equipDetails[category]) {
@@ -923,34 +1214,158 @@ function openEquipModal(fleetIndex, slotIndex) {
                     }
                 }
 
-                let safeName = eqData.name.replace(/"/g, '&quot;');
-                let iconUrl = `https://azurlane.netojuu.com/images/${eqData.code}.png`;
-                let boxClass = eqData.box ? `box-${eqData.box}` : "box-grey";
+                if (!isEquipMatchingFilter(category, eqData)) {
+                    continue;
+                }
 
-                let isLimitedAndSelected = limitedEquipsSelected.has(eqId);
-                let itemClass = isLimitedAndSelected ? "modal-ship-icon equip-disabled" : `modal-ship-icon ${boxClass}`;
-                let clickAction = isLimitedAndSelected ? "" : `onclick="selectEquip('${eqId}', '${category}')"`;
-
-                gridHtml += `
-                    <div class="ship-item-wrapper" onmouseleave="handleItemLeave(this)">
-                        <div class="${itemClass}" title="${safeName}" ${clickAction}
-                             onmouseenter="handleIconHover(this, true)">
-                            <img src="${iconUrl}" class="modal-ship-image" alt="${safeName}">
-                        </div>
-                        <div class="ship-name-box" onmouseenter="handleNameHover(this, true)">
-                            <span class="ship-name-text">${safeName}</span>
-                        </div>
-                    </div>
-                `;
+                allEquipsList.push({
+                    id: eqId,
+                    category: category,
+                    data: eqData,
+                    displayName: eqData.name
+                });
             }
         }
     });
 
-    document.getElementById('equipModalGrid').innerHTML = controlsHtml + `<div class="ship-grid-list">${gridHtml}</div>`;
+    allEquipsList.sort((a, b) => {
+        let rA = getEquipBoxRank(a.data.box);
+        let rB = getEquipBoxRank(b.data.box);
+        if (rA !== rB) return rA - rB;
+
+        let fAStr = a.data.faction || 'Universal';
+        let fBStr = b.data.faction || 'Universal';
+        let fA = equipFactionOrder.indexOf(fAStr);
+        let fB = equipFactionOrder.indexOf(fBStr);
+        if (fA === -1) fA = 99;
+        if (fB === -1) fB = 99;
+        if (fA !== fB) return fA - fB;
+
+        let cA = allowedCategories.indexOf(a.category);
+        let cB = allowedCategories.indexOf(b.category);
+        if (cA !== cB) return cA - cB;
+
+        return a.displayName.localeCompare(b.displayName);
+    });
+
+    allEquipsList.forEach(item => {
+        let eqId = item.id;
+        let category = item.category;
+        let eqData = item.data;
+
+        let safeName = item.displayName.replace(/"/g, '&quot;');
+        let iconUrl = `https://azurlane.netojuu.com/images/${eqData.code}.png`;
+        let boxClass = eqData.box ? `box-${eqData.box}` : "box-grey";
+
+        let isLimitedAndSelected = limitedEquipsSelected.has(eqId);
+        let itemClass = isLimitedAndSelected ? "modal-ship-icon equip-disabled" : `modal-ship-icon ${boxClass}`;
+        let clickAction = isLimitedAndSelected ? "" : `onclick="selectEquip('${eqId}', '${category}')"`;
+
+        gridHtml += `
+            <div class="ship-item-wrapper" onmouseleave="handleItemLeave(this)">
+                <div class="${itemClass}" title="${safeName}" ${clickAction}
+                     onmouseenter="handleIconHover(this, true)">
+                    <img src="${iconUrl}" class="modal-ship-image" alt="${safeName}">
+                </div>
+                <div class="ship-name-box" onmouseenter="handleNameHover(this, true)">
+                    <span class="ship-name-text">${safeName}</span>
+                </div>
+            </div>
+        `;
+    });
+
+    gridListEl.innerHTML = gridHtml;
+}
+
+// ==========================================
+// ĐIỀU KHIỂN POPUP CHỌN TRANG BỊ & ENHANCE
+// ==========================================
+let currentEquipEnhanceVal = 0;
+
+function injectEquipModal() {
+    if (!document.getElementById('equipSelectionModal')) {
+        const equipModalHtml = `
+        <div id="equipSelectionModal" class="modal-overlay" style="display:none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>CHỌN TRANG BỊ</h2>
+                    <div class="modal-header-actions">
+                        <button type="button" class="filter-toggle-btn" onclick="toggleEquipFilter(this)">Mở Bộ Lọc ▼</button>
+                        <button type="button" class="modal-close-btn" onclick="closeEquipModal()">Đóng</button>
+                    </div>
+                </div>
+                <div class="modal-body" id="equipModalGrid">
+                </div>
+            </div>
+        </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', equipModalHtml);
+    }
+}
+
+function openEquipModal(fleetIndex, slotIndex) {
+    selectingSlotIndex = fleetIndex;
+    selectingEquipSlotIndex = slotIndex;
+    
+    let shipInfo = getShipTypeAndData(fleetState[fleetIndex].shipId);
+    if (!shipInfo) return;
+
+    resetEquipFilterState();
+
+    let allowedCategories = [];
+    let isAugmentSlot = (slotIndex === 5);
+
+    if (isAugmentSlot) {
+        allowedCategories = ["Augmentation"];
+    } else if (slotIndex === 3 || slotIndex === 4) {
+        allowedCategories = ["Auxiliary"];
+    } else {
+        let mainSlots = shipInfo.data.equipSlot.slice(0, 3);
+        allowedCategories = mainSlots[slotIndex] || [];
+    }
+
+    const eqModal = document.getElementById('equipSelectionModal');
+    const headerActions = eqModal.querySelector('.modal-header-actions');
+    if (headerActions) {
+        if (isAugmentSlot) {
+            headerActions.innerHTML = `<button type="button" class="modal-close-btn" onclick="closeEquipModal()">Đóng</button>`;
+        } else {
+            headerActions.innerHTML = `
+                <button type="button" class="filter-toggle-btn" onclick="toggleEquipFilter(this)">Mở Bộ Lọc ▼</button>
+                <button type="button" class="modal-close-btn" onclick="closeEquipModal()">Đóng</button>
+            `;
+        }
+    }
+
+    let maxAllowedEnhance = (isAugmentSlot || allowedCategories.includes("Augmentation")) ? 10 : 13;
+
+    const fleetGroupIndex = getFleetGroupIndex(fleetIndex);
+    let existingEquip = fleetState[fleetIndex].equips[slotIndex];
+    if (existingEquip && existingEquip.enhance !== undefined) {
+        currentEquipEnhanceVal = Math.min(existingEquip.enhance, maxAllowedEnhance);
+    } else {
+        currentEquipEnhanceVal = Math.min(getDefaultEquipEnhanceForFleet(fleetGroupIndex), maxAllowedEnhance);
+    }
+
+    let controlsHtml = `
+        <div class="ship-modal-controls">
+            <div class="control-group">
+                <label>Enhance:</label>
+                <input type="number" id="equipEnhanceInput" min="0" max="${maxAllowedEnhance}" value="${currentEquipEnhanceVal}" onchange="handleEquipEnhanceInputChange(this.value)">
+                <input type="range" id="equipEnhanceRange" min="0" max="${maxAllowedEnhance}" value="${currentEquipEnhanceVal}" oninput="handleEquipEnhanceRangeChange(this.value)">
+                <button type="button" class="set-default-btn" onclick="handleSetDefaultEquipEnhance()">Đặt làm mặc định</button>
+            </div>
+        </div>
+    `;
+
+    let filterHtml = isAugmentSlot ? "" : buildEquipFilterHtml(allowedCategories);
+
+    document.getElementById('equipModalGrid').innerHTML = filterHtml + controlsHtml + `<div class="ship-grid-list"></div>`;
+    renderEquipListOnly(allowedCategories, shipInfo);
     
     applyAntiShiftPadding(true);
 
-    document.getElementById('equipSelectionModal').style.display = "flex";
+    eqModal.style.display = "flex";
     document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
 }
@@ -984,17 +1399,20 @@ function handleSetDefaultEquipEnhance() {
     let maxAllowed = (selectingEquipSlotIndex === 5) ? 10 : 13;
     let finalDefault = Math.min(currentEquipEnhanceVal, maxAllowed);
     
-    saveDefaultEquipEnhance(finalDefault);
+    if (selectingSlotIndex !== -1) {
+        const fleetGroupIndex = getFleetGroupIndex(selectingSlotIndex);
+        saveDefaultEquipEnhanceForFleet(fleetGroupIndex, finalDefault);
 
-    if (selectingSlotIndex !== -1 && selectingEquipSlotIndex !== -1) {
-        let currentEq = fleetState[selectingSlotIndex].equips[selectingEquipSlotIndex];
-        if (currentEq && currentEq.id) {
-            let eqData = window.equipDetails[currentEq.category] && window.equipDetails[currentEq.category][currentEq.id];
-            let maxEnhance = eqData ? getMaxEnhanceByBox(eqData.box, currentEq.category) : maxAllowed;
+        if (selectingEquipSlotIndex !== -1) {
+            let currentEq = fleetState[selectingSlotIndex].equips[selectingEquipSlotIndex];
+            if (currentEq && currentEq.id) {
+                let eqData = window.equipDetails[currentEq.category] && window.equipDetails[currentEq.category][currentEq.id];
+                let maxEnhance = eqData ? getMaxEnhanceByBox(eqData.box, currentEq.category) : maxAllowed;
 
-            currentEq.enhance = Math.min(finalDefault, maxEnhance);
-            saveFleetState();
-            renderFleet();
+                currentEq.enhance = Math.min(finalDefault, maxEnhance);
+                saveFleetState();
+                renderFleet();
+            }
         }
     }
 
@@ -1028,6 +1446,8 @@ function closeEquipModal() {
     if (eqModal) eqModal.style.display = "none";
     selectingEquipSlotIndex = -1;
     
+    resetEquipFilterState();
+
     document.documentElement.style.overflow = '';
     document.body.style.overflow = '';
     applyAntiShiftPadding(false);
