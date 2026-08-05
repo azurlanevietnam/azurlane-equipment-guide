@@ -6,6 +6,21 @@ equipData["Auxiliary"] = {
 };
 
 equipDetails["Auxiliary"] = {
+    "rainbow_aux": {
+        "admiralty_fct": {
+            name: "Admiralty Fire Control Table",
+            tier: "N/A",
+            source: ["Core Data Shop"],
+            stats: ["FP +46", "ACC +65"],
+            equippable: ["BB", "BC", "BBV", "BM"],
+            limit: 1,
+            fleetLimit: 2,
+            linkTab: 0,
+            desc: ["Tàu mang trang bị này được giảm 15% thời gian hồi loạt pháo kích đầu tiên và giảm 2 điểm phân tán của pháo chính."],
+            code: "c/c4/3580",
+            box: "rainbow"
+        },
+    },
     "yellow_aux": {
         "frontier_medal": {
             name: "Frontier Medal",
@@ -67,6 +82,17 @@ equipDetails["Auxiliary"] = {
             fleetLimit: 1,
             desc: ["Trong trận đấu, mỗi 15s, tàu mang trang bị này sẽ kích hoạt ngẫu nhiên một trong các hiệu ứng sau: 1 - Nhận một lớp giáp ảo tương đương 3% HP. 2 - Hồi 2% HP. 3 - Phóng một loạt barrage ngư lôi đặc biệt. 4 - Phóng một loạt barrage đạn pháo đặc biệt."],
             code: "9/95/3980",
+            box: "purple"
+        },
+        "repair_toolkit": {
+            name: "Repair Toolkit",
+            tier: "N/A",
+            source: ["3-4, 10-3, 14-1 Drop", "Any T3/4 Tech Box"],
+            stats: ["HP +530"],
+            equippable: ["All"],
+            linkTab: 3,
+            desc: ["Trong trận đấu, mỗi 15s, tàu mang trang bị này sẽ hồi 1% HP."],
+            code: "d/d5/2400",
             box: "purple"
         },
         "homing_beacon": {

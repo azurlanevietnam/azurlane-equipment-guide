@@ -48,33 +48,36 @@ const MAP_EQUIP_CATEGORY = {
 
 // Hàm hỗ trợ tìm thông tin chi tiết của trang bị dựa vào Category hiển thị
 function getEquipDataGlobal(category, eqId) {
-    if (!category || !eqId || !window.equipDetails) return null;
+    if (!eqId || !window.equipDetails) return null;
+
     let targetCat = category;
     if (category === "CA-gun" || category === "CB-gun") targetCat = "CA-gun";
     if (category === "Surface Torpedo" || category === "Guided Missile") targetCat = "Surface Torpedo";
 
-    let catContainer = window.equipDetails[targetCat];
-    if (!catContainer) return null;
+    // 1. Thử tìm nhanh ở danh mục chỉ định
+    if (targetCat && window.equipDetails[targetCat]) {
+        let catContainer = window.equipDetails[targetCat];
+        if (catContainer[eqId]) return catContainer[eqId];
+    }
 
-    // Nếu tìm thấy trực tiếp
-    if (catContainer[eqId]) return catContainer[eqId];
-
-    // Nếu dữ liệu bị phân nhóm nhỏ (nested categories như Augmentation), tiến hành tìm kiếm đệ quy sâu bên trong
+    // 2. Nếu trang bị nằm trong mảng con / nhóm lồng nhau, quét toàn bộ window.equipDetails
     let foundData = null;
     let searchNested = (obj) => {
         if (foundData || !obj || typeof obj !== 'object') return;
-        if (obj[eqId] && obj[eqId].name) {
+        
+        if (obj[eqId] && typeof obj[eqId] === 'object' && obj[eqId].name) {
             foundData = obj[eqId];
             return;
         }
+
         for (let key in obj) {
             if (typeof obj[key] === 'object' && obj[key] !== null) {
                 searchNested(obj[key]);
             }
         }
     };
-    searchNested(catContainer);
 
+    searchNested(window.equipDetails);
     return foundData;
 }
 
@@ -233,8 +236,8 @@ function deleteFleet(groupIndexToDelete) {
         saveDefaultEquipEnhanceForFleet(g, nextEquipDef);
     }
 
-    saveDefaultShipSettingsForFleet(totalFleets - 1, 1, 'Stranger');
-    saveDefaultEquipEnhanceForFleet(totalFleets - 1, 0);
+    saveDefaultShipSettingsForFleet(totalFleets - 1, 120, 'Love');
+    saveDefaultEquipEnhanceForFleet(totalFleets - 1, 10);
 
     saveFleetState();
     renderFleet();
@@ -424,7 +427,6 @@ function renderFleetSlotRow(index) {
             let rawEffVal = shipInfo.data.slotEff && shipInfo.data.slotEff[i] ? shipInfo.data.slotEff[i] : "";
             let isModified = shipInfo.data._modifiedEffIndices && shipInfo.data._modifiedEffIndices[i];
 
-            // Nếu chỉ số bị thay đổi bởi luật, đổi sang màu xanh lá cây (#2ecc71)
             let effStyle = isModified ? 'color: #2ecc71; font-weight: bold;' : '';
             let eff = rawEffVal ? `<span class="eff-line" style="${effStyle}">${rawEffVal}%</span>` : "";
             let amt = (shipInfo.data.slotAmount && shipInfo.data.slotAmount[i]) ? `x${shipInfo.data.slotAmount[i]}` : "";
@@ -771,7 +773,6 @@ function renderShipListOnly() {
     let gridListEl = document.querySelector('.ship-grid-list');
     if (!gridListEl) return;
 
-    // Tìm các con tàu đã xuất hiện trong hạm đội hiện tại
     const currentFleetGroup = getFleetGroupIndex(selectingSlotIndex);
     const startIdx = currentFleetGroup * 9;
     const endIdx = startIdx + 9;
@@ -799,7 +800,7 @@ function renderShipListOnly() {
         "Eagle Union", "Royal Navy", "Heavy Sakura", "Ironblood",
         "Dragon Empery", "Sardegna Empire", "Northern Parliament",
         "Iris Libre", "Vichya Dominion", "Kingdom of Tulipia",
-        "Liga de Pedrería", "META", "Tempesta", "Universal", "Collab"
+        "Liga de Pedrería", "META", "Tempesta", "Universal", "Atelier Ryza"
     ];
 
     let slotType = getSlotCategoryType(selectingSlotIndex);
@@ -848,10 +849,10 @@ function renderShipListOnly() {
         let shipId = item.id;
         let shipData = item.data;
 
-        // --- KIỂM TRA TRÁNH LẶP TÀU TRONG CÙNG HẠM ĐỘI ---
+        // --- ẨN HOÀN TOÀN CÁC TÀU ĐÃ CHỌN TRONG CÙNG HẠM ĐỘI ---
         let isShipSelectedInFleet = selectedShipsInFleet.has(shipId);
         if (isShipSelectedInFleet) {
-            return; // Nếu tàu đã có trong hạm đội -> Bỏ qua (ẩn hoàn toàn khỏi bảng chọn)
+            return;
         }
 
         let iconUrl = getShipIconUrl(shipId, shipData);
@@ -1075,7 +1076,7 @@ function buildEquipFilterHtml(allowedCategories) {
         "Universal", "Eagle Union", "Royal Navy", "Heavy Sakura", "Ironblood",
         "Dragon Empery", "Sardegna Empire", "Northern Parliament",
         "Iris Libre", "Vichya Dominion", "Kingdom of Tulipia",
-        "Liga de Pedrería", "META", "Tempesta", "Collab"
+        "Liga de Pedrería", "META", "Tempesta", "Atelier Ryza"
     ];
 
     const rarities = [
@@ -1253,10 +1254,8 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
         if (slotData && slotData.equips) {
             slotData.equips.forEach((eq, eqIdx) => {
                 if (eq && eq.id) {
-                    // Đếm số lượng trang bị trong cùng Fleet
                     fleetEquipCounts[eq.id] = (fleetEquipCounts[eq.id] || 0) + 1;
 
-                    // Giới hạn limit = 1 trên cùng 1 con tàu
                     if (slotIdx === selectingSlotIndex && eqIdx !== selectingEquipSlotIndex) {
                         let eqData = getEquipDataGlobal(eq.category, eq.id);
                         if (eqData && eqData.limit === 1) {
@@ -1284,7 +1283,7 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
         "Universal", "Eagle Union", "Royal Navy", "Heavy Sakura", "Ironblood",
         "Dragon Empery", "Sardegna Empire", "Northern Parliament",
         "Iris Libre", "Vichya Dominion", "Kingdom of Tulipia",
-        "Liga de Pedrería", "META", "Tempesta", "Collab"
+        "Liga de Pedrería", "META", "Tempesta", "Atelier Ryza"
     ];
 
     let allEquipsList = [];
@@ -1300,12 +1299,10 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
         if (window.equipDetails && window.equipDetails[targetDataCategory]) {
             let catContainer = window.equipDetails[targetDataCategory];
 
-            // Hàm phụ trợ giúp quét qua cả dữ liệu phẳng lẫn dữ liệu phân nhóm (nested categories như Augmentation)
             let processEquipEntries = (equipObj) => {
                 for (let eqId in equipObj) {
                     let eqData = equipObj[eqId];
                     
-                    // Nếu bên trong lại chứa tiếp các nhóm con (như "exc_aug_cb", "purple_aug") thì gọi đệ quy quét tiếp cấp con
                     if (eqData && typeof eqData === 'object' && !eqData.code && !eqData.name) {
                         processEquipEntries(eqData);
                         continue;
@@ -1327,26 +1324,30 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
                     if (category === "Surface Torpedo" && actualCategory !== "Surface Torpedo") continue;
                     if (category === "Guided Missile" && actualCategory !== "Guided Missile") continue;
 
-                    // Lọc theo thuộc tính equippable
+                    // --- CƠ CHẾ KIỂM TRA EQUIPPABLE / UNEQUIPPABLE MỚI ---
                     let equipableList = eqData.equippable || eqData.equipable;
                     let isEquippableAllowed = false;
 
-                    if (equipableList && Array.isArray(equipableList)) {
-                        if (equipableList.includes("All") || equipableList.includes(shipInfo.type)) {
-                            isEquippableAllowed = true;
-                        }
+                    // Nếu không khai báo equippable, mặc định cho phép tất cả các loại tàu dùng ("All")
+                    if (!equipableList || !Array.isArray(equipableList) || equipableList.length === 0) {
+                        isEquippableAllowed = true;
+                    } else if (equipableList.includes("All") || equipableList.includes(shipInfo.type)) {
+                        isEquippableAllowed = true;
                     }
 
-                    // Kiểm tra danh sách ngoại lệ bị cấm (unequippable)
+                    // Kiểm tra danh sách ngoại lệ unequippable (loại trừ các tàu bị cấm)
                     let unequippableList = eqData.unequippable || eqData.unequipList;
                     if (unequippableList && Array.isArray(unequippableList)) {
                         if (unequippableList.includes(shipInfo.type)) {
-                            isEquippableAllowed = false; // Bị cấm nếu loại tàu hiện tại nằm trong danh sách unequippable
+                            isEquippableAllowed = false; 
                         }
                     }
 
-                    // Nếu không thỏa mãn điều kiện sử dụng -> Bỏ qua (không hiển thị)
                     if (!isEquippableAllowed) {
+                        continue;
+                    }
+
+                    if (!isEquipMatchingFilter(actualCategory, eqData)) {
                         continue;
                     }
 
@@ -1388,12 +1389,11 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
         let category = item.category === "Augmentation" || selectingEquipSlotIndex === 5 ? "Augmentation" : item.category;
         let eqData = item.data;
 
-        // --- KIỂM TRA ĐIỀU KIỆN EXCLUSIVE: NẾU KHÔNG ĐỦ QUYỀN THÌ ẨN LUÔN ---
+        // --- EXCLUSIVE: NẾU TÀU HIỆN TẠI KHÔNG NẰM TRONG DANH SÁCH -> ẨN LUÔN ---
         if (eqData.exclusive && Array.isArray(eqData.exclusive)) {
             let currentShipId = fleetState[selectingSlotIndex].shipId;
-            // Nếu tàu hiện tại không nằm trong danh sách exclusive -> Ẩn hoàn toàn khỏi bảng chọn
             if (!eqData.exclusive.includes(currentShipId)) {
-                return; // Dùng return để bỏ qua (ẩn luôn), không render món này ra giao diện
+                return;
             }
         }
 
@@ -1401,7 +1401,6 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
         let iconUrl = `https://azurlane.netojuu.com/images/${eqData.code}.png`;
         let boxClass = eqData.box ? `box-${eqData.box}` : "box-grey";
 
-        // Các giới hạn khác (như trùng lặp trong hạm đội) vẫn giữ nguyên trạng thái DISABLE (bôi mờ) và chống chọn
         let isLimitedOnShip = limitedEquipsOnCurrentShip.has(eqId);
         
         let currentEqInSlot = fleetState[selectingSlotIndex].equips[selectingEquipSlotIndex];
@@ -1727,7 +1726,6 @@ function getProcessedShipData(fleetSlotIndex) {
                 let minCount = rule.minCount || 1;
                 let bonusVal = rule.bonus;
 
-                // Đếm số lượng trang bị thuộc faction yêu cầu trên toàn bộ các ô trang bị của con tàu này
                 let factionEquipCount = 0;
                 slot.equips.forEach(eq => {
                     if (eq && eq.id) {
@@ -1739,7 +1737,6 @@ function getProcessedShipData(fleetSlotIndex) {
                     }
                 });
 
-                // Nếu đạt điều kiện số lượng tối thiểu
                 if (factionEquipCount >= minCount) {
                     let currentEff = parseInt(shipDataCopy.slotEff[targetSlot], 10) || 0;
                     shipDataCopy.slotEff[targetSlot] = String(currentEff + bonusVal);

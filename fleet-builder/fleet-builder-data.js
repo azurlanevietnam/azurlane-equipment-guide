@@ -7,10 +7,9 @@ const fleetDataFiles = [
     'ship/destroyer-data.js',
     'ship/missile-destroyer-data.js',
     'ship/large-cruiser-data.js',
+    'ship/battleship-data.js',
     'ship/aircraft-carrier-data.js',
     // Sau này bạn có thể bỏ comment để thêm các loại tàu khác:
-    // 'ship/battleship-data.js',
-    // 'ship/cruiser-data.js',
     
     // 3. TẢI SCRIPT XỬ LÝ GIAO DIỆN TỪ THƯ MỤC "fleet-builder" CUỐI CÙNG
     'fleet-builder/fleet-builder-script.js'
