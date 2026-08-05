@@ -1,9 +1,9 @@
 const navLinks = [
-    { name: "HEALER LIST", url: "index.html" },
+    { name: "FLEET BUILDER", url: "index.html" },
     { name: "EQUIPMENT LIST", url: "equip.html" },
-    { name: "AA CALCULATOR", url: "aa-caculate.html" },
     { name: "PLANE DMG BURST TIERLIST", url: "planedmg.html" },
-    { name: "FLEET BUILDER", url: "fleet-builder.html" }
+    { name: "HEALER LIST", url: "hearler-tierlist.html" },
+    { name: "AA CALCULATOR", url: "aa-caculate.html" },
 ];
 
 document.addEventListener("DOMContentLoaded", () => {

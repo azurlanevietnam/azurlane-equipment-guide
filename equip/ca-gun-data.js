@@ -21,6 +21,7 @@ equipDetails["CA-gun"] = {
         gunType: "ca",
         tier: "SS",
         source: ["Springtide Inn Online Event Shop"],
+        faction: "Northern Parliament",
         stats: ["FP +65"],
         ammoType: "AP",
         ammoMod: "80% / 125% / 85%",
@@ -50,7 +51,7 @@ equipDetails["CA-gun"] = {
         code: "5/5c/43160",
         box: "rainbow"
     },
-    "single-305-mk8": {
+    "triple-305-mk8": {
         name: "Triple 305mm (12\"/50 Mk 8)",
         gunType: "cb",
         tier: "S++",
@@ -191,6 +192,7 @@ equipDetails["CA-gun"] = {
         gunType: "cb",
         tier: "S",
         source: ["Abyssal Refrain Event Shop", "Gear Lab"],
+        faction: "Northern Parliament",
         stats: ["FP +45"],
         ammoType: "APB",
         ammoMod: "70% / 115% / 80%",

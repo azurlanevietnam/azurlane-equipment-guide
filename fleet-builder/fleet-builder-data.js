@@ -4,11 +4,13 @@ const fleetDataFiles = [
     'equip/equip-data.js',
     
     // 2. TẢI DỮ LIỆU TỪNG LOẠI TÀU TỪ THƯ MỤC "ship"
+    'ship/destroyer-data.js',
+    'ship/missile-destroyer-data.js',
+    'ship/large-cruiser-data.js',
     'ship/aircraft-carrier-data.js',
     // Sau này bạn có thể bỏ comment để thêm các loại tàu khác:
     // 'ship/battleship-data.js',
     // 'ship/cruiser-data.js',
-    // 'ship/destroyer-data.js',
     
     // 3. TẢI SCRIPT XỬ LÝ GIAO DIỆN TỪ THƯ MỤC "fleet-builder" CUỐI CÙNG
     'fleet-builder/fleet-builder-script.js'

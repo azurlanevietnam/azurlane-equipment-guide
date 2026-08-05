@@ -94,7 +94,7 @@ shipDetails["CV"] = {
         rarity: "Ultra Rare",
         code: "7/70",
         box: "rainbow",
-        equipSlot: [[FT], [FT, DB, TB], [CLG, AAG]],
+        equipSlot: [[FT], [FT, DB, TB], [CLGM, AAGM]],
         slotAmount: [4, 4, 1],
         slotEff: ["140", "140", "100"]
 

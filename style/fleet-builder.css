@@ -18,7 +18,7 @@
 .fleet-box-wrapper {
     display: flex;
     flex-direction: column; 
-    gap: 12px;
+    gap: 4px;
     background: #1a252f;    /* Khung nền đen riêng của Fleet */
     padding: 16px; 
     border-radius: 8px;
@@ -74,6 +74,7 @@
     background: transparent;
     color: #e74c3c;
     border: 2px solid #e74c3c;
+    margin-right: 6px;
 }
 
 .fleet-delete-btn:hover:not(:disabled) {

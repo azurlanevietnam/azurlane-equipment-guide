@@ -5,11 +5,14 @@ const FT = "Fighter";
 const DB = "Dive Bomber";
 const TB = "Torpedo Bomber";
 const SP = "Seaplane";
-const DDG = "DD-gun";
-const CLG = "CL-gun";
-const CAG = "CA-gun";
-const BBG = "BB-gun";
-const AAG = "AA-gun";
+const DDGM = "DD-gun";
+const CLGM = "CL-gun";
+const CAGM = "CA-gun";
+const CBGM = "CB-gun";
+const BBGM = "BB-gun";
+const AAGM = "AA-gun";
+const TRPM = "Surface Torpedo";
+const GMM = "Guided Missile";
 const AUX = "Auxiliary";
 const AUG = "Augmentation";
 
@@ -39,6 +42,7 @@ const dataFiles = [
     'dd-gun-data.js',
     'ca-gun-data.js',
     'aa-gun-data.js',
+    "torpedo-data.js",
     'fighter-data.js',
     'dive-bomber-data.js',
     'torp-bomber-data.js',
