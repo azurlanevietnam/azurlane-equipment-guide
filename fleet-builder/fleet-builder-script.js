@@ -46,7 +46,7 @@ const MAP_EQUIP_CATEGORY = {
     "AUG": "Augmentation"
 };
 
-// Hàm hỗ trợ tìm thông tin chi tiết của trang bị dựa vào Category hiển thị
+// Hàm hỗ trợ tìm thông tin chi tiết của trang bị dựa vào Category hiển thị (hỗ trợ quét đệ quy các nhóm con)
 function getEquipDataGlobal(category, eqId) {
     if (!eqId || !window.equipDetails) return null;
 
@@ -60,7 +60,7 @@ function getEquipDataGlobal(category, eqId) {
         if (catContainer[eqId]) return catContainer[eqId];
     }
 
-    // 2. Nếu trang bị nằm trong mảng con / nhóm lồng nhau, quét toàn bộ window.equipDetails
+    // 2. Nếu trang bị nằm trong mảng con / nhóm lồng nhau, quét đệ quy toàn bộ window.equipDetails
     let foundData = null;
     let searchNested = (obj) => {
         if (foundData || !obj || typeof obj !== 'object') return;
@@ -852,7 +852,7 @@ function renderShipListOnly() {
         // --- ẨN HOÀN TOÀN CÁC TÀU ĐÃ CHỌN TRONG CÙNG HẠM ĐỘI ---
         let isShipSelectedInFleet = selectedShipsInFleet.has(shipId);
         if (isShipSelectedInFleet) {
-            return;
+            return; 
         }
 
         let iconUrl = getShipIconUrl(shipId, shipData);
@@ -1249,6 +1249,13 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
     let limitedEquipsOnCurrentShip = new Set();
     let fleetEquipCounts = {};
 
+    // Danh sách các cặp trang bị dùng chung giới hạn (Group / Pair Limit) trên cùng một con tàu
+    const PAIR_LIMIT_GROUPS = [
+        ["hpfcr", "admiralty_fct"] 
+    ];
+
+    let currentShipEquips = fleetState[selectingSlotIndex] ? fleetState[selectingSlotIndex].equips : [];
+
     for (let slotIdx = startIdx; slotIdx < endIdx; slotIdx++) {
         let slotData = fleetState[slotIdx];
         if (slotData && slotData.equips) {
@@ -1266,6 +1273,19 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
             });
         }
     }
+
+    // --- KIỂM TRA LUẬT NHÓM CẶP TRANG BỊ TRÊN CÙNG CON TÀU ---
+    currentShipEquips.forEach((eq, eqIdx) => {
+        if (eq && eq.id && eqIdx !== selectingEquipSlotIndex) {
+            PAIR_LIMIT_GROUPS.forEach(group => {
+                if (group.includes(eq.id)) {
+                    group.forEach(itemId => {
+                        limitedEquipsOnCurrentShip.add(itemId);
+                    });
+                }
+            });
+        }
+    });
 
     let gridHtml = `
         <div class="ship-item-wrapper" onmouseleave="handleItemLeave(this)">
@@ -1324,18 +1344,18 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
                     if (category === "Surface Torpedo" && actualCategory !== "Surface Torpedo") continue;
                     if (category === "Guided Missile" && actualCategory !== "Guided Missile") continue;
 
-                    // --- CƠ CHẾ KIỂM TRA EQUIPPABLE / UNEQUIPPABLE MỚI ---
+                    // --- LUẬT MẶC ĐỊNH EQUIPPABLE LÀ ALL NẾU KHÔNG KHAI BÁO ---
                     let equipableList = eqData.equippable || eqData.equipable;
                     let isEquippableAllowed = false;
 
-                    // Nếu không khai báo equippable, mặc định cho phép tất cả các loại tàu dùng ("All")
+                    // Nếu thiếu/không khai báo equippable, tự động coi là equippable: ["All"]
                     if (!equipableList || !Array.isArray(equipableList) || equipableList.length === 0) {
                         isEquippableAllowed = true;
                     } else if (equipableList.includes("All") || equipableList.includes(shipInfo.type)) {
                         isEquippableAllowed = true;
                     }
 
-                    // Kiểm tra danh sách ngoại lệ unequippable (loại trừ các tàu bị cấm)
+                    // Kiểm tra danh sách ngoại lệ bị cấm (unequippable)
                     let unequippableList = eqData.unequippable || eqData.unequipList;
                     if (unequippableList && Array.isArray(unequippableList)) {
                         if (unequippableList.includes(shipInfo.type)) {
@@ -1393,7 +1413,7 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
         if (eqData.exclusive && Array.isArray(eqData.exclusive)) {
             let currentShipId = fleetState[selectingSlotIndex].shipId;
             if (!eqData.exclusive.includes(currentShipId)) {
-                return;
+                return; 
             }
         }
 

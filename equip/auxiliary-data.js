@@ -7,10 +7,23 @@ equipData["Auxiliary"] = {
 
 equipDetails["Auxiliary"] = {
     "rainbow_aux": {
+        "t93_pot": {
+            name: "Type 93 Pure Oxygen Torpedo",
+            tier: "N/A",
+            source: ["Core Data Shop"],
+            faction: "Heavy Sakura",
+            stats: ["TRP +118", "RLD +13"],
+            equippable: ["DD", "DDG", "CL", "CA", "CB", "SS", "SSV"],
+            linkTab: 3,
+            desc: [],
+            code: "5/59/2600",
+            box: "rainbow"
+        },
         "admiralty_fct": {
             name: "Admiralty Fire Control Table",
             tier: "N/A",
             source: ["Core Data Shop"],
+            faction: "Royal Navy",
             stats: ["FP +46", "ACC +65"],
             equippable: ["BB", "BC", "BBV", "BM"],
             limit: 1,
@@ -22,6 +35,19 @@ equipDetails["Auxiliary"] = {
         },
     },
     "yellow_aux": {
+        "hpfcr": {
+            name: "High Performance Fire Control Radar",
+            tier: "N/A",
+            source: ["PR3/4/5/6/7 Research"],
+            faction: "Eagle Union",
+            stats: ["FP +46", "ACC +65"],
+            equippable: ["BB", "BC", "BBV", "BM"],
+            limit: 1,
+            linkTab: 0,
+            desc: ["Tàu mang trang bị này được giảm 15% thời gian hồi loạt pháo kích đầu tiên."],
+            code: "3/3e/1260",
+            box: "yellow"
+        },
         "frontier_medal": {
             name: "Frontier Medal",
             tier: "N/A",
@@ -38,7 +64,6 @@ equipDetails["Auxiliary"] = {
             tier: "N/A",
             source: ["World-Spanning Arclight Event Reward"],
             stats: ["HP +640"],
-            equippable: ["All"],
             limit: 1,
             fleetLimit: 2,
             linkTab: 0,
@@ -76,7 +101,6 @@ equipDetails["Auxiliary"] = {
             tier: "N/A",
             source: ["EM Countermeasures -Simulation Experiment- Event Reward"],
             stats: ["HP +530"],
-            equippable: ["All"],
             unequippable: ["IXs", "IXv", "IXm"],
             linkTab: 0,
             fleetLimit: 1,

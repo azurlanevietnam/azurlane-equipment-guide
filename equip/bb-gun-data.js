@@ -555,4 +555,20 @@ equipDetails["BB-gun"] = {
         code: "2/2d/24000",
         box: "yellow"
     },
+    "triple-305-p1907": {
+        name: "Triple 305mm (Pattern 1907)",
+        tier: "N/A",
+        source: ["Northern Parliament GearDevelopment Pack"],
+        stats: ["FP +25"],
+        ammoType: "HE",
+        ammoMod: "140% / 110% / 90%",
+        rld: ["27.40s"],
+        dmg: ["3", "82"],
+        range: "200",
+        coef: 1.30,
+        linkTab: 0,
+        desc: [""],
+        code: "2/29/85420",
+        box: "blue"
+    },
 };
