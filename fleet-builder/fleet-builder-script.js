@@ -1385,10 +1385,12 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
     });
 
     allEquipsList.sort((a, b) => {
+        // 1. Tiêu chí đầu tiên: Theo độ hiếm (Box rank: rainbow -> yellow -> purple -> blue -> grey)
         let rA = getEquipBoxRank(a.data.box);
         let rB = getEquipBoxRank(b.data.box);
         if (rA !== rB) return rA - rB;
 
+        // 2. Tiêu chí thứ hai: Theo Faction (Universal ưu tiên đứng đầu)
         let fAStr = a.data.faction || 'Universal';
         let fBStr = b.data.faction || 'Universal';
         let fA = equipFactionOrder.indexOf(fAStr);
@@ -1397,10 +1399,12 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
         if (fB === -1) fB = 99;
         if (fA !== fB) return fA - fB;
 
+        // 3. Tiêu chí thứ ba: Theo loại trang bị (Dựa theo thứ tự khai báo trong allowedCategories của tàu)
         let cA = allowedCategories.indexOf(a.category);
         let cB = allowedCategories.indexOf(b.category);
         if (cA !== cB) return cA - cB;
 
+        // 4. Tiêu chí cuối cùng: Theo Tên trang bị (Alphabet A-Z)
         return a.displayName.localeCompare(b.displayName);
     });
 
