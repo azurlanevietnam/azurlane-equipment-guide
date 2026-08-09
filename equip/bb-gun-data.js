@@ -319,7 +319,7 @@ equipDetails["BB-gun"] = {
         code: "8/8a/44200",
         box: "yellow"
     },
-    "triple-305-skc-bb": {
+    "triple-305-skc": {
         name: "Triple 305mm (SK C/39 Prototype)",
         tier: "S-",
         source: ["PR3 Research", "Gear Lab"],
