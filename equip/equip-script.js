@@ -4,10 +4,70 @@ const tierlistViewContainer = document.getElementById('tierlistView');
 const detailsViewContainer = document.getElementById('detailsView');
 const extraFiltersView = document.getElementById('extraFiltersView');
 
-let currentMainTab = "Torpedo Bomber";
+let currentMainTab = "Fighter";
 let currentSubTab = "";
 let currentFilterConfig = null;
 let currentFilterValue = 'all';
+
+// ==========================================
+// HÀM BỔ TRỢ: TÌM TRANG BỊ TOÀN CỤC (1 CẤP & 2 CẤP)
+// ==========================================
+function getEquipDataGlobal(catName, eqId) {
+    if (!eqId || !equipDetails) return null;
+
+    let catContainer = equipDetails[catName];
+    if (!catContainer) return null;
+
+    // 1. Thử lấy trực tiếp (Cấu trúc 1 cấp)
+    if (catContainer[eqId] && catContainer[eqId].name) {
+        return catContainer[eqId];
+    }
+
+    // 2. Quét đệ quy nếu thuộc cấu trúc 2 cấp / nhóm lồng nhau
+    let found = null;
+    function searchNested(obj) {
+        if (found || !obj || typeof obj !== 'object') return;
+        if (obj[eqId] && typeof obj[eqId] === 'object' && obj[eqId].name) {
+            found = obj[eqId];
+            return;
+        }
+        for (let key in obj) {
+            if (typeof obj[key] === 'object' && obj[key] !== null) {
+                searchNested(obj[key]);
+            }
+        }
+    }
+
+    searchNested(catContainer);
+    return found;
+}
+
+// ==========================================
+// HÀM BỔ TRỢ: QUÉT TẤT CẢ EQUIP ID (HỖ TRỢ CẢ 1 CẤP VÀ 2 CẤP)
+// ==========================================
+function getAllEquipIds(catName) {
+    let result = [];
+    let container = equipDetails[catName];
+    if (!container) return result;
+
+    function extractIds(obj) {
+        for (let key in obj) {
+            let item = obj[key];
+            if (item && typeof item === 'object') {
+                // Nếu đối tượng chứa thuộc tính 'name', đây chính là một trang bị chuẩn
+                if (item.name) {
+                    result.push(key);
+                } else {
+                    // Nếu là nhóm bọc lồng (cấu trúc 2 cấp), tiếp tục quét sâu vào bên trong
+                    extractIds(item);
+                }
+            }
+        }
+    }
+
+    extractIds(container);
+    return result;
+}
 
 function initEquipPage() {
     renderMainTabs();
@@ -25,7 +85,7 @@ function renderMainTabs() {
 function applyExtraFilter(equipId) {
     if (!currentFilterConfig || currentFilterValue === 'all') return true;
     
-    const equipInfo = equipDetails[currentMainTab][equipId];
+    const equipInfo = getEquipDataGlobal(currentMainTab, equipId);
     if (!equipInfo) return false;
     
     const prop = currentFilterConfig.property;
@@ -66,7 +126,7 @@ function selectMainTab(catName) {
     renderSubTabs(data.subCategories);
     selectSubTab('all');
 
-    let allEquipForMainTab = Object.keys(equipDetails[currentMainTab] || {});
+    let allEquipForMainTab = getAllEquipIds(currentMainTab);
     let filteredEquip = allEquipForMainTab.filter(id => applyExtraFilter(id));
     renderDetailsView(filteredEquip);
 }
@@ -89,10 +149,10 @@ function selectSubTab(subId) {
     let equipListWithTiers = [];
 
     if (subId === 'all') {
-        const allEquipIds = Object.keys(equipDetails[currentMainTab] || {});
+        const allEquipIds = getAllEquipIds(currentMainTab);
 
         equipListWithTiers = allEquipIds.map(id => {
-            const equipInfo = equipDetails[currentMainTab][id];
+            const equipInfo = getEquipDataGlobal(currentMainTab, id);
             return { id: id, tier: equipInfo ? (equipInfo.tier || "Unranked") : "Unranked" };
         });
     } else {
@@ -125,7 +185,7 @@ function renderTierlistView(equipListWithTiers) {
     equipListWithTiers.forEach(item => {
         const equipId = item.id;
         const tier = item.tier;
-        const equipItem = equipDetails[currentMainTab] ? equipDetails[currentMainTab][equipId] : null;
+        const equipItem = getEquipDataGlobal(currentMainTab, equipId);
         if (!equipItem) return;
 
         if (!groupedEquips[tier]) groupedEquips[tier] = [];
@@ -142,7 +202,7 @@ function renderTierlistView(equipListWithTiers) {
         return indexA - indexB;
     });
 
-    const originalOrder = Object.keys(equipDetails[currentMainTab] || {});
+    const originalOrder = getAllEquipIds(currentMainTab);
 
     let html = "";
     sortedTiers.forEach((tier, index) => {
@@ -163,7 +223,7 @@ function renderTierlistView(equipListWithTiers) {
 
         let itemsHtml = "";
         groupedEquips[tier].forEach(equipId => {
-            const equipItem = equipDetails[currentMainTab][equipId];
+            const equipItem = getEquipDataGlobal(currentMainTab, equipId);
             let safeTitle = equipItem.name.replace(/"/g, '&quot;');
 
             let customStyle = "";
@@ -206,7 +266,7 @@ function selectExtraFilter(val) {
     renderExtraFilters();
     selectSubTab(currentSubTab);
     
-    let allEquipForMainTab = Object.keys(equipDetails[currentMainTab] || {});
+    let allEquipForMainTab = getAllEquipIds(currentMainTab);
     let filteredEquip = allEquipForMainTab.filter(id => applyExtraFilter(id));
     renderDetailsView(filteredEquip);
 }
@@ -215,14 +275,17 @@ function renderDetailsView(equipList) {
     let finalHTML = "";
 
     let filteredList = equipList.filter(equipId => {
-        return equipDetails[currentMainTab] && equipDetails[currentMainTab][equipId];
+        return getEquipDataGlobal(currentMainTab, equipId);
     });
 
-    const originalOrder = Object.keys(equipDetails[currentMainTab] || {});
+    const originalOrder = getAllEquipIds(currentMainTab);
 
     filteredList.sort((a, b) => {
-        const tierA = (equipDetails[currentMainTab] && equipDetails[currentMainTab][a]) ? (equipDetails[currentMainTab][a].tier || "Unranked") : "Unranked";
-        const tierB = (equipDetails[currentMainTab] && equipDetails[currentMainTab][b]) ? (equipDetails[currentMainTab][b].tier || "Unranked") : "Unranked";
+        const eqA = getEquipDataGlobal(currentMainTab, a);
+        const eqB = getEquipDataGlobal(currentMainTab, b);
+
+        const tierA = eqA ? (eqA.tier || "Unranked") : "Unranked";
+        const tierB = eqB ? (eqB.tier || "Unranked") : "Unranked";
 
         let indexA = tierPriority.indexOf(tierA);
         let indexB = tierPriority.indexOf(tierB);
@@ -235,7 +298,7 @@ function renderDetailsView(equipList) {
     });
 
     filteredList.forEach(equipId => {
-        const equipInfo = equipDetails[currentMainTab][equipId];
+        const equipInfo = getEquipDataGlobal(currentMainTab, equipId);
 
         let statsHTML = equipInfo.stats ? equipInfo.stats.join('<br>') : '';
         let descHTML = equipInfo.desc ? equipInfo.desc.map(d => `<div>${d}</div>`).join('') : '';
@@ -244,7 +307,6 @@ function renderDetailsView(equipList) {
         // 1. NHẬN DIỆN MÔI TRƯỜNG & KHỞI TẠO BIẾN
         // ==========================================
         let isPlane = ["Fighter", "Dive Bomber", "Torpedo Bomber", "Seaplane"].includes(currentMainTab);
-
         let isAuxOrAug = ["Auxiliary", "Augmentation"].includes(currentMainTab);
 
         let labelColCannon = "";
@@ -254,14 +316,12 @@ function renderDetailsView(equipList) {
 
         if (isPlane) {
             labelColCannon = "Pháo";
-            labelCol5 = "Vũ khí"; // Gộp vũ khí 1 & 2
+            labelCol5 = "Vũ khí";
             labelCol6 = "Reload";
-            // Cột 7 (Range) sẽ bị ẩn đối với máy bay
         } else if (currentMainTab === "AA-gun") {
             labelCol5 = "Tầm bắn";
         }
 
-        // Hàm tiện ích: Đóng gói HTML cho 1 block Vũ khí/Đạn dược (Giao diện Toggle Dotted)
         function buildAmmoHTML(type, dmgRaw, mod, coef, spread, splash, speed, hitchance) {
             if (!type && !dmgRaw && !mod) return `<div class="ammo-container">-</div>`;
             
@@ -303,16 +363,12 @@ function renderDetailsView(equipList) {
             `;
         }
 
-
         let contentColCannon = "";
         let contentCol5 = "";
         let contentCol6 = "";
         let contentCol7 = "";
 
         if (isPlane) {
-            // ==========================================
-            // Xử lý Cột Pháo
-            // ==========================================
             if (equipInfo.cannons && equipInfo.cannons.length > 0) {
                 let cannonsArr = equipInfo.cannons.map((cannonId) => {
                     let cData = window.aircraftCannons ? window.aircraftCannons[cannonId] : null;
@@ -357,9 +413,6 @@ function renderDetailsView(equipList) {
                 contentColCannon = `<div class="ammo-container">-</div>`;
             }
 
-            // ==========================================
-            // Xử lý Cột Vũ Khí
-            // ==========================================
             const getWeaponData = (wId) => {
                 if (window.aircraftTorpedoes && window.aircraftTorpedoes[wId]) return window.aircraftTorpedoes[wId];
                 if (window.aircraftRockets && window.aircraftRockets[wId]) return window.aircraftRockets[wId];
@@ -409,7 +462,6 @@ function renderDetailsView(equipList) {
                 ${w2HTML}
             </div>`;
 
-            // Reload máy bay giữ nguyên
             let rldHTML = equipInfo.rld ? equipInfo.rld.map((r, index) => {
                 let displayText = (index === 1) ? `Intercept Rld: ${r}` : r;
                 return `<div class="rld-item">${displayText}</div>`;
@@ -421,7 +473,7 @@ function renderDetailsView(equipList) {
             let nsSpread = equipInfo.weaponSpread ? (Array.isArray(equipInfo.weaponSpread) ? equipInfo.weaponSpread[0] : equipInfo.weaponSpread) : null;
             let nsSplash = equipInfo.weaponSplash ? (Array.isArray(equipInfo.weaponSplash) ? equipInfo.weaponSplash[0] : equipInfo.weaponSplash) : null;
             let nsSpeed = equipInfo.weaponSpeed ? (Array.isArray(equipInfo.weaponSpeed) ? equipInfo.weaponSpeed[0] : equipInfo.weaponSpeed) : null;
-            let nsHitChance = equipInfo.hitchance || null; // Lấy hitchance nếu vũ khí bề mặt có lưu
+            let nsHitChance = equipInfo.hitchance || null;
             contentCol5 = buildAmmoHTML(ammoType, equipInfo.dmg, equipInfo.ammoMod, equipInfo.coef, nsSpread, nsSplash, nsSpeed, nsHitChance);
             
             let rldHTML = equipInfo.rld ? equipInfo.rld.map(r => `<div class="rld-item">${r}</div>`).join('') : "-";
@@ -442,7 +494,6 @@ function renderDetailsView(equipList) {
             : `<div class="base-box square-box ${bgClass}" ${customStyle}></div>`;
 
         let rowClass = isPlane ? "row-card-equip plane-layout" : "row-card-equip";
-
         if (isAuxOrAug) rowClass = "row-card-equip aux-layout";
 
         finalHTML += `
@@ -509,7 +560,6 @@ if (document.readyState === 'loading') {
 } else {
     initEquipPage();
 }
-
 
 // ==========================================
 // POPUP HANDLERS

@@ -11,6 +11,7 @@ const CAGM = "CA-gun";
 const CBGM = "CB-gun";
 const BBGM = "BB-gun";
 const AAGM = "AA-gun";
+const AATFGM = "AA-Gun (Time Fuze)"; // <-- THÊM HẰNG SỐ MỚI
 const TRPM = "Surface Torpedo";
 const GMM = "Guided Missile";
 const AUX = "Auxiliary";

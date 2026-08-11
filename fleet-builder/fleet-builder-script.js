@@ -36,6 +36,7 @@ const MAP_EQUIP_CATEGORY = {
     "CBGM": "CB-gun",
     "BBGM": "BB-gun",
     "AAGM": "AA-gun",
+    "AATFGM": "AA-Gun (Time Fuze)", // Mới thêm
     "TRPM": "Surface Torpedo",
     "GMM": "Guided Missile",
     "FT": "Fighter",
@@ -53,6 +54,7 @@ function getEquipDataGlobal(category, eqId) {
     let targetCat = category;
     if (category === "CA-gun" || category === "CB-gun") targetCat = "CA-gun";
     if (category === "Surface Torpedo" || category === "Guided Missile") targetCat = "Surface Torpedo";
+    if (category === "AA-gun" || category === "AA-Gun (Time Fuze)") targetCat = "AA-gun"; // Ánh xạ chung về "AA-gun"
 
     // 1. Thử tìm nhanh ở danh mục chỉ định
     if (targetCat && window.equipDetails[targetCat]) {
@@ -60,7 +62,7 @@ function getEquipDataGlobal(category, eqId) {
         if (catContainer[eqId]) return catContainer[eqId];
     }
 
-    // 2. Nếu trang bị nằm trong mảng con / nhóm lồng nhau, quét đệ quy toàn bộ window.equipDetails
+    // 2. Quét đệ quy nếu nằm trong nhóm lồng nhau
     let foundData = null;
     let searchNested = (obj) => {
         if (foundData || !obj || typeof obj !== 'object') return;
@@ -1314,6 +1316,8 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
             targetDataCategory = "CA-gun";
         } else if (category === "Surface Torpedo" || category === "Guided Missile") {
             targetDataCategory = "Surface Torpedo";
+        } else if (category === "AA-gun" || category === "AA-Gun (Time Fuze)") {
+            targetDataCategory = "AA-gun";
         }
 
         if (window.equipDetails && window.equipDetails[targetDataCategory]) {
@@ -1332,30 +1336,35 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
 
                     let actualCategory = category;
 
+                    // Phân loại động dựa trên thuộc tính trong CSDL
                     if (targetDataCategory === "CA-gun") {
                         actualCategory = (eqData.gunType === "cb") ? "CB-gun" : "CA-gun";
                     }
                     else if (targetDataCategory === "Surface Torpedo") {
                         actualCategory = (eqData.torpType === "gm") ? "Guided Missile" : "Surface Torpedo";
                     }
+                    else if (targetDataCategory === "AA-gun") {
+                        actualCategory = (eqData.gunType === "aatf") ? "AA-Gun (Time Fuze)" : "AA-gun";
+                    }
 
+                    // Lọc chính xác trang bị theo category yêu cầu
                     if (category === "CA-gun" && actualCategory !== "CA-gun") continue;
                     if (category === "CB-gun" && actualCategory !== "CB-gun") continue;
                     if (category === "Surface Torpedo" && actualCategory !== "Surface Torpedo") continue;
                     if (category === "Guided Missile" && actualCategory !== "Guided Missile") continue;
+                    if (category === "AA-gun" && actualCategory !== "AA-gun") continue;
+                    if (category === "AA-Gun (Time Fuze)" && actualCategory !== "AA-Gun (Time Fuze)") continue;
 
                     // --- LUẬT MẶC ĐỊNH EQUIPPABLE LÀ ALL NẾU KHÔNG KHAI BÁO ---
                     let equipableList = eqData.equippable || eqData.equipable;
                     let isEquippableAllowed = false;
 
-                    // Nếu thiếu/không khai báo equippable, tự động coi là equippable: ["All"]
                     if (!equipableList || !Array.isArray(equipableList) || equipableList.length === 0) {
                         isEquippableAllowed = true;
                     } else if (equipableList.includes("All") || equipableList.includes(shipInfo.type)) {
                         isEquippableAllowed = true;
                     }
 
-                    // Kiểm tra danh sách ngoại lệ bị cấm (unequippable)
                     let unequippableList = eqData.unequippable || eqData.unequipList;
                     if (unequippableList && Array.isArray(unequippableList)) {
                         if (unequippableList.includes(shipInfo.type)) {

@@ -6,7 +6,7 @@ shipDetails["BB"] = {
         rarity: "Ultra Rare",
         code: "d/d5",
         box: "rainbow",
-        equipSlot: [["BBGM"], [DDGM], [AAGM]],
+        equipSlot: [["BBGM"], ["DDGM"], ["AAGM", "AATFGM"]],
         slotAmount: [3, 3, 1],
         slotEff: ["155", "210", "130"]
     },
