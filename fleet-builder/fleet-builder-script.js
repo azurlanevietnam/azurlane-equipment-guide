@@ -28,8 +28,25 @@ let isEquipFilterOpen = false;
 // ==========================================
 let isSwapShipMode = false;
 let swapSourceSlotIndex = -1;
-let isHeaderHidden = false; // Trạng thái ẩn/hiện thanh chức năng của tất cả fleet
 let isSettingsMenuOpen = false;
+
+// Đọc trạng thái ẩn thanh chức năng từ localStorage (độc lập hoàn toàn với Reset)
+let isHeaderHidden = loadHeaderHiddenState();
+
+function loadHeaderHiddenState() {
+    try {
+        const saved = localStorage.getItem('azur_lane_header_hidden_state');
+        return saved !== null ? JSON.parse(saved) : false;
+    } catch (e) {
+        return false;
+    }
+}
+
+function saveHeaderHiddenState(state) {
+    try {
+        localStorage.setItem('azur_lane_header_hidden_state', JSON.stringify(state));
+    } catch (e) { }
+}
 
 // Mã loại tàu phân khu
 const VANGUARD_SHIP_TYPES = ["DD", "CL", "CA", "CB", "DDG", "AE", "IXv"];
@@ -94,6 +111,7 @@ function initFleetBuilder() {
     injectConfirmModal();
     injectResetButton();
 
+    updateGlobalHeaderButtonUI();
     waitForDataAndRender();
 }
 
@@ -221,17 +239,26 @@ function toggleSettingsMenu() {
     }
 }
 
-function toggleGlobalFleetHeaders() {
-    isHeaderHidden = !isHeaderHidden;
+function updateGlobalHeaderButtonUI() {
     const toggleBtn = document.getElementById('globalToggleHeaderBtn');
     if (toggleBtn) {
-        toggleBtn.innerText = isHeaderHidden ? "Hiện Thanh Chức Năng" : "Ẩn Thanh Chức Năng";
-        if (isHeaderHidden) {
+        // Tên button luôn cố định là "Thanh Chức Năng"
+        toggleBtn.innerText = "Thanh Chức Năng";
+        
+        // isHeaderHidden = false (Trạng thái HIỆN) -> Thêm class active
+        // isHeaderHidden = true (Trạng thái ẨN) -> Loại bỏ class active
+        if (!isHeaderHidden) {
             toggleBtn.classList.add("active");
         } else {
             toggleBtn.classList.remove("active");
         }
     }
+}
+
+function toggleGlobalFleetHeaders() {
+    isHeaderHidden = !isHeaderHidden;
+    saveHeaderHiddenState(isHeaderHidden);
+    updateGlobalHeaderButtonUI();
     renderFleet();
 }
 

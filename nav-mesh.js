@@ -39,4 +39,33 @@ document.addEventListener("DOMContentLoaded", () => {
             <a href="https://pbs.twimg.com/media/HMIK5ZzXQAANEd_?format=jpg&name=4096x4096" target="_blank" class="rickroll-btn">TIER ZÚ</a>
         </div>
     `;
+
+    // ========================================================
+    // LOGIC TỰ ĐỘNG ẨN/HIỆN NAVBAR KHỦNG CHIẾN KHÔNG BỊ VƯỚNG MODAL
+    // ========================================================
+    let lastScrollTop = 0;
+    const delta = 5;
+
+    window.addEventListener("scroll", () => {
+        // 1. Nếu bất kỳ modal chọn tàu/trang bị nào đang mở -> Giữ nguyên trạng thái Navbar, không ẩn
+        const activeModal = document.querySelector(".modal-overlay[style*='display: flex'], .modal-overlay[style*='display:block']");
+        if (activeModal) return;
+
+        let st = window.pageYOffset || document.documentElement.scrollTop;
+
+        if (Math.abs(lastScrollTop - st) <= delta) return;
+
+        if (st <= 0) {
+            // Đang ở đầu trang -> Luôn hiện
+            navbarContainer.classList.remove("nav-hidden");
+        } else if (st > lastScrollTop && st > 70) {
+            // Cuộn chuột xuống -> Thu lại
+            navbarContainer.classList.add("nav-hidden");
+        } else {
+            // Cuộn chuột lên -> Hiển thị lại
+            navbarContainer.classList.remove("nav-hidden");
+        }
+
+        lastScrollTop = st;
+    }, { passive: true });
 });

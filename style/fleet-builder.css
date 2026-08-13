@@ -54,13 +54,15 @@
     display: none !important;
 }
 
+/* NÚT THANH CHỨC NĂNG TỔNG */
+/* Mặc định khi Thanh Chức Năng ẨN: Không background, viền & chữ màu #29b6f6 */
 .toggle-header-global-btn {
     padding: 6px 20px;
     font-size: 16px;
     font-weight: bold;
-    color: #cbd5e1;
-    background: #1a252f;
-    border: 2px solid #34495e;
+    color: #29b6f6;
+    background: transparent;
+    border: 2px solid #29b6f6;
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -68,21 +70,20 @@
 }
 
 .toggle-header-global-btn:hover {
-    color: #ffffff;
-    background: #2c3e50;
-    border-color: #f1c40f;
+    box-shadow: 0 0 10px rgba(41, 182, 246, 0.4);
 }
 
+/* Khi Thanh Chức Năng HIỆN (Active): Background & viền #29b6f6, chữ màu Trắng */
 .toggle-header-global-btn.active {
-    color: #f1c40f;
-    border-color: #f1c40f;
-    box-shadow: 0 0 8px rgba(241, 196, 15, 0.4);
+    background-color: #29b6f6;
+    color: #ffffff;
+    border-color: #29b6f6;
+    box-shadow: 0 0 12px rgba(41, 182, 246, 0.6);
 }
 
 /* ========================================================
    2. BỐ CỤC CHÍNH VÀ CÁC HÀNG ĐỘI HÌNH (FLEET BUILDER)
 ======================================================== */
-/* Container ngoài cùng: KHÔNG NỀN, KHÔNG KHUNG, xếp các Fleet theo chiều dọc */
 #fleet-builder-container {
     display: flex;
     flex-direction: column; 
@@ -95,7 +96,6 @@
     padding: 0 !important;
 }
 
-/* MỖI FLEET LÀ MỘT KHỐI NỀN ĐEN ĐỘC LẬP CHỨA 3 HÀNG CHỨC NĂNG & NỘI DUNG */
 .fleet-box-wrapper {
     display: flex;
     flex-direction: column; 
@@ -232,7 +232,7 @@
 ======================================================== */
 .fleet-box-wrapper.swap-mode-active .fleet-title,
 .fleet-box-wrapper.swap-mode-active .fleet-add-btn {
-    opacity: 0.3;
+    opacity: 0.7;
 }
 
 .fleet-box-wrapper.swap-mode-active .fleet-swap-btn,
@@ -242,7 +242,7 @@
 }
 
 .fleet-box-wrapper.swap-mode-active .equip-slot {
-    opacity: 0.3;
+    opacity: 0.7;
     pointer-events: none !important;
 }
 
@@ -251,7 +251,7 @@
 }
 
 .fleet-box-wrapper.swap-mode-active .ship-slot.disabled {
-    opacity: 0.3;
+    opacity: 0.7;
     pointer-events: none !important;
 }
 
@@ -264,7 +264,7 @@
 .fleet-main-content-row {
     display: flex;
     flex-direction: row;
-    gap: 0px;              /* Khoảng cách giữa Cột Trái và Cột Phải */
+    gap: 0px;
 }
 
 .fleet-column {
@@ -279,7 +279,7 @@
     flex-direction: column;
     gap: 0;
     width: fit-content;
-    margin: 0 auto;        /* Căn chính giữa */
+    margin: 0 auto;
     align-items: center;
 }
 
@@ -372,8 +372,6 @@
     font-weight: 100;                 /* Mỏng tối thiểu */
     position: absolute;
     z-index: 6;
-    
-    /* CĂN GIỮA TUYỆT ĐỐI VÀ XOAY 45 ĐỘ */
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) rotate(45deg);

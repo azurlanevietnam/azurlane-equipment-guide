@@ -10,7 +10,6 @@
 
     <link rel="stylesheet" href="style/style.css">
     <link rel="stylesheet" href="style/fleet-builder.css">
-    <!-- Thêm dòng này để nạp background màu độ hiếm cho tàu & trang bị -->
     <link rel="stylesheet" href="style/equip-data.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,7 +29,7 @@
         <div class="settings-menu-wrapper">
             <button type="button" id="settingsToggleBtn" class="settings-toggle-btn" onclick="toggleSettingsMenu()">Cài Đặt ▼</button>
             <div id="settingsPanel" class="settings-panel hidden">
-                <button type="button" id="globalToggleHeaderBtn" class="toggle-header-global-btn" onclick="toggleGlobalFleetHeaders()">Ẩn Thanh Chức Năng</button>
+                <button type="button" id="globalToggleHeaderBtn" class="toggle-header-global-btn" onclick="toggleGlobalFleetHeaders()">Thanh Chức Năng</button>
             </div>
         </div>
 
@@ -55,8 +54,6 @@
     </div>
 
     <script src="nav-mesh.js"></script>
-
-    <!-- Chỉ cần gọi file Data Loader, nó sẽ tự động nạp các file còn lại -->
     <script src="fleet-builder/fleet-builder-data.js"></script>
 </body>
 
