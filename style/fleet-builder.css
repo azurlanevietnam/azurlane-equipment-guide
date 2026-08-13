@@ -99,9 +99,8 @@
 .fleet-box-wrapper {
     display: flex;
     flex-direction: column; 
-    gap: 4px;
     background: #1a252f;    /* Khung nền đen riêng của Fleet */
-    padding: 16px 8px 8px 8px; 
+    padding: 14px 8px 8px 8px; 
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
     width: fit-content;
@@ -120,7 +119,7 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding-bottom: 4px;
+    padding-bottom: 8px;
     transition: opacity 0.3s ease;
 }
 
@@ -291,7 +290,7 @@
     display: flex;
     gap: 4px; 
     background: #121a22;
-    padding: 6px; 
+    padding: 4px; 
     border-radius: 0; 
 }
 
