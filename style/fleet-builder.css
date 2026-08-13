@@ -1,12 +1,93 @@
 /* ========================================================
-   1. BỐ CỤC CHÍNH VÀ CÁC HÀNG ĐỘI HÌNH (FLEET BUILDER)
+   1. QUY TẮC CON TRỎ CHUỘT (POINTER FOR DISABLED)
+======================================================== */
+.disabled,
+.equip-disabled,
+[disabled] {
+    cursor: pointer !important;
+}
+
+/* KHUNG VÙNG NÚT CÀI ĐẶT VÀ MENU SỔ XUỐNG */
+.settings-menu-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: -15px;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 50;
+}
+
+.settings-toggle-btn {
+    padding: 8px 24px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #cbd5e1;
+    background: #1a252f;
+    border: 2px solid #34495e;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.settings-toggle-btn:hover,
+.settings-toggle-btn.active {
+    color: #ffffff;
+    background: #2c3e50;
+    border-color: #29b6f6;
+    box-shadow: 0 0 10px rgba(41, 182, 246, 0.4);
+}
+
+.settings-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #121a22;
+    border: 2px solid #34495e;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-top: 8px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+.settings-panel.hidden {
+    display: none !important;
+}
+
+.toggle-header-global-btn {
+    padding: 6px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #cbd5e1;
+    background: #1a252f;
+    border: 2px solid #34495e;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.toggle-header-global-btn:hover {
+    color: #ffffff;
+    background: #2c3e50;
+    border-color: #f1c40f;
+}
+
+.toggle-header-global-btn.active {
+    color: #f1c40f;
+    border-color: #f1c40f;
+    box-shadow: 0 0 8px rgba(241, 196, 15, 0.4);
+}
+
+/* ========================================================
+   2. BỐ CỤC CHÍNH VÀ CÁC HÀNG ĐỘI HÌNH (FLEET BUILDER)
 ======================================================== */
 /* Container ngoài cùng: KHÔNG NỀN, KHÔNG KHUNG, xếp các Fleet theo chiều dọc */
 #fleet-builder-container {
     display: flex;
     flex-direction: column; 
     align-items: center;    
-    gap: 30px;              /* Khoảng cách giữa các khối Fleet */
+    gap: 12px;              /* Khoảng cách giữa các khối Fleet */
     width: 100%;
     background: transparent !important;
     border: none !important;
@@ -20,20 +101,53 @@
     flex-direction: column; 
     gap: 4px;
     background: #1a252f;    /* Khung nền đen riêng của Fleet */
-    padding: 16px; 
+    padding: 16px 8px 8px 8px; 
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
     width: fit-content;
     margin: 0 auto;
+    transition: padding 0.2s ease;
 }
 
-/* HÀNG 1: HÀNG CHỨC NĂNG (TÊN FLEET & NÚT TẠO MỚI BÊN TRÁI, NÚT XÓA BÊN PHẢI) */
+/* KHI ẨN THANH CHỨC NĂNG: PADDING CHUYỂN THÀNH 8px */
+.fleet-box-wrapper.header-is-hidden {
+    padding: 8px !important;
+}
+
+/* HÀNG 1: HÀNG CHỨC NĂNG (TÊN FLEET - CĂN GIỮA NÚT ĐỔI TÀU - NÚT XÓA/TẮT) */
 .fleet-header-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
     padding-bottom: 4px;
+    transition: opacity 0.3s ease;
+}
+
+.fleet-header-row.hidden-header {
+    display: none !important;
+}
+
+.fleet-header-left,
+.fleet-header-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.fleet-header-left {
+    justify-content: flex-start;
+}
+
+.fleet-header-center {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.fleet-header-right {
+    justify-content: flex-end;
 }
 
 .fleet-title {
@@ -46,6 +160,7 @@
 
 /* TẤT CẢ BUTTON TRONG THANH CHỨC NĂNG CÓ PADDING 6px 20px VÀ FONT-SIZE 20px */
 .fleet-add-btn,
+.fleet-swap-btn,
 .fleet-delete-btn {
     padding: 6px 20px !important;
     font-size: 20px !important;
@@ -69,7 +184,26 @@
     box-shadow: 0 0 8px rgba(241, 196, 15, 0.5);
 }
 
-/* NÚT XÓA (MÀU ĐỎ) */
+/* NÚT ĐỔI TÀU (NẰM CHÍNH GIỮA) */
+.fleet-swap-btn {
+    background: transparent;
+    color: #29b6f6;
+    border: 2px solid #29b6f6;
+}
+
+.fleet-swap-btn:hover {
+    background-color: #29b6f6;
+    color: #1a252f;
+    box-shadow: 0 0 8px rgba(41, 182, 246, 0.5);
+}
+
+.fleet-swap-btn.active {
+    background-color: #29b6f6;
+    color: #1a252f;
+    box-shadow: 0 0 12px rgba(41, 182, 246, 0.8);
+}
+
+/* NÚT XÓA / NÚT TẮT (MÀU ĐỎ) */
 .fleet-delete-btn {
     background: transparent;
     color: #e74c3c;
@@ -77,7 +211,8 @@
     margin-right: 6px;
 }
 
-.fleet-delete-btn:hover:not(:disabled) {
+.fleet-delete-btn:hover:not(:disabled),
+.fleet-delete-btn.active {
     background-color: #e74c3c;
     color: #ffffff;
     box-shadow: 0 0 8px rgba(231, 76, 60, 0.5);
@@ -92,11 +227,44 @@
     pointer-events: none !important;
 }
 
+/* ========================================================
+   3. CHẾ ĐỘ ĐỔI TÀU (SWAP SHIP MODE) - OPACITY 70%
+======================================================== */
+.fleet-box-wrapper.swap-mode-active .fleet-title,
+.fleet-box-wrapper.swap-mode-active .fleet-add-btn {
+    opacity: 0.3;
+}
+
+.fleet-box-wrapper.swap-mode-active .fleet-swap-btn,
+.fleet-box-wrapper.swap-mode-active .fleet-delete-btn {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+.fleet-box-wrapper.swap-mode-active .equip-slot {
+    opacity: 0.3;
+    pointer-events: none !important;
+}
+
+.fleet-box-wrapper.swap-mode-active .ship-slot {
+    opacity: 1;
+}
+
+.fleet-box-wrapper.swap-mode-active .ship-slot.disabled {
+    opacity: 0.3;
+    pointer-events: none !important;
+}
+
+.square-slot.ship-slot.swap-selected {
+    transform: scale(1.25);
+    z-index: 15 !important;
+}
+
 /* HÀNG 2: HẠM ĐỘI CHÍNH (2 CỘT x 3 ROWS) */
 .fleet-main-content-row {
     display: flex;
     flex-direction: row;
-    gap: 16px;              /* Khoảng cách giữa Cột Trái và Cột Phải */
+    gap: 0px;              /* Khoảng cách giữa Cột Trái và Cột Phải */
 }
 
 .fleet-column {
@@ -105,12 +273,14 @@
     gap: 0;
 }
 
-/* HÀNG 3: HẠM ĐỘI NGẦM / SUBMARINE (1 CỘT x 3 ROWS, MẶC ĐỊNH HIDDEN) */
+/* HÀNG 3: HẠM ĐỘI NGẦM / SUBMARINE (1 CỘT x 3 ROWS, CĂN CHÍNH GIỮA) */
 .fleet-sub-content-row {
     display: flex;
     flex-direction: column;
     gap: 0;
     width: fit-content;
+    margin: 0 auto;        /* Căn chính giữa */
+    align-items: center;
 }
 
 .fleet-sub-content-row.hidden {
@@ -143,7 +313,7 @@
 }
 
 /* ========================================================
-   2. CÁC Ô VUÔNG TRANG BỊ / TÀU VÀ HIỆU ỨNG HOVER
+   4. CÁC Ô VUÔNG TRANG BỊ / TÀU VÀ HIỆU ỨNG HOVER
 ======================================================== */
 .square-slot {
     width: 84px;
@@ -186,7 +356,6 @@
 
 /* Trạng thái chưa chọn tàu (Disabled) */
 .equip-slot.disabled {
-    cursor: not-allowed;
     background-color: #22303d;
     border: none;
 }
@@ -228,7 +397,7 @@
 }
 
 /* ========================================================
-   3. KHUNG FRAME PHẨM CHẤT TÀU & TRANG BỊ (BACKGROUNDS)
+   5. KHUNG FRAME PHẨM CHẤT TÀU & TRANG BỊ (BACKGROUNDS)
 ======================================================== */
 .square-slot.box-grey::before, 
 .modal-ship-icon.box-grey::before { 
@@ -257,7 +426,7 @@
 }
 
 /* ========================================================
-   4. BADGE THÔNG TIN TRÊN Ô TÀU & TRANG BỊ
+   6. BADGE THÔNG TIN TRÊN Ô TÀU & TRANG BỊ
 ======================================================== */
 .square-slot.ship-slot,
 .square-slot.equip-slot {
@@ -333,7 +502,7 @@
 }
 
 /* ==========================================================
-   5. POPUP CHỌN TÀU VÀ TRANG BỊ (CHỈ DÙNG 1 THANH CUỘN DUY NHẤT)
+   7. POPUP CHỌN TÀU VÀ TRANG BỊ (CHỈ DÙNG 1 THANH CUỘN DUY NHẤT)
 ========================================================== */
 .modal-overlay {
     display: none;
@@ -402,7 +571,7 @@
 }
 
 /* ========================================================
-   6. BẢNG ĐIỀU KHIỂN LEVEL, AFFINITY VÀ ENHANCE TRONG MODAL
+   8. BẢNG ĐIỀU KHIỂN LEVEL, AFFINITY VÀ ENHANCE TRONG MODAL
 ======================================================== */
 .ship-modal-controls {
     width: 100%;
@@ -501,7 +670,7 @@
 }
 
 /* ========================================================
-   7. DANH SÁCH ITEM HOVER VÀ BỘ CHẠY CHỮ TÊN (MARQUEE)
+   9. DANH SÁCH ITEM HOVER VÀ BỘ CHẠY CHỮ TÊN (MARQUEE)
 ======================================================== */
 .ship-grid-list {
     display: flex;
@@ -608,7 +777,6 @@
 }
 
 .modal-ship-icon.equip-disabled {
-    cursor: not-allowed;
     opacity: 0.4;
     filter: grayscale(80%);
 }
@@ -619,7 +787,7 @@
 }
 
 /* ========================================================
-   8. POPUP XÁC NHẬN RESET ĐỘI HÌNH
+   10. POPUP XÁC NHẬN RESET ĐỘI HÌNH
 ======================================================== */
 .reset-modal-content {
     max-width: 480px;
@@ -676,7 +844,7 @@
 }
 
 /* ========================================================
-   9. TÙY CHỈNH THẺ INPUT NUMBER (ẨN MŨI TÊN LÊN/XUỐNG)
+   11. TÙY CHỈNH THẺ INPUT NUMBER (ẨN MŨI TÊN LÊN/XUỐNG)
 ======================================================== */
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
@@ -745,7 +913,7 @@ input[type="number"] {
 }
 
 /* ========================================================
-   10. BẢNG BỘ LỌC TÀU (SHIP FILTER PANEL)
+   12. BẢNG BỘ LỌC TÀU (SHIP FILTER PANEL)
 ======================================================== */
 .ship-filter-panel {
     width: 100%;

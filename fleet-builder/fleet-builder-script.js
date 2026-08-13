@@ -23,6 +23,14 @@ let equipFilterFaction = new Set(['ALL']);
 let equipFilterRarity = new Set(['ALL']);
 let isEquipFilterOpen = false;
 
+// ==========================================
+// TRẠNG THÁI ĐỔI TÀU, MENU CÀI ĐẶT & ẨN THANH CHỨC NĂNG
+// ==========================================
+let isSwapShipMode = false;
+let swapSourceSlotIndex = -1;
+let isHeaderHidden = false; // Trạng thái ẩn/hiện thanh chức năng của tất cả fleet
+let isSettingsMenuOpen = false;
+
 // Mã loại tàu phân khu
 const VANGUARD_SHIP_TYPES = ["DD", "CL", "CA", "CB", "DDG", "AE", "IXv"];
 const MAIN_SHIP_TYPES = ["BC", "BB", "BBV", "CV", "CVL", "BM", "DDG", "AR", "IXm"];
@@ -36,7 +44,7 @@ const MAP_EQUIP_CATEGORY = {
     "CBGM": "CB-gun",
     "BBGM": "BB-gun",
     "AAGM": "AA-gun",
-    "AATFGM": "AA-Gun (Time Fuze)", // Mới thêm
+    "AATFGM": "AA-Gun (Time Fuze)",
     "TRPM": "Surface Torpedo",
     "GMM": "Guided Missile",
     "FT": "Fighter",
@@ -54,15 +62,13 @@ function getEquipDataGlobal(category, eqId) {
     let targetCat = category;
     if (category === "CA-gun" || category === "CB-gun") targetCat = "CA-gun";
     if (category === "Surface Torpedo" || category === "Guided Missile") targetCat = "Surface Torpedo";
-    if (category === "AA-gun" || category === "AA-Gun (Time Fuze)") targetCat = "AA-gun"; // Ánh xạ chung về "AA-gun"
+    if (category === "AA-gun" || category === "AA-Gun (Time Fuze)") targetCat = "AA-gun";
 
-    // 1. Thử tìm nhanh ở danh mục chỉ định
     if (targetCat && window.equipDetails[targetCat]) {
         let catContainer = window.equipDetails[targetCat];
         if (catContainer[eqId]) return catContainer[eqId];
     }
 
-    // 2. Quét đệ quy nếu nằm trong nhóm lồng nhau
     let foundData = null;
     let searchNested = (obj) => {
         if (foundData || !obj || typeof obj !== 'object') return;
@@ -195,6 +201,83 @@ function loadFleetState() {
 }
 
 // ==========================================
+// QUẢN LÝ MENU CÀI ĐẶT & ẨN/HIỆN THANH CHỨC NĂNG
+// ==========================================
+function toggleSettingsMenu() {
+    isSettingsMenuOpen = !isSettingsMenuOpen;
+    const panel = document.getElementById('settingsPanel');
+    const toggleBtn = document.getElementById('settingsToggleBtn');
+    
+    if (panel) {
+        if (isSettingsMenuOpen) {
+            panel.classList.remove('hidden');
+            toggleBtn.classList.add('active');
+            toggleBtn.innerText = "Cài Đặt ▲";
+        } else {
+            panel.classList.add('hidden');
+            toggleBtn.classList.remove('active');
+            toggleBtn.innerText = "Cài Đặt ▼";
+        }
+    }
+}
+
+function toggleGlobalFleetHeaders() {
+    isHeaderHidden = !isHeaderHidden;
+    const toggleBtn = document.getElementById('globalToggleHeaderBtn');
+    if (toggleBtn) {
+        toggleBtn.innerText = isHeaderHidden ? "Hiện Thanh Chức Năng" : "Ẩn Thanh Chức Năng";
+        if (isHeaderHidden) {
+            toggleBtn.classList.add("active");
+        } else {
+            toggleBtn.classList.remove("active");
+        }
+    }
+    renderFleet();
+}
+
+// ==========================================
+// QUẢN LÝ TÍNH NĂNG ĐỔI VỊ TRÍ TÀU (SWAP SHIP)
+// ==========================================
+function toggleSwapShipMode() {
+    isSwapShipMode = !isSwapShipMode;
+    swapSourceSlotIndex = -1;
+    renderFleet();
+}
+
+function handleShipSlotClick(slotIndex) {
+    if (!isSwapShipMode) {
+        openShipModal(slotIndex);
+        return;
+    }
+
+    if (swapSourceSlotIndex !== -1) {
+        const sourceSubGroup = Math.floor((swapSourceSlotIndex % 9) / 3);
+        const targetSubGroup = Math.floor((slotIndex % 9) / 3);
+        if (sourceSubGroup !== targetSubGroup) {
+            return;
+        }
+    }
+
+    if (swapSourceSlotIndex === -1) {
+        swapSourceSlotIndex = slotIndex;
+        renderFleet();
+    } else if (swapSourceSlotIndex === slotIndex) {
+        swapSourceSlotIndex = -1;
+        renderFleet();
+    } else {
+        const tempSlot = fleetState[swapSourceSlotIndex];
+        fleetState[swapSourceSlotIndex] = fleetState[slotIndex];
+        fleetState[slotIndex] = tempSlot;
+
+        swapSourceSlotIndex = -1;
+        isSwapShipMode = false;
+
+        saveFleetState();
+        renderFleet();
+    }
+}
+
+// ==========================================
 // QUẢN LÝ TÍNH NĂNG THÊM & XÓA HẠM ĐỘI
 // ==========================================
 function addNewFleet(insertAfterGroupIndex) {
@@ -292,7 +375,7 @@ function closeConfirmModal() {
 function executeResetFleet() {
     for (let g = 0; g < MAX_FLEETS; g++) {
         saveDefaultShipSettingsForFleet(g, 120, 'Love');
-        saveDefaultEquipEnhanceForFleet(g, 10);
+        saveDefaultEquipEnhanceForFleet(g, 0);
     }
 
     fleetState = createEmptyFleetGroup(0);
@@ -329,15 +412,6 @@ function getShipTypeAndData(shipId) {
         }
     }
     return null;
-}
-
-function getShipIconUrl(shipId, shipData) {
-    if (shipId.endsWith('_kai')) {
-        return `https://cdn.nagami.moe/squareicon/${shipData.code}.png`;
-    } else {
-        const formattedName = shipData.name.replace(/ /g, '_');
-        return `https://azurlane.netojuu.com/images/${shipData.code}/${formattedName}Icon.png`;
-    }
 }
 
 function getAffinityDisplay(affinityKey) {
@@ -402,19 +476,33 @@ function renderFleetSlotRow(index) {
     let shipInfo = slot.shipId ? getProcessedShipData(index) : null;
     let shipHtml = "";
 
+    const isSelectedForSwap = (isSwapShipMode && swapSourceSlotIndex === index);
+    const shipSelectedClass = isSelectedForSwap ? ' swap-selected' : '';
+
+    let isShipDisabledForSwap = false;
+    if (isSwapShipMode && swapSourceSlotIndex !== -1 && swapSourceSlotIndex !== index) {
+        const sourceSubGroup = Math.floor((swapSourceSlotIndex % 9) / 3);
+        const currentSubGroup = Math.floor((index % 9) / 3);
+        if (sourceSubGroup !== currentSubGroup) {
+            isShipDisabledForSwap = true;
+        }
+    }
+
+    const shipDisabledClass = isShipDisabledForSwap ? ' disabled' : '';
+
     if (shipInfo) {
         let iconUrl = getShipIconUrl(slot.shipId, shipInfo.data);
         let boxClass = shipInfo.data.box ? `box-${shipInfo.data.box}` : "box-grey";
         let affText = getAffinityDisplay(slot.affinity || 'Stranger');
         let shipLevel = slot.level !== undefined ? slot.level : 1;
 
-        shipHtml = `<div class="square-slot ship-slot ${boxClass}" onclick="openShipModal(${index})">
+        shipHtml = `<div class="square-slot ship-slot ${boxClass}${shipSelectedClass}${shipDisabledClass}" onclick="handleShipSlotClick(${index})">
                         <span class="ship-badge-level">Lv.${shipLevel}</span>
                         <span class="ship-badge-affinity">${affText}</span>
                         <img src="${iconUrl}" class="slot-image" alt="${shipInfo.data.name}">
                     </div>`;
     } else {
-        shipHtml = `<div class="square-slot ship-slot box-grey" onclick="openShipModal(${index})">
+        shipHtml = `<div class="square-slot ship-slot box-grey${shipSelectedClass}${shipDisabledClass}" onclick="handleShipSlotClick(${index})">
                         <span class="plus-sign">+</span>
                     </div>`;
     }
@@ -444,6 +532,7 @@ function renderFleetSlotRow(index) {
         }
 
         let eqData = (isShipSelected && eqSave && eqSave.id) ? getEquipDataGlobal(eqSave.category, eqSave.id) : null;
+        let onClickEvent = (isShipSelected && !isSwapShipMode) ? `onclick="openEquipModal(${index}, ${i})"` : "";
 
         if (isShipSelected && eqSave && eqSave.id && eqData) {
             let boxClass = eqData.box ? `box-${eqData.box}` : "box-grey";
@@ -451,7 +540,7 @@ function renderFleetSlotRow(index) {
             let enhanceVal = eqSave.enhance !== undefined ? eqSave.enhance : 0;
 
             equipsHtml += `
-                <div class="square-slot equip-slot ${boxClass}" onclick="openEquipModal(${index}, ${i})">
+                <div class="square-slot equip-slot ${boxClass}" ${onClickEvent}>
                     ${slotInfoBadgeHtml}
                     <span class="equip-badge-enhance">+${enhanceVal}</span>
                     <img src="${iconUrl}" class="slot-image">
@@ -459,7 +548,6 @@ function renderFleetSlotRow(index) {
             `;
         } else {
             let equipClass = isShipSelected ? "box-grey" : "disabled";
-            let onClickEvent = isShipSelected ? `onclick="openEquipModal(${index}, ${i})"` : "";
 
             equipsHtml += `
                 <div class="square-slot equip-slot ${equipClass}" ${onClickEvent}>
@@ -481,16 +569,28 @@ function renderFleet() {
     const isOnlyOneFleet = totalFleets <= 1;
 
     for (let group = 0; group < totalFleets; group++) {
-        const addBtnAttr = isMaxReached ? 'disabled class="fleet-add-btn hidden"' : 'class="fleet-add-btn"';
+        const addBtnAttr = (isMaxReached || isSwapShipMode) ? 'disabled class="fleet-add-btn hidden"' : 'class="fleet-add-btn"';
         const deleteBtnAttr = isOnlyOneFleet ? 'disabled class="fleet-delete-btn hidden"' : 'class="fleet-delete-btn"';
+        const swapBtnClass = isSwapShipMode ? 'fleet-swap-btn active' : 'fleet-swap-btn';
+
+        const rightActionBtnHtml = isSwapShipMode 
+            ? `<button type="button" class="fleet-delete-btn active" onclick="toggleSwapShipMode()">Tắt</button>`
+            : `<button type="button" ${deleteBtnAttr} onclick="deleteFleet(${group})">Xóa</button>`;
+
+        const headerHiddenClass = isHeaderHidden ? ' hidden-header' : '';
 
         let headerRowHtml = `
-            <div class="fleet-header-row">
-                <div style="display: flex; align-items: center;">
+            <div class="fleet-header-row${headerHiddenClass}">
+                <div class="fleet-header-left">
                     <span class="fleet-title">Hạm Đội ${group + 1}</span>
                     <button type="button" ${addBtnAttr} onclick="addNewFleet(${group})">Hạm Đội Mới</button>
                 </div>
-                <button type="button" ${deleteBtnAttr} onclick="deleteFleet(${group})">Xóa</button>
+                <div class="fleet-header-center">
+                    <button type="button" class="${swapBtnClass}" onclick="toggleSwapShipMode()">Đổi Tàu</button>
+                </div>
+                <div class="fleet-header-right">
+                    ${rightActionBtnHtml}
+                </div>
             </div>
         `;
 
@@ -523,8 +623,10 @@ function renderFleet() {
             </div>
         `;
 
+        const wrapperExtraClass = `${isSwapShipMode ? ' swap-mode-active' : ''}${isHeaderHidden ? ' header-is-hidden' : ''}`;
+
         fullHtml += `
-            <div class="fleet-box-wrapper">
+            <div class="fleet-box-wrapper${wrapperExtraClass}">
                 ${headerRowHtml}
                 ${mainContentRowHtml}
                 ${subContentRowHtml}
@@ -1787,4 +1889,24 @@ if (document.readyState === 'loading') {
     document.addEventListener("DOMContentLoaded", initFleetBuilder);
 } else {
     initFleetBuilder();
+}
+
+function getShipIconUrl(shipId, shipData) {
+    // =========================================================================
+    // [TEMP_OVERRIDE_START]: HÀM GHI ĐÈ LINK ẢNH TẠM THỜI (DỄ DÀNG XÓA TRONG TƯƠNG LAI)
+    // =========================================================================
+    if (shipId === "belfast_kai") {
+        return "https://cdn.imgchest.com/files/43601f3c1e50.png";
+    }
+    // =========================================================================
+    // [TEMP_OVERRIDE_END]
+    // =========================================================================
+
+    // Logic lấy URL gốc mặc định
+    if (shipId.endsWith('_kai')) {
+        return `https://cdn.nagami.moe/squareicon/${shipData.code}.png`;
+    } else {
+        const formattedName = shipData.name.replace(/ /g, '_');
+        return `https://azurlane.netojuu.com/images/${shipData.code}/${formattedName}Icon.png`;
+    }
 }

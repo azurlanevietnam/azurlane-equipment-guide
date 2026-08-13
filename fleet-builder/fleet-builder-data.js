@@ -5,6 +5,7 @@ const fleetDataFiles = [
     
     // 2. TẢI DỮ LIỆU TỪNG LOẠI TÀU TỪ THƯ MỤC "ship"
     'ship/destroyer-data.js',
+    'ship/light-cruiser-data.js',
     'ship/missile-destroyer-data.js',
     'ship/large-cruiser-data.js',
     'ship/battleship-data.js',

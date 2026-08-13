@@ -35,6 +35,31 @@ equipDetails["Auxiliary"] = {
         },
     },
     "yellow_aux": {
+        "rpg-adventure": {
+            name: "RPG Adventure Interface",
+            tier: "N/A",
+            source: ["From Zero to Hero Event Reward"],
+            faction: "Universal",
+            stats: ["HP +640"],
+            fleetLimit: 2,
+            linkTab: 0,
+            desc: ["Trong trận đấu, kích hoạt ngẫu nhiên một trong ba hiệu ứng sau:"],
+            code: "c/c1/150280",
+            box: "yellow"
+        },
+        "hydraulic-rudder": {
+            name: "Improved Hydraulic Rudder",
+            tier: "N/A",
+            source: ["All Series Research"],
+            faction: "Eagle Union",
+            unequippable: ["IXM", "IXv", "IXs"],
+            stats: ["EVA +49", "HP +72"],
+            limit: 1,
+            linkTab: 0,
+            desc: ["Trong trận đấu, mỗi 20s, tàu mang trang bị này có 30% cơ hội kích hoạt hiệu ứng né tránh mọi sát thương trong 2s."],
+            code: "4/48/1760",
+            box: "yellow"
+        },
         "hpfcr": {
             name: "High Performance Fire Control Radar",
             tier: "N/A",
@@ -46,6 +71,19 @@ equipDetails["Auxiliary"] = {
             linkTab: 0,
             desc: ["Tàu mang trang bị này được giảm 15% thời gian hồi loạt pháo kích đầu tiên."],
             code: "3/3e/1260",
+            box: "yellow"
+        },
+        "6crh-ap": {
+            name: "6CRH Armor Piercing Shell",
+            tier: "N/A",
+            source: ["Core Data Shop"],
+            faction: "Royal Navy",
+            stats: ["FP +57", "ACC +23"],
+            equippable: ["BB", "BC", "BBV", "BM"],
+            limit: 1,
+            linkTab: 0,
+            desc: ["Nếu tàu mang trang bị này có faction là Royal Navy, tăng 30% sát thương chí mạng. Hiệu ứng không cộng dồn."],
+            code: "b/bf/1060",
             box: "yellow"
         },
         "frontier_medal": {
@@ -96,6 +134,18 @@ equipDetails["Auxiliary"] = {
         },
     },
     "purple_aux": {
+        "albion_erp": {
+            name: "Albion's Exercise Report",
+            tier: "N/A",
+            source: ["Core Data Shop"],
+            faction: "Royal Navy",
+            stats: ["HP +130", "AVI 32"],
+            linkTab: 0,
+            fleetLimit: 2,
+            desc: ["Trong trận đấu, mỗi 15s, tàu mang trang bị này sẽ kích hoạt ngẫu nhiên một trong các hiệu ứng sau: 1 - Nhận một lớp giáp ảo tương đương 3% HP. 2 - Hồi 2% HP. 3 - Phóng một loạt barrage ngư lôi đặc biệt. 4 - Phóng một loạt barrage đạn pháo đặc biệt."],
+            code: "a/a7/3640",
+            box: "purple"
+        },
         "anti_em_cmd": {
             name: "Anti-EM Commands",
             tier: "N/A",

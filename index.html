@@ -23,11 +23,19 @@
 <body>
     <nav class="top-navbar" id="global-navbar"></nav>
 
-    <div class="container">
+    <div class="container" style="display: flex; flex-direction: column; align-items: center;">
         <h1 class="main-title">FLEET BUILDER</h1>
 
-        <!-- Vùng chứa 3 Box Đội hình -->
-        <div id="fleet-builder-container" class="fleet-box-wrapper"></div>
+        <!-- Vùng Nút Cài Đặt và Khung Menu Sổ Xuống -->
+        <div class="settings-menu-wrapper">
+            <button type="button" id="settingsToggleBtn" class="settings-toggle-btn" onclick="toggleSettingsMenu()">Cài Đặt ▼</button>
+            <div id="settingsPanel" class="settings-panel hidden">
+                <button type="button" id="globalToggleHeaderBtn" class="toggle-header-global-btn" onclick="toggleGlobalFleetHeaders()">Ẩn Thanh Chức Năng</button>
+            </div>
+        </div>
+
+        <!-- Vùng chứa các Box Đội hình -->
+        <div id="fleet-builder-container"></div>
     </div>
 
     <!-- Popup (Modal) Chọn Tàu -->
