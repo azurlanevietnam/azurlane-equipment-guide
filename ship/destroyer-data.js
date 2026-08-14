@@ -10,4 +10,15 @@ shipDetails["DD"] = {
         slotAmount: [1, 2, 1],
         slotEff: ["140", "140", "180"]
     },
+    "trafalgar": {
+        name: "Trafalgar",
+        source: ["A Rose on the High Tower Event Shop"],
+        faction: "Royal Navy",
+        rarity: "Ultra Rare",
+        code: "7/72",
+        box: "rainbow",
+        equipSlot: [["DDGM"], ["TRPM"], ["AAGM"]],
+        slotAmount: [1, 2, 2],
+        slotEff: ["125", "120", "160"]
+    },
 };

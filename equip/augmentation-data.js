@@ -7,6 +7,18 @@ equipData["Augmentation"] = {
 
 equipDetails["Augmentation"] = {
     "exc_aug_cb": {
+        "privateers_heroism": {
+            name: "Privateer's Heroism",
+            tier: "N/A",
+            source: ["Augment Crafting"],
+            exclusive: ["drake"],
+            stats: ["FP +35", "EVA +20"],
+            equippable: ["CA"],
+            linkTab: 0,
+            desc: ["Trong trận đấu, tàu dẫn đầu của hàng trước sẽ tung ra những đòn chém đặc biệt. Sát thương, phạm vi và hình dạng của những đòn chém này phụ thuộc vào loại hiệu ứng và số lượng tàu mang augment có hiệu ứng đòn chém đặc biệt."],
+            code: "e/e4/Augment_15360",
+            box: "yellow"
+        },
         "elder_lily": {
             name: "Elder Lily",
             tier: "N/A",
@@ -14,7 +26,7 @@ equipDetails["Augmentation"] = {
             exclusive: ["kala_ideas"],
             stats: ["TRP +35", "ACC +10"],
             equippable: ["CB"],
-            linkTab: 2,
+            linkTab: 0,
             desc: ["Trong trận đấu, tàu dẫn đầu của hàng trước sẽ tung ra những đòn chém đặc biệt. Sát thương, phạm vi và hình dạng của những đòn chém này phụ thuộc vào loại hiệu ứng và số lượng tàu mang augment có hiệu ứng đòn chém đặc biệt."],
             code: "b/b9/10460",
             box: "yellow"

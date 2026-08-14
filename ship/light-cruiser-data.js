@@ -18,7 +18,16 @@ shipDetails["CL"] = {
         box: "rainbow",
         equipSlot: [["CLGM"], ["TRPM"], ["AAGM"]],
         slotAmount: [2, 2, 2],
-        slotEff: ["130", "155", "120"]
+        slotEff: ["130", "155", "120"],
+        customRules: [
+            {
+                type: "MULTIPLE_SHIP_TYPE_SLOT_EFF_BONUS",
+                targetSlotIndex: 0, // Slot 1 (index 0)
+                requiredShipType: "CL", // Loại tàu Light Cruiser
+                minCount: 2, // Đội hình có từ 2 CL trở lên (tức là ngoài Belfast Kai còn có ít nhất 1 CL khác)
+                bonus: 20 // +0.2 slot efficiency tương đương +20%
+            }
+        ]
     },
     "aurora": {
         name: "Aurora",

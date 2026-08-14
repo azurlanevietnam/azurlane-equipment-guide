@@ -134,24 +134,13 @@ equipDetails["Auxiliary"] = {
         },
     },
     "purple_aux": {
-        "albion_erp": {
-            name: "Albion's Exercise Report",
-            tier: "N/A",
-            source: ["Core Data Shop"],
-            faction: "Royal Navy",
-            stats: ["HP +130", "AVI 32"],
-            linkTab: 0,
-            fleetLimit: 2,
-            desc: ["Trong trận đấu, mỗi 15s, tàu mang trang bị này sẽ kích hoạt ngẫu nhiên một trong các hiệu ứng sau: 1 - Nhận một lớp giáp ảo tương đương 3% HP. 2 - Hồi 2% HP. 3 - Phóng một loạt barrage ngư lôi đặc biệt. 4 - Phóng một loạt barrage đạn pháo đặc biệt."],
-            code: "a/a7/3640",
-            box: "purple"
-        },
         "anti_em_cmd": {
             name: "Anti-EM Commands",
             tier: "N/A",
             source: ["EM Countermeasures -Simulation Experiment- Event Reward"],
-            stats: ["HP +530"],
+            faction: "Universal",
             unequippable: ["IXs", "IXv", "IXm"],
+            stats: ["HP +530"],
             linkTab: 0,
             fleetLimit: 1,
             desc: ["Trong trận đấu, mỗi 15s, tàu mang trang bị này sẽ kích hoạt ngẫu nhiên một trong các hiệu ứng sau: 1 - Nhận một lớp giáp ảo tương đương 3% HP. 2 - Hồi 2% HP. 3 - Phóng một loạt barrage ngư lôi đặc biệt. 4 - Phóng một loạt barrage đạn pháo đặc biệt."],
@@ -194,6 +183,17 @@ equipDetails["Auxiliary"] = {
             code: "c/c9/3940",
             box: "purple"
         },
+        "drop_tank": {
+            name: "Drop Tank",
+            tier: "N/A",
+            source: ["5-3 Drop", "Any T3/T4 Tech Box"],
+            stats: ["AVI +75", "HP +64"],
+            equippable: ["CV", "CVL", "BBV"],
+            linkTab: 3,
+            desc: ["Tăng 120 HP cho toàn bộ máy bay trên tàu được trang bị. Hiệu ứng không cộng dồn."],
+            code: "2/2b/2100",
+            box: "purple"
+        },
         "100150_aviation_gasoline": {
             name: "100/150 Aviation Gasoline",
             tier: "N/A",
@@ -206,15 +206,28 @@ equipDetails["Auxiliary"] = {
             code: "d/d4/660",
             box: "purple"
         },
-        "drop_tank": {
-            name: "Drop Tank",
+        "albion_erp": {
+            name: "Albion's Exercise Report",
             tier: "N/A",
-            source: ["5-3 Drop", "Any T3/T4 Tech Box"],
-            stats: ["AVI +75", "HP +64"],
-            equippable: ["CV", "CVL", "BBV"],
-            linkTab: 3,
-            desc: ["Tăng 120 HP cho toàn bộ máy bay trên tàu được trang bị. Hiệu ứng không cộng dồn."],
-            code: "2/2b/2100",
+            source: ["Core Data Shop"],
+            faction: "Royal Navy",
+            stats: ["HP +130", "AVI +32"],
+            linkTab: 0,
+            fleetLimit: 2,
+            desc: ["Trong trận đấu, mỗi 15s, tàu mang trang bị này sẽ kích hoạt ngẫu nhiên một trong các hiệu ứng sau: 1 - Nhận một lớp giáp ảo tương đương 3% HP. 2 - Hồi 2% HP. 3 - Phóng một loạt barrage ngư lôi đặc biệt. 4 - Phóng một loạt barrage đạn pháo đặc biệt."],
+            code: "a/a7/3640",
+            box: "purple"
+        },
+        "watatsumi_rn": {
+            name: "Watatsumi Research Notes",
+            tier: "N/A",
+            source: ["The Weaver's Omen Event Reward"],
+            faction: "Heavy Sakura",
+            stats: ["FP +16", "AVI +32"],
+            linkTab: 0,
+            fleetLimit: 2,
+            desc: ["Trong trận đấu, tàu mang trang bị này tăng 5% sát thương gây ra lên tàu META."],
+            code: "a/a2/3900",
             box: "purple"
         },
     }

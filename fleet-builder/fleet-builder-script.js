@@ -242,11 +242,8 @@ function toggleSettingsMenu() {
 function updateGlobalHeaderButtonUI() {
     const toggleBtn = document.getElementById('globalToggleHeaderBtn');
     if (toggleBtn) {
-        // Tên button luôn cố định là "Thanh Chức Năng"
         toggleBtn.innerText = "Thanh Chức Năng";
         
-        // isHeaderHidden = false (Trạng thái HIỆN) -> Thêm class active
-        // isHeaderHidden = true (Trạng thái ẨN) -> Loại bỏ class active
         if (!isHeaderHidden) {
             toggleBtn.classList.add("active");
         } else {
@@ -1455,7 +1452,7 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
             let processEquipEntries = (equipObj) => {
                 for (let eqId in equipObj) {
                     let eqData = equipObj[eqId];
-                    
+
                     if (eqData && typeof eqData === 'object' && !eqData.code && !eqData.name) {
                         processEquipEntries(eqData);
                         continue;
@@ -1484,7 +1481,7 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
                     if (category === "AA-gun" && actualCategory !== "AA-gun") continue;
                     if (category === "AA-Gun (Time Fuze)" && actualCategory !== "AA-Gun (Time Fuze)") continue;
 
-                    // --- LUẬT MẶC ĐỊNH EQUIPPABLE LÀ ALL NẾU KHÔNG KHAI BÁO ---
+                    // --- KIỂM TRA ĐIỀU KIỆN CHO PHÉP TRANG BỊ (EQUIPPABLE) ---
                     let equipableList = eqData.equippable || eqData.equipable;
                     let isEquippableAllowed = false;
 
@@ -1862,7 +1859,7 @@ function getProcessedShipData(fleetSlotIndex) {
     if (shipDataCopy.customRules && Array.isArray(shipDataCopy.customRules)) {
         shipDataCopy.customRules.forEach(rule => {
             
-            // --- LUẬT 1: Azuma (Tăng theo loại súng CBGM ở slot 0) ---
+            // --- LUẬT 1: Azuma & Cherbourg (Tăng theo loại súng CBGM) ---
             if (rule.type === "SLOT_EFF_BONUS") {
                 let targetSlot = rule.slotIndex;
                 let requiredCat = rule.equipCategory;
@@ -1881,7 +1878,7 @@ function getProcessedShipData(fleetSlotIndex) {
                 }
             }
 
-            // --- LUẬT 2: Kronstadt (Tăng slot 2 nếu có tối thiểu N trang bị Northern Parliament trong hạm) ---
+            // --- LUẬT 2: Kronstadt (Tăng theo trang bị Faction trong hạm) ---
             if (rule.type === "FACTION_SLOT_EFF_BONUS") {
                 let targetSlot = rule.targetSlotIndex;
                 let requiredFaction = rule.requiredFaction;
@@ -1900,6 +1897,51 @@ function getProcessedShipData(fleetSlotIndex) {
                 });
 
                 if (factionEquipCount >= minCount) {
+                    let currentEff = parseInt(shipDataCopy.slotEff[targetSlot], 10) || 0;
+                    shipDataCopy.slotEff[targetSlot] = String(currentEff + bonusVal);
+                    shipDataCopy._modifiedEffIndices[targetSlot] = true;
+                }
+            }
+
+            // --- LUẬT 3: Belfast Kai (Tăng slot 1 nếu hạm đội có >= 2 CL) ---
+            if (rule.type === "MULTIPLE_SHIP_TYPE_SLOT_EFF_BONUS") {
+                let targetSlot = rule.targetSlotIndex;
+                let requiredType = rule.requiredShipType;
+                let minCount = rule.minCount || 2;
+                let bonusVal = rule.bonus;
+
+                const fleetGroupIdx = getFleetGroupIndex(fleetSlotIndex);
+                const startIdx = fleetGroupIdx * 9;
+                const endIdx = startIdx + 9;
+
+                let shipTypeCount = 0;
+                for (let i = startIdx; i < endIdx; i++) {
+                    let sData = fleetState[i];
+                    if (sData && sData.shipId) {
+                        let info = getShipTypeAndData(sData.shipId);
+                        if (info && info.type === requiredType) {
+                            shipTypeCount++;
+                        }
+                    }
+                }
+
+                if (shipTypeCount >= minCount) {
+                    let currentEff = parseInt(shipDataCopy.slotEff[targetSlot], 10) || 0;
+                    shipDataCopy.slotEff[targetSlot] = String(currentEff + bonusVal);
+                    shipDataCopy._modifiedEffIndices[targetSlot] = true;
+                }
+            }
+
+            // --- LUẬT 4: Drake (Tăng slot 1 thêm +10% nếu trang bị Augment privateers_heroism) ---
+            if (rule.type === "EQUIP_ID_SLOT_EFF_BONUS") {
+                let targetSlot = rule.targetSlotIndex;
+                let requiredEquipId = rule.requiredEquipId;
+                let bonusVal = rule.bonus;
+
+                // Kiểm tra xem tàu có đang trang bị item có ID trùng khớp ở bất kỳ slot nào (đặc biệt là Augment slot 5)
+                let hasEquip = slot.equips.some(eq => eq && eq.id === requiredEquipId);
+
+                if (hasEquip) {
                     let currentEff = parseInt(shipDataCopy.slotEff[targetSlot], 10) || 0;
                     shipDataCopy.slotEff[targetSlot] = String(currentEff + bonusVal);
                     shipDataCopy._modifiedEffIndices[targetSlot] = true;
