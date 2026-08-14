@@ -19,6 +19,13 @@ shipDetails["DD"] = {
         box: "rainbow",
         equipSlot: [["DDGM"], ["TRPM"], ["AAGM"]],
         slotAmount: [1, 2, 2],
-        slotEff: ["125", "120", "160"]
+        slotEff: ["125", "120", "160"],
+        customRules: [
+            {
+                type: "ALWAYS_SLOT_EFF_BONUS",
+                targetSlotIndex: 0,
+                bonus: 15
+            }
+        ]
     },
 };

@@ -32,4 +32,23 @@ shipDetails["BB"] = {
         slotAmount: [3, 3, 1],
         slotEff: ["145", "180", "130"]
     },
+    "warspite_kai": {
+        name: "Warspite Kai",
+        source: ["Warspite + Prototype Shop"],
+        faction: "Royal Navy",
+        rarity: "Ultra Rare",
+        code: "yanzhan_g",
+        box: "rainbow",
+        equipSlot: [["BBGM"], ["CLGM", "DDGM"], ["AAGM", "AATFGM"]],
+        slotAmount: [3, 3, 1],
+        slotEff: ["140", "200", "115"],
+        customRules: [
+            {
+                type: "EQUIP_ID_SLOT_EFF_BONUS",
+                targetSlotIndex: 0,
+                requiredEquipId: "oldladys_royalsword",
+                bonus: 10
+            }
+        ]
+    },
 };

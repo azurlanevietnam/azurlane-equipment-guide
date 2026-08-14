@@ -89,7 +89,7 @@ function getEquipDataGlobal(category, eqId) {
     let foundData = null;
     let searchNested = (obj) => {
         if (foundData || !obj || typeof obj !== 'object') return;
-        
+
         if (obj[eqId] && typeof obj[eqId] === 'object' && obj[eqId].name) {
             foundData = obj[eqId];
             return;
@@ -225,7 +225,7 @@ function toggleSettingsMenu() {
     isSettingsMenuOpen = !isSettingsMenuOpen;
     const panel = document.getElementById('settingsPanel');
     const toggleBtn = document.getElementById('settingsToggleBtn');
-    
+
     if (panel) {
         if (isSettingsMenuOpen) {
             panel.classList.remove('hidden');
@@ -243,7 +243,7 @@ function updateGlobalHeaderButtonUI() {
     const toggleBtn = document.getElementById('globalToggleHeaderBtn');
     if (toggleBtn) {
         toggleBtn.innerText = "Thanh Chức Năng";
-        
+
         if (!isHeaderHidden) {
             toggleBtn.classList.add("active");
         } else {
@@ -302,7 +302,7 @@ function handleShipSlotClick(slotIndex) {
 }
 
 // ==========================================
-// QUẢN LÝ TÍNH NĂNG THÊM & XÓA HẠM ĐỘI
+// QUẢN LÝ TÍNH NĂNG THÊM, NHÂN BẢN & XÓA HẠM ĐỘI
 // ==========================================
 function addNewFleet(insertAfterGroupIndex) {
     const totalFleets = Math.floor(fleetState.length / 9);
@@ -317,6 +317,44 @@ function addNewFleet(insertAfterGroupIndex) {
 
     const insertPosition = newGroupIndex * 9;
     fleetState.splice(insertPosition, 0, ...newFleetSlots);
+
+    saveFleetState();
+    renderFleet();
+}
+
+function duplicateFleet(sourceGroupIndex) {
+    const totalFleets = Math.floor(fleetState.length / 9);
+
+    if (totalFleets >= MAX_FLEETS) {
+        console.warn(`Đã đạt giới hạn tối đa ${MAX_FLEETS} hạm đội! Không thể nhân bản.`);
+        return;
+    }
+
+    const sourceStartPos = sourceGroupIndex * 9;
+    const sourceSlots = fleetState.slice(sourceStartPos, sourceStartPos + 9);
+
+    // Deep copy 9 ô slot của hạm đội nguồn
+    const duplicatedSlots = JSON.parse(JSON.stringify(sourceSlots));
+
+    const insertGroupIndex = sourceGroupIndex + 1;
+    const insertPosition = insertGroupIndex * 9;
+
+    // Dịch các hạm đội phía dưới xuống 1 đơn vị index và chèn hạm đội nhân bản vào
+    fleetState.splice(insertPosition, 0, ...duplicatedSlots);
+
+    // Sao chép cả cài đặt mặc định level & affinity sang vị trí hạm đội mới
+    for (let g = totalFleets; g > insertGroupIndex; g--) {
+        const prevShipDef = getDefaultShipSettingsForFleet(g - 1);
+        const prevEquipDef = getDefaultEquipEnhanceForFleet(g - 1);
+
+        saveDefaultShipSettingsForFleet(g, prevShipDef.level, prevShipDef.affinity);
+        saveDefaultEquipEnhanceForFleet(g, prevEquipDef);
+    }
+
+    const sourceShipDef = getDefaultShipSettingsForFleet(sourceGroupIndex);
+    const sourceEquipDef = getDefaultEquipEnhanceForFleet(sourceGroupIndex);
+    saveDefaultShipSettingsForFleet(insertGroupIndex, sourceShipDef.level, sourceShipDef.affinity);
+    saveDefaultEquipEnhanceForFleet(insertGroupIndex, sourceEquipDef);
 
     saveFleetState();
     renderFleet();
@@ -541,7 +579,7 @@ function renderFleetSlotRow(index) {
             let rawEffVal = shipInfo.data.slotEff && shipInfo.data.slotEff[i] ? shipInfo.data.slotEff[i] : "";
             let isModified = shipInfo.data._modifiedEffIndices && shipInfo.data._modifiedEffIndices[i];
 
-            let effStyle = isModified ? 'color: #2ecc71; font-weight: bold;' : '';
+            let effStyle = isModified ? 'color: #2ecc71; font-weight: 800; font-size: 16px;' : '';
             let eff = rawEffVal ? `<span class="eff-line" style="${effStyle}">${rawEffVal}%</span>` : "";
             let amt = (shipInfo.data.slotAmount && shipInfo.data.slotAmount[i]) ? `x${shipInfo.data.slotAmount[i]}` : "";
 
@@ -594,10 +632,11 @@ function renderFleet() {
 
     for (let group = 0; group < totalFleets; group++) {
         const addBtnAttr = (isMaxReached || isSwapShipMode) ? 'disabled class="fleet-add-btn hidden"' : 'class="fleet-add-btn"';
+        const duplicateBtnAttr = (isMaxReached || isSwapShipMode) ? 'disabled class="fleet-duplicate-btn hidden"' : 'class="fleet-duplicate-btn"';
         const deleteBtnAttr = isOnlyOneFleet ? 'disabled class="fleet-delete-btn hidden"' : 'class="fleet-delete-btn"';
         const swapBtnClass = isSwapShipMode ? 'fleet-swap-btn active' : 'fleet-swap-btn';
 
-        const rightActionBtnHtml = isSwapShipMode 
+        const rightActionBtnHtml = isSwapShipMode
             ? `<button type="button" class="fleet-delete-btn active" onclick="toggleSwapShipMode()">Tắt</button>`
             : `<button type="button" ${deleteBtnAttr} onclick="deleteFleet(${group})">Xóa</button>`;
 
@@ -608,6 +647,7 @@ function renderFleet() {
                 <div class="fleet-header-left">
                     <span class="fleet-title">Hạm Đội ${group + 1}</span>
                     <button type="button" ${addBtnAttr} onclick="addNewFleet(${group})">Hạm Đội Mới</button>
+                    <button type="button" ${duplicateBtnAttr} onclick="duplicateFleet(${group})">Nhân Bản</button>
                 </div>
                 <div class="fleet-header-center">
                     <button type="button" class="${swapBtnClass}" onclick="toggleSwapShipMode()">Đổi Tàu</button>
@@ -980,7 +1020,7 @@ function renderShipListOnly() {
         // --- ẨN HOÀN TOÀN CÁC TÀU ĐÃ CHỌN TRONG CÙNG HẠM ĐỘI ---
         let isShipSelectedInFleet = selectedShipsInFleet.has(shipId);
         if (isShipSelectedInFleet) {
-            return; 
+            return;
         }
 
         let iconUrl = getShipIconUrl(shipId, shipData);
@@ -1379,7 +1419,7 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
 
     // Danh sách các cặp trang bị dùng chung giới hạn (Group / Pair Limit) trên cùng một con tàu
     const PAIR_LIMIT_GROUPS = [
-        ["hpfcr", "admiralty_fct"] 
+        ["hpfcr", "admiralty_fct"]
     ];
 
     let currentShipEquips = fleetState[selectingSlotIndex] ? fleetState[selectingSlotIndex].equips : [];
@@ -1494,7 +1534,7 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
                     let unequippableList = eqData.unequippable || eqData.unequipList;
                     if (unequippableList && Array.isArray(unequippableList)) {
                         if (unequippableList.includes(shipInfo.type)) {
-                            isEquippableAllowed = false; 
+                            isEquippableAllowed = false;
                         }
                     }
 
@@ -1552,7 +1592,7 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
         if (eqData.exclusive && Array.isArray(eqData.exclusive)) {
             let currentShipId = fleetState[selectingSlotIndex].shipId;
             if (!eqData.exclusive.includes(currentShipId)) {
-                return; 
+                return;
             }
         }
 
@@ -1561,11 +1601,11 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
         let boxClass = eqData.box ? `box-${eqData.box}` : "box-grey";
 
         let isLimitedOnShip = limitedEquipsOnCurrentShip.has(eqId);
-        
+
         let currentEqInSlot = fleetState[selectingSlotIndex].equips[selectingEquipSlotIndex];
         let currentCountInFleet = fleetEquipCounts[eqId] || 0;
         if (currentEqInSlot && currentEqInSlot.id === eqId) {
-            currentCountInFleet -= 1; 
+            currentCountInFleet -= 1;
         }
 
         let isFleetLimitReached = (eqData.fleetLimit !== undefined && currentCountInFleet >= eqData.fleetLimit);
@@ -1858,7 +1898,7 @@ function getProcessedShipData(fleetSlotIndex) {
 
     if (shipDataCopy.customRules && Array.isArray(shipDataCopy.customRules)) {
         shipDataCopy.customRules.forEach(rule => {
-            
+
             // --- LUẬT 1: Azuma & Cherbourg (Tăng theo loại súng CBGM) ---
             if (rule.type === "SLOT_EFF_BONUS") {
                 let targetSlot = rule.slotIndex;
@@ -1946,6 +1986,16 @@ function getProcessedShipData(fleetSlotIndex) {
                     shipDataCopy.slotEff[targetSlot] = String(currentEff + bonusVal);
                     shipDataCopy._modifiedEffIndices[targetSlot] = true;
                 }
+            }
+
+            // --- LUẬT 5: Tăng vô điều kiện Sloteff cho slot chỉ định ---
+            if (rule.type === "ALWAYS_SLOT_EFF_BONUS") {
+                let targetSlot = rule.targetSlotIndex;
+                let bonusVal = rule.bonus;
+
+                let currentEff = parseInt(shipDataCopy.slotEff[targetSlot], 10) || 0;
+                shipDataCopy.slotEff[targetSlot] = String(currentEff + bonusVal);
+                shipDataCopy._modifiedEffIndices[targetSlot] = true;
             }
 
         });

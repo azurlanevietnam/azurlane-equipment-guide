@@ -7,6 +7,18 @@ equipData["Augmentation"] = {
 
 equipDetails["Augmentation"] = {
     "exc_aug_cb": {
+        "oldladys_royalsword": {
+            name: "Old Lady's Royal Sword",
+            tier: "N/A",
+            source: ["Augment Crafting"],
+            exclusive: ["warspite_kai"],
+            stats: ["FP +35", "ACC +20"],
+            equippable: ["BB"],
+            linkTab: 0,
+            desc: ["Tăng cho Warspite Kai 10% chỉ số ACC và 15% sát thương chí mạng của pháo chính."],
+            code: "d/df/Augment_14160",
+            box: "yellow"
+        },
         "privateers_heroism": {
             name: "Privateer's Heroism",
             tier: "N/A",

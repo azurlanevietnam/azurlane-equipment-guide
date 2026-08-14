@@ -99,8 +99,9 @@
 .fleet-box-wrapper {
     display: flex;
     flex-direction: column; 
+    gap: 4px;
     background: #1a252f;    /* Khung nền đen riêng của Fleet */
-    padding: 14px 8px 8px 8px; 
+    padding: 16px 8px 8px 8px; 
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
     width: fit-content;
@@ -113,13 +114,13 @@
     padding: 8px !important;
 }
 
-/* HÀNG 1: HÀNG CHỨC NĂNG (TÊN FLEET - CĂN GIỮA NÚT ĐỔI TÀU - NÚT XÓA/TẮT) */
+/* HÀNG 1: HÀNG CHỨC NĂNG (TÊN FLEET, NÚT THÊM, NÚT NHÂN BẢN - CĂN GIỮA NÚT ĐỔI TÀU - NÚT XÓA/TẮT) */
 .fleet-header-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding-bottom: 8px;
+    padding-bottom: 4px;
     transition: opacity 0.3s ease;
 }
 
@@ -159,6 +160,7 @@
 
 /* TẤT CẢ BUTTON TRONG THANH CHỨC NĂNG CÓ PADDING 6px 20px VÀ FONT-SIZE 20px */
 .fleet-add-btn,
+.fleet-duplicate-btn,
 .fleet-swap-btn,
 .fleet-delete-btn {
     padding: 6px 20px !important;
@@ -181,6 +183,20 @@
     background-color: #f1c40f;
     color: #1a252f;
     box-shadow: 0 0 8px rgba(241, 196, 15, 0.5);
+}
+
+/* NÚT NHÂN BẢN (MÀU XANH LÁ) */
+.fleet-duplicate-btn {
+    background: transparent;
+    color: #2ecc71;
+    border: 2px solid #2ecc71;
+    margin-left: 10px;
+}
+
+.fleet-duplicate-btn:hover:not(:disabled) {
+    background-color: #2ecc71;
+    color: #1a252f;
+    box-shadow: 0 0 8px rgba(46, 204, 113, 0.5);
 }
 
 /* NÚT ĐỔI TÀU (NẰM CHÍNH GIỮA) */
@@ -220,6 +236,8 @@
 /* TRẠNG THÁI KHÓA/ẨN NÚT CHỨC NĂNG */
 .fleet-add-btn:disabled,
 .fleet-add-btn.hidden,
+.fleet-duplicate-btn:disabled,
+.fleet-duplicate-btn.hidden,
 .fleet-delete-btn:disabled,
 .fleet-delete-btn.hidden {
     display: none !important;
@@ -230,7 +248,8 @@
    3. CHẾ ĐỘ ĐỔI TÀU (SWAP SHIP MODE) - OPACITY 70%
 ======================================================== */
 .fleet-box-wrapper.swap-mode-active .fleet-title,
-.fleet-box-wrapper.swap-mode-active .fleet-add-btn {
+.fleet-box-wrapper.swap-mode-active .fleet-add-btn,
+.fleet-box-wrapper.swap-mode-active .fleet-duplicate-btn {
     opacity: 0.7;
 }
 
@@ -290,7 +309,7 @@
     display: flex;
     gap: 4px; 
     background: #121a22;
-    padding: 4px; 
+    padding: 6px; 
     border-radius: 0; 
 }
 
