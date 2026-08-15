@@ -31,15 +31,15 @@ shipDetails["BB"] = {
         equipSlot: [["BBGM"], ["CLGM", "DDGM"], ["AAGM", "AATFGM"]],
         slotAmount: [3, 3, 1],
         slotEff: ["145", "180", "130"],
-        customRules: [
-            {
-                type: "FACTION_SLOT_EFF_BONUS",
-                targetSlotIndex: 2,           // Slot 3 (index 2 - AA Gun)
-                requiredFaction: "Royal Navy", // Faction yêu cầu
-                minCount: 1,                  // Tối thiểu 1 trang bị
-                bonus: 30                     // Tăng +30% hiệu suất
-            }
-        ]
+        // customRules: [
+        //     {
+        //         type: "FACTION_SLOT_EFF_BONUS",
+        //         targetSlotIndex: 2,           // Slot 3 (index 2 - AA Gun)
+        //         requiredFaction: "Royal Navy", // Faction yêu cầu
+        //         minCount: 1,                  // Tối thiểu 1 trang bị
+        //         bonus: 30                     // Tăng +30% hiệu suất
+        //     }
+        // ]
     },
     "warspite_kai": {
         name: "Warspite Kai",

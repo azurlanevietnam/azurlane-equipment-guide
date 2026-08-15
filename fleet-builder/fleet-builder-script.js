@@ -1,18 +1,16 @@
+// ==========================================
+// 1. BIẾN TOÀN CỤC & KHỞI TẠO TRẠNG THÁI
+// ==========================================
 const fleetContainer = document.getElementById('fleet-builder-container');
 const shipModal = document.getElementById('shipSelectionModal');
 const shipModalGrid = document.getElementById('shipModalGrid');
 
-const MAX_FLEETS = 36; // Giới hạn tối đa 36 hạm đội
+const MAX_FLEETS = 36;
 
-// Trạng thái mảng hạm đội động (Mỗi Fleet chứa 9 slot: 3 Main, 3 Vanguard, 3 Submarine)
 let fleetState = loadFleetState();
-
 let selectingSlotIndex = -1;
 let selectingEquipSlotIndex = -1;
 
-// ==========================================
-// TRẠNG THÁI BỘ LỌC TÀU & TRANG BỊ
-// ==========================================
 let shipFilterFaction = new Set(['ALL']);
 let shipFilterType = new Set(['ALL']);
 let shipFilterRarity = new Set(['ALL']);
@@ -23,37 +21,15 @@ let equipFilterFaction = new Set(['ALL']);
 let equipFilterRarity = new Set(['ALL']);
 let isEquipFilterOpen = false;
 
-// ==========================================
-// TRẠNG THÁI ĐỔI TÀU, MENU CÀI ĐẶT & ẨN THANH CHỨC NĂNG
-// ==========================================
 let isSwapShipMode = false;
 let swapSourceSlotIndex = -1;
 let isSettingsMenuOpen = false;
-
-// Đọc trạng thái ẩn thanh chức năng từ localStorage (độc lập hoàn toàn với Reset)
 let isHeaderHidden = loadHeaderHiddenState();
 
-function loadHeaderHiddenState() {
-    try {
-        const saved = localStorage.getItem('azur_lane_header_hidden_state');
-        return saved !== null ? JSON.parse(saved) : false;
-    } catch (e) {
-        return false;
-    }
-}
-
-function saveHeaderHiddenState(state) {
-    try {
-        localStorage.setItem('azur_lane_header_hidden_state', JSON.stringify(state));
-    } catch (e) { }
-}
-
-// Mã loại tàu phân khu
 const VANGUARD_SHIP_TYPES = ["DD", "CL", "CA", "CB", "DDG", "AE", "IXv"];
 const MAIN_SHIP_TYPES = ["BC", "BB", "BBV", "CV", "CVL", "BM", "DDG", "AR", "IXm"];
 const SUBMARINE_SHIP_TYPES = ["SS", "SSV", "IXs"];
 
-// Bảng ánh xạ mã Hằng số/Chuỗi viết tắt sang Tên Category chuẩn trong equipDetails
 const MAP_EQUIP_CATEGORY = {
     "DDGM": "DD-gun",
     "CLGM": "CL-gun",
@@ -72,68 +48,22 @@ const MAP_EQUIP_CATEGORY = {
     "AUG": "Augmentation"
 };
 
-// Hàm hỗ trợ tìm thông tin chi tiết của trang bị dựa vào Category hiển thị (hỗ trợ quét đệ quy các nhóm con)
-function getEquipDataGlobal(category, eqId) {
-    if (!eqId || !window.equipDetails) return null;
-
-    let targetCat = category;
-    if (category === "CA-gun" || category === "CB-gun") targetCat = "CA-gun";
-    if (category === "Surface Torpedo" || category === "Guided Missile") targetCat = "Surface Torpedo";
-    if (category === "AA-gun" || category === "AA-Gun (Time Fuze)") targetCat = "AA-gun";
-
-    if (targetCat && window.equipDetails[targetCat]) {
-        let catContainer = window.equipDetails[targetCat];
-        if (catContainer[eqId]) return catContainer[eqId];
+// ==========================================
+// 2. LƯU TRỮ VÀ ĐỌC DỮ LIỆU TỪ LOCALSTORAGE
+// ==========================================
+function loadHeaderHiddenState() {
+    try {
+        const saved = localStorage.getItem('azur_lane_header_hidden_state');
+        return saved !== null ? JSON.parse(saved) : false;
+    } catch (e) {
+        return false;
     }
-
-    let foundData = null;
-    let searchNested = (obj) => {
-        if (foundData || !obj || typeof obj !== 'object') return;
-
-        if (obj[eqId] && typeof obj[eqId] === 'object' && obj[eqId].name) {
-            foundData = obj[eqId];
-            return;
-        }
-
-        for (let key in obj) {
-            if (typeof obj[key] === 'object' && obj[key] !== null) {
-                searchNested(obj[key]);
-            }
-        }
-    };
-
-    searchNested(window.equipDetails);
-    return foundData;
 }
 
-function initFleetBuilder() {
-    injectEquipModal();
-    injectConfirmModal();
-    injectResetButton();
-
-    updateGlobalHeaderButtonUI();
-    waitForDataAndRender();
-}
-
-function waitForDataAndRender() {
-    const checkDataReady = setInterval(() => {
-        if (window.shipDetails && window.equipDetails && Object.keys(window.equipDetails).length > 0) {
-            clearInterval(checkDataReady);
-            renderFleet();
-        }
-    }, 50);
-}
-
-function getSlotCategoryType(slotIndex) {
-    let rowInGroup = slotIndex % 9;
-    if (rowInGroup >= 6) return "SUB";
-    if (rowInGroup >= 3) return "VANGUARD";
-    return "MAIN";
-}
-
-function getFleetGroupIndex(slotIndex) {
-    if (slotIndex < 0) return 0;
-    return Math.floor(slotIndex / 9);
+function saveHeaderHiddenState(state) {
+    try {
+        localStorage.setItem('azur_lane_header_hidden_state', JSON.stringify(state));
+    } catch (e) { }
 }
 
 function saveFleetState() {
@@ -219,7 +149,240 @@ function loadFleetState() {
 }
 
 // ==========================================
-// QUẢN LÝ MENU CÀI ĐẶT & ẨN/HIỆN THANH CHỨC NĂNG
+// 3. HÀM TIỆN ÍCH, TRUY VẤN VÀ TÍNH TOÁN DỮ LIỆU
+// ==========================================
+function getSlotCategoryType(slotIndex) {
+    let rowInGroup = slotIndex % 9;
+    if (rowInGroup >= 6) return "SUB";
+    if (rowInGroup >= 3) return "VANGUARD";
+    return "MAIN";
+}
+
+function getFleetGroupIndex(slotIndex) {
+    if (slotIndex < 0) return 0;
+    return Math.floor(slotIndex / 9);
+}
+
+function getShipTypeAndData(shipId) {
+    if (!window.shipDetails) return null;
+    for (let type in window.shipDetails) {
+        if (window.shipDetails[type][shipId]) {
+            return { type: type, data: window.shipDetails[type][shipId] };
+        }
+    }
+    return null;
+}
+
+function getShipIconUrl(shipId, shipData) {
+    if (shipId.endsWith('_kai')) {
+        return `https://cdn.nagami.moe/squareicon/${shipData.code}.png`;
+    } else {
+        const formattedName = shipData.name.replace(/ /g, '_');
+        return `https://azurlane.netojuu.com/images/${shipData.code}/${formattedName}Icon.png`;
+    }
+}
+
+function getAffinityDisplay(affinityKey) {
+    switch (affinityKey) {
+        case 'Stranger': return '50♥';
+        case 'Friendly': return '61♥';
+        case 'Crush': return '81♥';
+        case 'Love': return '100♥';
+        case 'Oath': return '100💍';
+        case 'Oath200': return '200💍';
+        default: return '50♥';
+    }
+}
+
+function getMaxEnhanceByBox(boxColor, category) {
+    if (category === "Augmentation" || selectingEquipSlotIndex === 5) {
+        return 10;
+    }
+
+    switch (boxColor) {
+        case 'rainbow':
+        case 'yellow': return 13;
+        case 'purple': return 11;
+        case 'blue': return 7;
+        case 'grey': return 3;
+        default: return 13;
+    }
+}
+
+function getScrollbarWidth() {
+    return window.innerWidth - document.documentElement.clientWidth;
+}
+
+function applyAntiShiftPadding(isModalOpen) {
+    const mainContainer = document.querySelector('.container');
+    const topNavbar = document.querySelector('.top-navbar');
+    const scrollbarWidth = isModalOpen ? getScrollbarWidth() : 0;
+
+    if (mainContainer) {
+        mainContainer.style.paddingRight = isModalOpen ? `${scrollbarWidth}px` : '';
+    }
+    if (topNavbar) {
+        topNavbar.style.paddingRight = isModalOpen ? `${30 + scrollbarWidth}px` : '';
+    }
+}
+
+function getSlotAllowedCategories(shipInfo, slotIndex) {
+    if (slotIndex === 5) return ["Augmentation"];
+    if (slotIndex === 3 || slotIndex === 4) return ["Auxiliary"];
+
+    if (!shipInfo || !shipInfo.data || !shipInfo.data.equipSlot) return [];
+
+    let rawSlots = shipInfo.data.equipSlot[slotIndex] || [];
+    return rawSlots.map(code => MAP_EQUIP_CATEGORY[code] || code);
+}
+
+function getEquipDataGlobal(category, eqId) {
+    if (!eqId || !window.equipDetails) return null;
+
+    let targetCat = category;
+    if (category === "CA-gun" || category === "CB-gun") targetCat = "CA-gun";
+    if (category === "Surface Torpedo" || category === "Guided Missile") targetCat = "Surface Torpedo";
+    if (category === "AA-gun" || category === "AA-Gun (Time Fuze)") targetCat = "AA-gun";
+
+    if (targetCat && window.equipDetails[targetCat]) {
+        let catContainer = window.equipDetails[targetCat];
+        if (catContainer[eqId]) return catContainer[eqId];
+    }
+
+    let foundData = null;
+    let searchNested = (obj) => {
+        if (foundData || !obj || typeof obj !== 'object') return;
+
+        if (obj[eqId] && typeof obj[eqId] === 'object' && obj[eqId].name) {
+            foundData = obj[eqId];
+            return;
+        }
+
+        for (let key in obj) {
+            if (typeof obj[key] === 'object' && obj[key] !== null) {
+                searchNested(obj[key]);
+            }
+        }
+    };
+
+    searchNested(window.equipDetails);
+    return foundData;
+}
+
+function getProcessedShipData(fleetSlotIndex) {
+    let slot = fleetState[fleetSlotIndex];
+    if (!slot || !slot.shipId) return null;
+
+    let baseInfo = getShipTypeAndData(slot.shipId);
+    if (!baseInfo || !baseInfo.data) return null;
+
+    let shipDataCopy = JSON.parse(JSON.stringify(baseInfo.data));
+    let shipType = baseInfo.type;
+
+    shipDataCopy._modifiedEffIndices = {};
+
+    if (shipDataCopy.customRules && Array.isArray(shipDataCopy.customRules)) {
+        shipDataCopy.customRules.forEach(rule => {
+            if (rule.type === "SLOT_EFF_BONUS") {
+                let targetSlot = rule.slotIndex;
+                let requiredCat = rule.equipCategory;
+                let bonusVal = rule.bonus;
+
+                let eq = slot.equips[targetSlot];
+                if (eq && eq.id) {
+                    let eqData = getEquipDataGlobal(eq.category, eq.id);
+                    let isCBGun = eq.category === "CBGM" || eq.category === "CB-gun" || (eqData && eqData.gunType === "cb");
+
+                    if (eq.category === requiredCat || (requiredCat === "CBGM" && isCBGun)) {
+                        let currentEff = parseInt(shipDataCopy.slotEff[targetSlot], 10) || 0;
+                        shipDataCopy.slotEff[targetSlot] = String(currentEff + bonusVal);
+                        shipDataCopy._modifiedEffIndices[targetSlot] = true;
+                    }
+                }
+            }
+
+            if (rule.type === "FACTION_SLOT_EFF_BONUS") {
+                let targetSlot = rule.targetSlotIndex;
+                let requiredFaction = rule.requiredFaction;
+                let minCount = rule.minCount || 1;
+                let bonusVal = rule.bonus;
+
+                let factionEquipCount = 0;
+                slot.equips.forEach(eq => {
+                    if (eq && eq.id) {
+                        let eqData = getEquipDataGlobal(eq.category, eq.id);
+                        let eqFaction = eqData ? (eqData.faction || 'Universal') : 'Universal';
+                        if (eqFaction === requiredFaction) {
+                            factionEquipCount++;
+                        }
+                    }
+                });
+
+                if (factionEquipCount >= minCount) {
+                    let currentEff = parseInt(shipDataCopy.slotEff[targetSlot], 10) || 0;
+                    shipDataCopy.slotEff[targetSlot] = String(currentEff + bonusVal);
+                    shipDataCopy._modifiedEffIndices[targetSlot] = true;
+                }
+            }
+
+            if (rule.type === "MULTIPLE_SHIP_TYPE_SLOT_EFF_BONUS") {
+                let targetSlot = rule.targetSlotIndex;
+                let requiredType = rule.requiredShipType;
+                let minCount = rule.minCount || 2;
+                let bonusVal = rule.bonus;
+
+                const fleetGroupIdx = getFleetGroupIndex(fleetSlotIndex);
+                const startIdx = fleetGroupIdx * 9;
+                const endIdx = startIdx + 9;
+
+                let shipTypeCount = 0;
+                for (let i = startIdx; i < endIdx; i++) {
+                    let sData = fleetState[i];
+                    if (sData && sData.shipId) {
+                        let info = getShipTypeAndData(sData.shipId);
+                        if (info && info.type === requiredType) {
+                            shipTypeCount++;
+                        }
+                    }
+                }
+
+                if (shipTypeCount >= minCount) {
+                    let currentEff = parseInt(shipDataCopy.slotEff[targetSlot], 10) || 0;
+                    shipDataCopy.slotEff[targetSlot] = String(currentEff + bonusVal);
+                    shipDataCopy._modifiedEffIndices[targetSlot] = true;
+                }
+            }
+
+            if (rule.type === "EQUIP_ID_SLOT_EFF_BONUS") {
+                let targetSlot = rule.targetSlotIndex;
+                let requiredEquipId = rule.requiredEquipId;
+                let bonusVal = rule.bonus;
+
+                let hasEquip = slot.equips.some(eq => eq && eq.id === requiredEquipId);
+
+                if (hasEquip) {
+                    let currentEff = parseInt(shipDataCopy.slotEff[targetSlot], 10) || 0;
+                    shipDataCopy.slotEff[targetSlot] = String(currentEff + bonusVal);
+                    shipDataCopy._modifiedEffIndices[targetSlot] = true;
+                }
+            }
+
+            if (rule.type === "ALWAYS_SLOT_EFF_BONUS") {
+                let targetSlot = rule.targetSlotIndex;
+                let bonusVal = rule.bonus;
+
+                let currentEff = parseInt(shipDataCopy.slotEff[targetSlot], 10) || 0;
+                shipDataCopy.slotEff[targetSlot] = String(currentEff + bonusVal);
+                shipDataCopy._modifiedEffIndices[targetSlot] = true;
+            }
+        });
+    }
+
+    return { type: shipType, data: shipDataCopy };
+}
+
+// ==========================================
+// 4. QUẢN LÝ MENU CÀI ĐẶT & ẨN/HIỆN THANH CHỨC NĂNG
 // ==========================================
 function toggleSettingsMenu() {
     isSettingsMenuOpen = !isSettingsMenuOpen;
@@ -260,7 +423,7 @@ function toggleGlobalFleetHeaders() {
 }
 
 // ==========================================
-// QUẢN LÝ TÍNH NĂNG ĐỔI VỊ TRÍ TÀU (SWAP SHIP)
+// 5. QUẢN LÝ CHẾ ĐỘ ĐỔI TÀU (SWAP SHIP MODE)
 // ==========================================
 function toggleSwapShipMode() {
     isSwapShipMode = !isSwapShipMode;
@@ -302,7 +465,7 @@ function handleShipSlotClick(slotIndex) {
 }
 
 // ==========================================
-// QUẢN LÝ TÍNH NĂNG THÊM, NHÂN BẢN & XÓA HẠM ĐỘI
+// 6. QUẢN LÝ THÊM, NHÂN BẢN, XÓA & RESET HẠM ĐỘI
 // ==========================================
 function addNewFleet(insertAfterGroupIndex) {
     const totalFleets = Math.floor(fleetState.length / 9);
@@ -333,16 +496,12 @@ function duplicateFleet(sourceGroupIndex) {
     const sourceStartPos = sourceGroupIndex * 9;
     const sourceSlots = fleetState.slice(sourceStartPos, sourceStartPos + 9);
 
-    // Deep copy 9 ô slot của hạm đội nguồn
     const duplicatedSlots = JSON.parse(JSON.stringify(sourceSlots));
-
     const insertGroupIndex = sourceGroupIndex + 1;
     const insertPosition = insertGroupIndex * 9;
 
-    // Dịch các hạm đội phía dưới xuống 1 đơn vị index và chèn hạm đội nhân bản vào
     fleetState.splice(insertPosition, 0, ...duplicatedSlots);
 
-    // Sao chép cả cài đặt mặc định level & affinity sang vị trí hạm đội mới
     for (let g = totalFleets; g > insertGroupIndex; g--) {
         const prevShipDef = getDefaultShipSettingsForFleet(g - 1);
         const prevEquipDef = getDefaultEquipEnhanceForFleet(g - 1);
@@ -390,9 +549,6 @@ function deleteFleet(groupIndexToDelete) {
     renderFleet();
 }
 
-// ==========================================
-// POPUP XÁC NHẬN RESET ĐỘI HÌNH
-// ==========================================
 function injectConfirmModal() {
     if (!document.getElementById('confirmResetModal')) {
         const confirmModalHtml = `
@@ -460,249 +616,15 @@ function injectResetButton() {
             </button>
         </div>
         `;
-        if (fleetContainer && fleetContainer.parentNode) {
-            fleetContainer.parentNode.insertAdjacentHTML('beforeend', resetBtnHtml);
+        const container = document.getElementById('fleet-builder-container');
+        if (container && container.parentNode) {
+            container.parentNode.insertAdjacentHTML('beforeend', resetBtnHtml);
         }
     }
-}
-
-function getShipTypeAndData(shipId) {
-    if (!window.shipDetails) return null;
-    for (let type in window.shipDetails) {
-        if (window.shipDetails[type][shipId]) {
-            return { type: type, data: window.shipDetails[type][shipId] };
-        }
-    }
-    return null;
-}
-
-function getAffinityDisplay(affinityKey) {
-    switch (affinityKey) {
-        case 'Stranger': return '50♥';
-        case 'Friendly': return '61♥';
-        case 'Crush': return '81♥';
-        case 'Love': return '100♥';
-        case 'Oath': return '100💍';
-        case 'Oath200': return '200💍';
-        default: return '50♥';
-    }
-}
-
-function getMaxEnhanceByBox(boxColor, category) {
-    if (category === "Augmentation" || selectingEquipSlotIndex === 5) {
-        return 10;
-    }
-
-    switch (boxColor) {
-        case 'rainbow':
-        case 'yellow': return 13;
-        case 'purple': return 11;
-        case 'blue': return 7;
-        case 'grey': return 3;
-        default: return 13;
-    }
-}
-
-function getScrollbarWidth() {
-    return window.innerWidth - document.documentElement.clientWidth;
-}
-
-function applyAntiShiftPadding(isModalOpen) {
-    const mainContainer = document.querySelector('.container');
-    const topNavbar = document.querySelector('.top-navbar');
-    const scrollbarWidth = isModalOpen ? getScrollbarWidth() : 0;
-
-    if (mainContainer) {
-        mainContainer.style.paddingRight = isModalOpen ? `${scrollbarWidth}px` : '';
-    }
-    if (topNavbar) {
-        topNavbar.style.paddingRight = isModalOpen ? `${30 + scrollbarWidth}px` : '';
-    }
-}
-
-function getSlotAllowedCategories(shipInfo, slotIndex) {
-    if (slotIndex === 5) return ["Augmentation"];
-    if (slotIndex === 3 || slotIndex === 4) return ["Auxiliary"];
-
-    if (!shipInfo || !shipInfo.data || !shipInfo.data.equipSlot) return [];
-
-    let rawSlots = shipInfo.data.equipSlot[slotIndex] || [];
-    return rawSlots.map(code => MAP_EQUIP_CATEGORY[code] || code);
 }
 
 // ==========================================
-// RENDER GIAO DIỆN CHÍNH
-// ==========================================
-function renderFleetSlotRow(index) {
-    let slot = fleetState[index];
-    let shipInfo = slot.shipId ? getProcessedShipData(index) : null;
-    let shipHtml = "";
-
-    const isSelectedForSwap = (isSwapShipMode && swapSourceSlotIndex === index);
-    const shipSelectedClass = isSelectedForSwap ? ' swap-selected' : '';
-
-    let isShipDisabledForSwap = false;
-    if (isSwapShipMode && swapSourceSlotIndex !== -1 && swapSourceSlotIndex !== index) {
-        const sourceSubGroup = Math.floor((swapSourceSlotIndex % 9) / 3);
-        const currentSubGroup = Math.floor((index % 9) / 3);
-        if (sourceSubGroup !== currentSubGroup) {
-            isShipDisabledForSwap = true;
-        }
-    }
-
-    const shipDisabledClass = isShipDisabledForSwap ? ' disabled' : '';
-
-    if (shipInfo) {
-        let iconUrl = getShipIconUrl(slot.shipId, shipInfo.data);
-        let boxClass = shipInfo.data.box ? `box-${shipInfo.data.box}` : "box-grey";
-        let affText = getAffinityDisplay(slot.affinity || 'Stranger');
-        let shipLevel = slot.level !== undefined ? slot.level : 1;
-
-        shipHtml = `<div class="square-slot ship-slot ${boxClass}${shipSelectedClass}${shipDisabledClass}" onclick="handleShipSlotClick(${index})">
-                        <span class="ship-badge-level">Lv.${shipLevel}</span>
-                        <span class="ship-badge-affinity">${affText}</span>
-                        <img src="${iconUrl}" class="slot-image" alt="${shipInfo.data.name}">
-                    </div>`;
-    } else {
-        shipHtml = `<div class="square-slot ship-slot box-grey${shipSelectedClass}${shipDisabledClass}" onclick="handleShipSlotClick(${index})">
-                        <span class="plus-sign">+</span>
-                    </div>`;
-    }
-
-    let equipsHtml = "";
-    for (let i = 0; i < 6; i++) {
-        let isShipSelected = slot.shipId !== null;
-        let eqSave = slot.equips[i];
-
-        let slotInfoBadgeHtml = "";
-        if (isShipSelected && shipInfo && shipInfo.data && i < 3) {
-            let rawEffVal = shipInfo.data.slotEff && shipInfo.data.slotEff[i] ? shipInfo.data.slotEff[i] : "";
-            let isModified = shipInfo.data._modifiedEffIndices && shipInfo.data._modifiedEffIndices[i];
-
-            let effStyle = isModified ? 'color: #2ecc71; font-weight: 800; font-size: 16px;' : '';
-            let eff = rawEffVal ? `<span class="eff-line" style="${effStyle}">${rawEffVal}%</span>` : "";
-            let amt = (shipInfo.data.slotAmount && shipInfo.data.slotAmount[i]) ? `x${shipInfo.data.slotAmount[i]}` : "";
-
-            if (eff || amt) {
-                slotInfoBadgeHtml = `
-                    <div class="equip-slot-info-badge">
-                        ${eff}
-                        ${amt ? `<span class="amount-line">${amt}</span>` : ''}
-                    </div>
-                `;
-            }
-        }
-
-        let eqData = (isShipSelected && eqSave && eqSave.id) ? getEquipDataGlobal(eqSave.category, eqSave.id) : null;
-        let onClickEvent = (isShipSelected && !isSwapShipMode) ? `onclick="openEquipModal(${index}, ${i})"` : "";
-
-        if (isShipSelected && eqSave && eqSave.id && eqData) {
-            let boxClass = eqData.box ? `box-${eqData.box}` : "box-grey";
-            let iconUrl = `https://azurlane.netojuu.com/images/${eqData.code}.png`;
-            let enhanceVal = eqSave.enhance !== undefined ? eqSave.enhance : 0;
-
-            equipsHtml += `
-                <div class="square-slot equip-slot ${boxClass}" ${onClickEvent}>
-                    ${slotInfoBadgeHtml}
-                    <span class="equip-badge-enhance">+${enhanceVal}</span>
-                    <img src="${iconUrl}" class="slot-image">
-                </div>
-            `;
-        } else {
-            let equipClass = isShipSelected ? "box-grey" : "disabled";
-
-            equipsHtml += `
-                <div class="square-slot equip-slot ${equipClass}" ${onClickEvent}>
-                    ${slotInfoBadgeHtml}
-                    ${isShipSelected ? '<span class="plus-sign">+</span>' : ''}
-                </div>
-            `;
-        }
-    }
-
-    return `<div class="fleet-row">${shipHtml}${equipsHtml}</div>`;
-}
-
-function renderFleet() {
-    let fullHtml = "";
-    const totalFleets = Math.floor(fleetState.length / 9);
-
-    const isMaxReached = totalFleets >= MAX_FLEETS;
-    const isOnlyOneFleet = totalFleets <= 1;
-
-    for (let group = 0; group < totalFleets; group++) {
-        const addBtnAttr = (isMaxReached || isSwapShipMode) ? 'disabled class="fleet-add-btn hidden"' : 'class="fleet-add-btn"';
-        const duplicateBtnAttr = (isMaxReached || isSwapShipMode) ? 'disabled class="fleet-duplicate-btn hidden"' : 'class="fleet-duplicate-btn"';
-        const deleteBtnAttr = isOnlyOneFleet ? 'disabled class="fleet-delete-btn hidden"' : 'class="fleet-delete-btn"';
-        const swapBtnClass = isSwapShipMode ? 'fleet-swap-btn active' : 'fleet-swap-btn';
-
-        const rightActionBtnHtml = isSwapShipMode
-            ? `<button type="button" class="fleet-delete-btn active" onclick="toggleSwapShipMode()">Tắt</button>`
-            : `<button type="button" ${deleteBtnAttr} onclick="deleteFleet(${group})">Xóa</button>`;
-
-        const headerHiddenClass = isHeaderHidden ? ' hidden-header' : '';
-
-        let headerRowHtml = `
-            <div class="fleet-header-row${headerHiddenClass}">
-                <div class="fleet-header-left">
-                    <span class="fleet-title">Hạm Đội ${group + 1}</span>
-                    <button type="button" ${addBtnAttr} onclick="addNewFleet(${group})">Hạm Đội Mới</button>
-                    <button type="button" ${duplicateBtnAttr} onclick="duplicateFleet(${group})">Nhân Bản</button>
-                </div>
-                <div class="fleet-header-center">
-                    <button type="button" class="${swapBtnClass}" onclick="toggleSwapShipMode()">Đổi Tàu</button>
-                </div>
-                <div class="fleet-header-right">
-                    ${rightActionBtnHtml}
-                </div>
-            </div>
-        `;
-
-        let leftColumnRows = "";
-        let rightColumnRows = "";
-        for (let r = 0; r < 3; r++) {
-            let leftSlotIndex = group * 9 + r;
-            let rightSlotIndex = group * 9 + 3 + r;
-
-            leftColumnRows += renderFleetSlotRow(leftSlotIndex);
-            rightColumnRows += renderFleetSlotRow(rightSlotIndex);
-        }
-
-        let mainContentRowHtml = `
-            <div class="fleet-main-content-row">
-                <div class="fleet-column fleet-column-left">${leftColumnRows}</div>
-                <div class="fleet-column fleet-column-right">${rightColumnRows}</div>
-            </div>
-        `;
-
-        let subColumnRows = "";
-        for (let r = 0; r < 3; r++) {
-            let subSlotIndex = group * 9 + 6 + r;
-            subColumnRows += renderFleetSlotRow(subSlotIndex);
-        }
-
-        let subContentRowHtml = `
-            <div class="fleet-sub-content-row hidden">
-                <div class="fleet-column fleet-column-sub">${subColumnRows}</div>
-            </div>
-        `;
-
-        const wrapperExtraClass = `${isSwapShipMode ? ' swap-mode-active' : ''}${isHeaderHidden ? ' header-is-hidden' : ''}`;
-
-        fullHtml += `
-            <div class="fleet-box-wrapper${wrapperExtraClass}">
-                ${headerRowHtml}
-                ${mainContentRowHtml}
-                ${subContentRowHtml}
-            </div>
-        `;
-    }
-
-    fleetContainer.innerHTML = fullHtml;
-}
-
-// ==========================================
-// TẠO VÀ XỬ LÝ BỘ LỌC TÀU
+// 7. BỘ LỌC VÀ CHỌN TÀU (SHIP SELECTION & FILTER)
 // ==========================================
 function toggleShipFilter(btnEl) {
     isShipFilterOpen = !isShipFilterOpen;
@@ -1017,7 +939,6 @@ function renderShipListOnly() {
         let shipId = item.id;
         let shipData = item.data;
 
-        // --- ẨN HOÀN TOÀN CÁC TÀU ĐÃ CHỌN TRONG CÙNG HẠM ĐỘI ---
         let isShipSelectedInFleet = selectedShipsInFleet.has(shipId);
         if (isShipSelectedInFleet) {
             return;
@@ -1046,9 +967,6 @@ function renderShipListOnly() {
     gridListEl.innerHTML = gridHtml;
 }
 
-// ==========================================
-// ĐIỀU KHIỂN POPUP CHỌN TÀU
-// ==========================================
 function openShipModal(slotIndex) {
     selectingSlotIndex = slotIndex;
 
@@ -1215,7 +1133,7 @@ function closeShipModal() {
 }
 
 // ==========================================
-// TẠO VÀ XỬ LÝ BỘ LỌC TRANG BỊ
+// 8. BỘ LỌC VÀ CHỌN TRANG BỊ (EQUIP SELECTION & FILTER)
 // ==========================================
 function toggleEquipFilter(btnEl) {
     isEquipFilterOpen = !isEquipFilterOpen;
@@ -1417,7 +1335,6 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
     let limitedEquipsOnCurrentShip = new Set();
     let fleetEquipCounts = {};
 
-    // Danh sách các cặp trang bị dùng chung giới hạn (Group / Pair Limit) trên cùng một con tàu
     const PAIR_LIMIT_GROUPS = [
         ["hpfcr", "admiralty_fct"]
     ];
@@ -1442,7 +1359,6 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
         }
     }
 
-    // --- KIỂM TRA LUẬT NHÓM CẶP TRANG BỊ TRÊN CÙNG CON TÀU ---
     currentShipEquips.forEach((eq, eqIdx) => {
         if (eq && eq.id && eqIdx !== selectingEquipSlotIndex) {
             PAIR_LIMIT_GROUPS.forEach(group => {
@@ -1502,7 +1418,6 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
 
                     let actualCategory = category;
 
-                    // Phân loại động dựa trên thuộc tính trong CSDL
                     if (targetDataCategory === "CA-gun") {
                         actualCategory = (eqData.gunType === "cb") ? "CB-gun" : "CA-gun";
                     }
@@ -1513,7 +1428,6 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
                         actualCategory = (eqData.gunType === "aatf") ? "AA-Gun (Time Fuze)" : "AA-gun";
                     }
 
-                    // Lọc chính xác trang bị theo category yêu cầu
                     if (category === "CA-gun" && actualCategory !== "CA-gun") continue;
                     if (category === "CB-gun" && actualCategory !== "CB-gun") continue;
                     if (category === "Surface Torpedo" && actualCategory !== "Surface Torpedo") continue;
@@ -1521,7 +1435,6 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
                     if (category === "AA-gun" && actualCategory !== "AA-gun") continue;
                     if (category === "AA-Gun (Time Fuze)" && actualCategory !== "AA-Gun (Time Fuze)") continue;
 
-                    // --- KIỂM TRA ĐIỀU KIỆN CHO PHÉP TRANG BỊ (EQUIPPABLE) ---
                     let equipableList = eqData.equippable || eqData.equipable;
                     let isEquippableAllowed = false;
 
@@ -1560,12 +1473,10 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
     });
 
     allEquipsList.sort((a, b) => {
-        // 1. Tiêu chí đầu tiên: Theo độ hiếm (Box rank: rainbow -> yellow -> purple -> blue -> grey)
         let rA = getEquipBoxRank(a.data.box);
         let rB = getEquipBoxRank(b.data.box);
         if (rA !== rB) return rA - rB;
 
-        // 2. Tiêu chí thứ hai: Theo Faction (Universal ưu tiên đứng đầu)
         let fAStr = a.data.faction || 'Universal';
         let fBStr = b.data.faction || 'Universal';
         let fA = equipFactionOrder.indexOf(fAStr);
@@ -1574,12 +1485,10 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
         if (fB === -1) fB = 99;
         if (fA !== fB) return fA - fB;
 
-        // 3. Tiêu chí thứ ba: Theo loại trang bị (Dựa theo thứ tự khai báo trong allowedCategories của tàu)
         let cA = allowedCategories.indexOf(a.category);
         let cB = allowedCategories.indexOf(b.category);
         if (cA !== cB) return cA - cB;
 
-        // 4. Tiêu chí cuối cùng: Theo Tên trang bị (Alphabet A-Z)
         return a.displayName.localeCompare(b.displayName);
     });
 
@@ -1588,7 +1497,6 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
         let category = item.category === "Augmentation" || selectingEquipSlotIndex === 5 ? "Augmentation" : item.category;
         let eqData = item.data;
 
-        // --- EXCLUSIVE: NẾU TÀU HIỆN TẠI KHÔNG NẰM TRONG DANH SÁCH -> ẨN LUÔN ---
         if (eqData.exclusive && Array.isArray(eqData.exclusive)) {
             let currentShipId = fleetState[selectingSlotIndex].shipId;
             if (!eqData.exclusive.includes(currentShipId)) {
@@ -1629,11 +1537,6 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
 
     gridListEl.innerHTML = gridHtml;
 }
-
-// ==========================================
-// ĐIỀU KHIỂN POPUP CHỌN TRANG BỊ & ENHANCE
-// ==========================================
-let currentEquipEnhanceVal = 0;
 
 function injectEquipModal() {
     if (!document.getElementById('equipSelectionModal')) {
@@ -1798,7 +1701,7 @@ function closeEquipModal() {
 }
 
 // ==========================================
-// CÁC HIỆU ỨNG VÀ EVENT CHUNG
+// 9. HIỆU ỨNG TƯƠNG TÁC GIAO DIỆN & POPUP HOVER
 // ==========================================
 function handleIconHover(iconEl, isHover) {
     const wrapper = iconEl.closest('.ship-item-wrapper');
@@ -1884,124 +1787,199 @@ window.onclick = function (event) {
     if (confirmModal && event.target === confirmModal) closeConfirmModal();
 };
 
-function getProcessedShipData(fleetSlotIndex) {
-    let slot = fleetState[fleetSlotIndex];
-    if (!slot || !slot.shipId) return null;
+// ==========================================
+// 10. RENDER BỐ CỤC ĐỘI HÌNH (FLEET BUILDER RENDER)
+// ==========================================
+function renderFleetSlotRow(index) {
+    let slot = fleetState[index];
+    let shipInfo = slot.shipId ? getProcessedShipData(index) : null;
+    let shipHtml = "";
 
-    let baseInfo = getShipTypeAndData(slot.shipId);
-    if (!baseInfo || !baseInfo.data) return null;
+    const isSelectedForSwap = (isSwapShipMode && swapSourceSlotIndex === index);
+    const shipSelectedClass = isSelectedForSwap ? ' swap-selected' : '';
 
-    let shipDataCopy = JSON.parse(JSON.stringify(baseInfo.data));
-    let shipType = baseInfo.type;
-
-    shipDataCopy._modifiedEffIndices = {};
-
-    if (shipDataCopy.customRules && Array.isArray(shipDataCopy.customRules)) {
-        shipDataCopy.customRules.forEach(rule => {
-
-            // --- LUẬT 1: Azuma & Cherbourg (Tăng theo loại súng CBGM) ---
-            if (rule.type === "SLOT_EFF_BONUS") {
-                let targetSlot = rule.slotIndex;
-                let requiredCat = rule.equipCategory;
-                let bonusVal = rule.bonus;
-
-                let eq = slot.equips[targetSlot];
-                if (eq && eq.id) {
-                    let eqData = getEquipDataGlobal(eq.category, eq.id);
-                    let isCBGun = eq.category === "CBGM" || eq.category === "CB-gun" || (eqData && eqData.gunType === "cb");
-
-                    if (eq.category === requiredCat || (requiredCat === "CBGM" && isCBGun)) {
-                        let currentEff = parseInt(shipDataCopy.slotEff[targetSlot], 10) || 0;
-                        shipDataCopy.slotEff[targetSlot] = String(currentEff + bonusVal);
-                        shipDataCopy._modifiedEffIndices[targetSlot] = true;
-                    }
-                }
-            }
-
-            // --- LUẬT 2: Kronstadt (Tăng theo trang bị Faction trong hạm) ---
-            if (rule.type === "FACTION_SLOT_EFF_BONUS") {
-                let targetSlot = rule.targetSlotIndex;
-                let requiredFaction = rule.requiredFaction;
-                let minCount = rule.minCount || 1;
-                let bonusVal = rule.bonus;
-
-                let factionEquipCount = 0;
-                slot.equips.forEach(eq => {
-                    if (eq && eq.id) {
-                        let eqData = getEquipDataGlobal(eq.category, eq.id);
-                        let eqFaction = eqData ? (eqData.faction || 'Universal') : 'Universal';
-                        if (eqFaction === requiredFaction) {
-                            factionEquipCount++;
-                        }
-                    }
-                });
-
-                if (factionEquipCount >= minCount) {
-                    let currentEff = parseInt(shipDataCopy.slotEff[targetSlot], 10) || 0;
-                    shipDataCopy.slotEff[targetSlot] = String(currentEff + bonusVal);
-                    shipDataCopy._modifiedEffIndices[targetSlot] = true;
-                }
-            }
-
-            // --- LUẬT 3: Belfast Kai (Tăng slot 1 nếu hạm đội có >= 2 CL) ---
-            if (rule.type === "MULTIPLE_SHIP_TYPE_SLOT_EFF_BONUS") {
-                let targetSlot = rule.targetSlotIndex;
-                let requiredType = rule.requiredShipType;
-                let minCount = rule.minCount || 2;
-                let bonusVal = rule.bonus;
-
-                const fleetGroupIdx = getFleetGroupIndex(fleetSlotIndex);
-                const startIdx = fleetGroupIdx * 9;
-                const endIdx = startIdx + 9;
-
-                let shipTypeCount = 0;
-                for (let i = startIdx; i < endIdx; i++) {
-                    let sData = fleetState[i];
-                    if (sData && sData.shipId) {
-                        let info = getShipTypeAndData(sData.shipId);
-                        if (info && info.type === requiredType) {
-                            shipTypeCount++;
-                        }
-                    }
-                }
-
-                if (shipTypeCount >= minCount) {
-                    let currentEff = parseInt(shipDataCopy.slotEff[targetSlot], 10) || 0;
-                    shipDataCopy.slotEff[targetSlot] = String(currentEff + bonusVal);
-                    shipDataCopy._modifiedEffIndices[targetSlot] = true;
-                }
-            }
-
-            // --- LUẬT 4: Drake (Tăng slot 1 thêm +10% nếu trang bị Augment privateers_heroism) ---
-            if (rule.type === "EQUIP_ID_SLOT_EFF_BONUS") {
-                let targetSlot = rule.targetSlotIndex;
-                let requiredEquipId = rule.requiredEquipId;
-                let bonusVal = rule.bonus;
-
-                // Kiểm tra xem tàu có đang trang bị item có ID trùng khớp ở bất kỳ slot nào (đặc biệt là Augment slot 5)
-                let hasEquip = slot.equips.some(eq => eq && eq.id === requiredEquipId);
-
-                if (hasEquip) {
-                    let currentEff = parseInt(shipDataCopy.slotEff[targetSlot], 10) || 0;
-                    shipDataCopy.slotEff[targetSlot] = String(currentEff + bonusVal);
-                    shipDataCopy._modifiedEffIndices[targetSlot] = true;
-                }
-            }
-
-            // --- LUẬT 5: Tăng vô điều kiện Sloteff cho slot chỉ định ---
-            if (rule.type === "ALWAYS_SLOT_EFF_BONUS") {
-                let targetSlot = rule.targetSlotIndex;
-                let bonusVal = rule.bonus;
-
-                let currentEff = parseInt(shipDataCopy.slotEff[targetSlot], 10) || 0;
-                shipDataCopy.slotEff[targetSlot] = String(currentEff + bonusVal);
-                shipDataCopy._modifiedEffIndices[targetSlot] = true;
-            }
-
-        });
+    let isShipDisabledForSwap = false;
+    if (isSwapShipMode && swapSourceSlotIndex !== -1 && swapSourceSlotIndex !== index) {
+        const sourceSubGroup = Math.floor((swapSourceSlotIndex % 9) / 3);
+        const currentSubGroup = Math.floor((index % 9) / 3);
+        if (sourceSubGroup !== currentSubGroup) {
+            isShipDisabledForSwap = true;
+        }
     }
 
-    return { type: shipType, data: shipDataCopy };
+    const shipDisabledClass = isShipDisabledForSwap ? ' disabled' : '';
+
+    if (shipInfo) {
+        let iconUrl = getShipIconUrl(slot.shipId, shipInfo.data);
+        let boxClass = shipInfo.data.box ? `box-${shipInfo.data.box}` : "box-grey";
+        let affText = getAffinityDisplay(slot.affinity || 'Stranger');
+        let shipLevel = slot.level !== undefined ? slot.level : 1;
+
+        shipHtml = `<div class="square-slot ship-slot ${boxClass}${shipSelectedClass}${shipDisabledClass}" onclick="handleShipSlotClick(${index})">
+                        <span class="ship-badge-level">Lv.${shipLevel}</span>
+                        <span class="ship-badge-affinity">${affText}</span>
+                        <img src="${iconUrl}" class="slot-image" alt="${shipInfo.data.name}">
+                    </div>`;
+    } else {
+        shipHtml = `<div class="square-slot ship-slot box-grey${shipSelectedClass}${shipDisabledClass}" onclick="handleShipSlotClick(${index})">
+                        <span class="plus-sign">+</span>
+                    </div>`;
+    }
+
+    let equipsHtml = "";
+    for (let i = 0; i < 6; i++) {
+        let isShipSelected = slot.shipId !== null;
+        let eqSave = slot.equips[i];
+
+        let slotInfoBadgeHtml = "";
+        if (isShipSelected && shipInfo && shipInfo.data && i < 3) {
+            let rawEffVal = shipInfo.data.slotEff && shipInfo.data.slotEff[i] ? shipInfo.data.slotEff[i] : "";
+            let isModified = shipInfo.data._modifiedEffIndices && shipInfo.data._modifiedEffIndices[i];
+
+            let effStyle = isModified ? 'color: #2ecc71; font-weight: 800; font-size: 16px;' : '';
+            let eff = rawEffVal ? `<span class="eff-line" style="${effStyle}">${rawEffVal}%</span>` : "";
+            let amt = (shipInfo.data.slotAmount && shipInfo.data.slotAmount[i]) ? `x${shipInfo.data.slotAmount[i]}` : "";
+
+            if (eff || amt) {
+                slotInfoBadgeHtml = `
+                    <div class="equip-slot-info-badge">
+                        ${eff}
+                        ${amt ? `<span class="amount-line">${amt}</span>` : ''}
+                    </div>
+                `;
+            }
+        }
+
+        let eqData = (isShipSelected && eqSave && eqSave.id) ? getEquipDataGlobal(eqSave.category, eqSave.id) : null;
+        let onClickEvent = (isShipSelected && !isSwapShipMode) ? `onclick="openEquipModal(${index}, ${i})"` : "";
+
+        if (isShipSelected && eqSave && eqSave.id && eqData) {
+            let boxClass = eqData.box ? `box-${eqData.box}` : "box-grey";
+            let iconUrl = `https://azurlane.netojuu.com/images/${eqData.code}.png`;
+            let enhanceVal = eqSave.enhance !== undefined ? eqSave.enhance : 0;
+
+            equipsHtml += `
+                <div class="square-slot equip-slot ${boxClass}" ${onClickEvent}>
+                    ${slotInfoBadgeHtml}
+                    <span class="equip-badge-enhance">+${enhanceVal}</span>
+                    <img src="${iconUrl}" class="slot-image">
+                </div>
+            `;
+        } else {
+            let equipClass = isShipSelected ? "box-grey" : "disabled";
+
+            equipsHtml += `
+                <div class="square-slot equip-slot ${equipClass}" ${onClickEvent}>
+                    ${slotInfoBadgeHtml}
+                    ${isShipSelected ? '<span class="plus-sign">+</span>' : ''}
+                </div>
+            `;
+        }
+    }
+
+    return `<div class="fleet-row">${shipHtml}${equipsHtml}</div>`;
+}
+
+function renderFleet() {
+    let fullHtml = "";
+    const totalFleets = Math.floor(fleetState.length / 9);
+
+    const isMaxReached = totalFleets >= MAX_FLEETS;
+    const isOnlyOneFleet = totalFleets <= 1;
+
+    for (let group = 0; group < totalFleets; group++) {
+        const addBtnAttr = (isMaxReached || isSwapShipMode) ? 'disabled class="fleet-add-btn hidden"' : 'class="fleet-add-btn"';
+        const duplicateBtnAttr = (isMaxReached || isSwapShipMode) ? 'disabled class="fleet-duplicate-btn hidden"' : 'class="fleet-duplicate-btn"';
+        const deleteBtnAttr = isOnlyOneFleet ? 'disabled class="fleet-delete-btn hidden"' : 'class="fleet-delete-btn"';
+        const swapBtnClass = isSwapShipMode ? 'fleet-swap-btn active' : 'fleet-swap-btn';
+
+        const rightActionBtnHtml = isSwapShipMode
+            ? `<button type="button" class="fleet-delete-btn active" onclick="toggleSwapShipMode()">Tắt</button>`
+            : `<button type="button" ${deleteBtnAttr} onclick="deleteFleet(${group})">Xóa</button>`;
+
+        const headerHiddenClass = isHeaderHidden ? ' hidden-header' : '';
+
+        let headerRowHtml = `
+            <div class="fleet-header-row${headerHiddenClass}">
+                <div class="fleet-header-left">
+                    <span class="fleet-title">Hạm Đội ${group + 1}</span>
+                    <button type="button" ${addBtnAttr} onclick="addNewFleet(${group})">Hạm Đội Mới</button>
+                    <button type="button" ${duplicateBtnAttr} onclick="duplicateFleet(${group})">Nhân Bản</button>
+                </div>
+                <div class="fleet-header-center">
+                    <button type="button" class="${swapBtnClass}" onclick="toggleSwapShipMode()">Đổi Tàu</button>
+                </div>
+                <div class="fleet-header-right">
+                    ${rightActionBtnHtml}
+                </div>
+            </div>
+        `;
+
+        let leftColumnRows = "";
+        let rightColumnRows = "";
+        for (let r = 0; r < 3; r++) {
+            let leftSlotIndex = group * 9 + r;
+            let rightSlotIndex = group * 9 + 3 + r;
+
+            leftColumnRows += renderFleetSlotRow(leftSlotIndex);
+            rightColumnRows += renderFleetSlotRow(rightSlotIndex);
+        }
+
+        let mainContentRowHtml = `
+            <div class="fleet-main-content-row">
+                <div class="fleet-column fleet-column-left">${leftColumnRows}</div>
+                <div class="fleet-column fleet-column-right">${rightColumnRows}</div>
+            </div>
+        `;
+
+        let subColumnRows = "";
+        for (let r = 0; r < 3; r++) {
+            let subSlotIndex = group * 9 + 6 + r;
+            subColumnRows += renderFleetSlotRow(subSlotIndex);
+        }
+
+        let subContentRowHtml = `
+            <div class="fleet-sub-content-row hidden">
+                <div class="fleet-column fleet-column-sub">${subColumnRows}</div>
+            </div>
+        `;
+
+        const wrapperExtraClass = `${isSwapShipMode ? ' swap-mode-active' : ''}${isHeaderHidden ? ' header-is-hidden' : ''}`;
+
+        fullHtml += `
+            <div class="fleet-box-wrapper${wrapperExtraClass}">
+                ${headerRowHtml}
+                ${mainContentRowHtml}
+                ${subContentRowHtml}
+            </div>
+        `;
+    }
+
+    const container = document.getElementById('fleet-builder-container');
+    if (container) {
+        container.innerHTML = fullHtml;
+    }
+}
+
+// ==========================================
+// 11. KHỞI CHẠY HỆ THỐNG
+// ==========================================
+function initFleetBuilder() {
+    injectEquipModal();
+    injectConfirmModal();
+    injectResetButton();
+
+    updateGlobalHeaderButtonUI();
+    waitForDataAndRender();
+}
+
+function waitForDataAndRender() {
+    const checkDataReady = setInterval(() => {
+        if (window.shipDetails && window.equipDetails && Object.keys(window.equipDetails).length > 0) {
+            clearInterval(checkDataReady);
+            renderFleet();
+        }
+    }, 50);
 }
 
 if (document.readyState === 'loading') {
