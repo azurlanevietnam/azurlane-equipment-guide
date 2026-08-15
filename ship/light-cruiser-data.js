@@ -15,6 +15,7 @@ shipDetails["CL"] = {
         source: ["Belfast + ... Event Reward"],
         faction: "Royal Navy",
         rarity: "Super Rare",
+        code: "beierfasite_g",
         box: "rainbow",
         equipSlot: [["CLGM"], ["TRPM"], ["AAGM"]],
         slotAmount: [2, 2, 2],

@@ -247,5 +247,49 @@ equipDetails["Fighter"] = {
             code: "c/c1/47180",
             box: "yellow"
         },
+        "me-155a": {
+            name: "Messerschmitt Me-155A",
+            tier: "N/A",
+            source: ["T4/T5 Ironblood Tech Box", "Gear Lab"],
+            faction: "Ironblood",
+            equippable: ["BBV", "CV", "CVL"],
+            stats: ["AVI +45"],
+            cannons: ["3x20_mg151_t3", "2x13_mg131_t3"],
+            rld: ["9.24s", "9.91s"],
+            linkTab: 3,
+            desc: [""],
+            code: "f/f9/47100",
+            box: "yellow"
+        },
+        "fw-190-g3r1": {
+            name: "Prototype Carrier-Based FW-190 G-3/R1",
+            tier: "N/A",
+            source: ["Gear Lab"],
+            faction: "Ironblood",
+            equippable: ["BBV", "CV", "CVL"],
+            stats: ["AVI +45"],
+            cannons: ["6x20_mg151_t3"],
+            rld: ["9.7s", "9.7s"],
+            linkTab: 0,
+            desc: [""],
+            code: "d/dd/47200",
+            box: "yellow"
+        },
+    },
+    "purple_ft": {
+        "xf5f-skyrocket": {
+            name: "Grumman XF5F Skyrocket",
+            tier: "N/A",
+            source: ["Core Data Shop", "Gear Lab"],
+            faction: "Eagle Union",
+            equippable: ["BBV", "CV", "CVL"],
+            stats: ["AVI +25"],
+            cannons: ["2x20_cannon_t3", "2x12_7_mg_t3"],
+            rld: ["8.98s", "8.98s"],
+            linkTab: 0,
+            desc: [""],
+            code: "c/c3/17400",
+            box: "purple"
+        },
     }
 };

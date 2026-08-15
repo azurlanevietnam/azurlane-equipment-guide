@@ -2009,23 +2009,3 @@ if (document.readyState === 'loading') {
 } else {
     initFleetBuilder();
 }
-
-function getShipIconUrl(shipId, shipData) {
-    // =========================================================================
-    // [TEMP_OVERRIDE_START]: HÀM GHI ĐÈ LINK ẢNH TẠM THỜI (DỄ DÀNG XÓA TRONG TƯƠNG LAI)
-    // =========================================================================
-    if (shipId === "belfast_kai") {
-        return "https://cdn.imgchest.com/files/43601f3c1e50.png";
-    }
-    // =========================================================================
-    // [TEMP_OVERRIDE_END]
-    // =========================================================================
-
-    // Logic lấy URL gốc mặc định
-    if (shipId.endsWith('_kai')) {
-        return `https://cdn.nagami.moe/squareicon/${shipData.code}.png`;
-    } else {
-        const formattedName = shipData.name.replace(/ /g, '_');
-        return `https://azurlane.netojuu.com/images/${shipData.code}/${formattedName}Icon.png`;
-    }
-}
