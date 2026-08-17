@@ -61,9 +61,17 @@ shipDetails["CV"] = {
         rarity: "Ultra Rare",
         code: "7/73",
         box: "rainbow",
-        equipSlot: [[FT, DB, TB], [DB], [TB]],
+        equipSlot: [["FT", "DB", "TB"], ["DB"], ["TB"]],
         slotAmount: [2, 3, 5],
-        slotEff: ["110", "115", "155"]
+        slotEff: ["110", "115", "155"],
+        customRules: [
+            {
+                type: "SLOT_EFF_BONUS",
+                slotIndex: 0,                 // Slot 1 (index 0)
+                equipCategory: "Torpedo Bomber", // Loại trang bị kích hoạt bonus (TB)
+                bonus: 50                     // Tăng +50% hiệu suất
+            }
+        ]
     },
     "hakuryuu": {
         name: "Hakuryuu",
