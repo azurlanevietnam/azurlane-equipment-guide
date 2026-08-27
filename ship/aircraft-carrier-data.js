@@ -82,7 +82,15 @@ shipDetails["CV"] = {
         box: "rainbow",
         equipSlot: [[FT, TB], [DB], [DB, TB]],
         slotAmount: [3, 4, 2],
-        slotEff: ["125", "150", "130"]
+        slotEff: ["125", "150", "130"],
+        customRules: [
+            {
+                type: "HAKURYUU_FACTION_BONUS",
+                requiredFaction: "Heavy Sakura",
+                targetSlots: [0, 1, 2],
+                bonus: 10
+            }
+        ]
     },
     "shinano": {
         name: "Shinano",

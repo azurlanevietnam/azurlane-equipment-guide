@@ -10,6 +10,7 @@ const fleetDataFiles = [
     'ship/heavy-cruiser-data.js',
     'ship/large-cruiser-data.js',
     'ship/battleship-data.js',
+    'ship/aviation-battleship-data.js',
     'ship/aircraft-carrier-data.js',
     // Sau này bạn có thể bỏ comment để thêm các loại tàu khác:
 

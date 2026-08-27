@@ -163,12 +163,29 @@ function getFleetGroupIndex(slotIndex) {
     return Math.floor(slotIndex / 9);
 }
 
+// Hàm tìm thông tin tàu hỗ trợ quét đệ quy cấu trúc dữ liệu con
 function getShipTypeAndData(shipId) {
-    if (!window.shipDetails) return null;
+    if (!shipId || !window.shipDetails) return null;
+
+    let found = null;
     for (let type in window.shipDetails) {
-        if (window.shipDetails[type][shipId]) {
-            return { type: type, data: window.shipDetails[type][shipId] };
-        }
+        let searchNested = (obj) => {
+            if (found || !obj || typeof obj !== 'object') return;
+
+            if (obj[shipId] && typeof obj[shipId] === 'object' && obj[shipId].name) {
+                found = { type: type, data: obj[shipId] };
+                return;
+            }
+
+            for (let key in obj) {
+                if (typeof obj[key] === 'object' && obj[key] !== null && key !== "equipSlot" && key !== "customRules") {
+                    searchNested(obj[key]);
+                }
+            }
+        };
+
+        searchNested(window.shipDetails[type]);
+        if (found) return found;
     }
     return null;
 }
@@ -374,6 +391,51 @@ function getProcessedShipData(fleetSlotIndex) {
                 let currentEff = parseInt(shipDataCopy.slotEff[targetSlot], 10) || 0;
                 shipDataCopy.slotEff[targetSlot] = String(currentEff + bonusVal);
                 shipDataCopy._modifiedEffIndices[targetSlot] = true;
+            }
+
+            if (rule.type === "HAKURYUU_FACTION_BONUS") {
+                let requiredFaction = rule.requiredFaction || "Heavy Sakura";
+                let targetSlots = rule.targetSlots || [0, 1, 2];
+                let bonusVal = rule.bonus || 10;
+                let isSatisfied = false;
+
+                for (let sIdx = 0; sIdx <= 2; sIdx++) {
+                    let eq = slot.equips[sIdx];
+                    if (eq && eq.id) {
+                        let eqData = getEquipDataGlobal(eq.category, eq.id);
+                        if (eqData && eqData.faction === requiredFaction) {
+                            isSatisfied = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!isSatisfied) {
+                    const fleetGroupIdx = getFleetGroupIndex(fleetSlotIndex);
+                    const startIdx = fleetGroupIdx * 9;
+
+                    for (let i = 0; i < 6; i++) {
+                        let checkSlotIdx = startIdx + i;
+                        if (checkSlotIdx !== fleetSlotIndex) {
+                            let sData = fleetState[checkSlotIdx];
+                            if (sData && sData.shipId) {
+                                let info = getShipTypeAndData(sData.shipId);
+                                if (info && info.data && info.data.faction === requiredFaction) {
+                                    isSatisfied = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (isSatisfied) {
+                    targetSlots.forEach(tSlot => {
+                        let currentEff = parseInt(shipDataCopy.slotEff[tSlot], 10) || 0;
+                        shipDataCopy.slotEff[tSlot] = String(currentEff + bonusVal);
+                        shipDataCopy._modifiedEffIndices[tSlot] = true;
+                    });
+                }
             }
         });
     }
@@ -906,12 +968,24 @@ function renderShipListOnly() {
     let allShipsList = [];
     if (window.shipDetails) {
         for (let cat in window.shipDetails) {
-            for (let shipId in window.shipDetails[cat]) {
-                let shipData = window.shipDetails[cat][shipId];
-                if (isShipMatchingFilter(cat, shipData)) {
-                    allShipsList.push({ id: shipId, cat: cat, data: shipData, displayName: shipData.name });
+            let processShipEntries = (shipObj) => {
+                for (let shipId in shipObj) {
+                    let shipData = shipObj[shipId];
+
+                    if (shipData && typeof shipData === 'object' && !shipData.code && !shipData.name) {
+                        processShipEntries(shipData);
+                        continue;
+                    }
+
+                    if (!shipData || !shipData.name) continue;
+
+                    if (isShipMatchingFilter(cat, shipData)) {
+                        allShipsList.push({ id: shipId, cat: cat, data: shipData, displayName: shipData.name });
+                    }
                 }
-            }
+            };
+
+            processShipEntries(window.shipDetails[cat]);
         }
     }
 

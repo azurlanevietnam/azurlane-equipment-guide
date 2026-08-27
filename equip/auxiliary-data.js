@@ -73,6 +73,19 @@ equipDetails["Auxiliary"] = {
             code: "3/3e/1260",
             box: "yellow"
         },
+        "shs": {
+            name: "Super Heavy Shell",
+            tier: "N/A",
+            source: ["Core Data Shop"],
+            faction: "Eagle Union",
+            stats: ["FP +85"],
+            equippable: ["BB", "BC", "BBV"],
+            limit: 1,
+            linkTab: 0,
+            desc: ["Tăng 8% tỉ lệ chí mạng của pháo chính."],
+            code: "8/8a/620",
+            box: "yellow"
+        },
         "6crh-ap": {
             name: "6CRH Armor Piercing Shell",
             tier: "N/A",
