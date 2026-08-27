@@ -35,10 +35,10 @@ shipDetails["BB"] = {
             customRules: [
                 {
                     type: "FACTION_SLOT_EFF_BONUS",
-                    targetSlotIndex: 2,           // Slot 3 (index 2 - AA Gun)
-                    requiredFaction: "Royal Navy", // Faction yêu cầu
-                    minCount: 1,                  // Tối thiểu 1 trang bị
-                    bonus: 30                     // Tăng +30% hiệu suất
+                    targetSlotIndex: 2,          
+                    requiredFaction: "Royal Navy",
+                    minCount: 1,           
+                    bonus: 30             
                 }
             ]
         },
@@ -93,6 +93,72 @@ shipDetails["BB"] = {
             equipSlot: [["BBGM"], ["CLGM", "DDGM"], ["AAGM", "AATFGM"]],
             slotAmount: [3, 3, 1],
             slotEff: ["160", "220", "100"],
+        },
+        "götz_von_berlichingen": {
+            name: "Götz von Berlichingen",
+            source: ["Alliance Before the Hagiobull Event Build"],
+            faction: "Ironblood",
+            rarity: "Ultra Rare",
+            code: "f/f0",
+            box: "rainbow",
+            equipSlot: [["BBGM"], ["CLGM", "DDGM"], ["AAGM", "AATFGM"]],
+            slotAmount: [3, 3, 1],
+            slotEff: ["160", "210", "90"],
+        },
+        "mecklenburg": {
+            name: "Mecklenburg",
+            source: ["PR8 Research"],
+            faction: "Ironblood",
+            rarity: "Decisive",
+            code: "7/74",
+            box: "rainbow",
+            equipSlot: [["BBGM"], ["CLGM", "DDGM"], ["AAGM", "AATFGM"]],
+            slotAmount: [3, 3, 1],
+            slotEff: ["170", "220", "120"],
+        },
+        "ulrich_von_hutten": {
+            name: "Ulrich von Hutten",
+            source: ["Heavy + Special Build", "UR Exchange"],
+            faction: "Ironblood",
+            rarity: "Ultra Rare",
+            code: "d/d4",
+            box: "rainbow",
+            equipSlot: [["BBGM"], ["CLGM", "DDGM"], ["AAGM", "AATFGM"]],
+            slotAmount: [3, 3, 1],
+            slotEff: ["155", "210", "90"],
+        },
+        "raffaello": {
+            name: "Raffaello",
+            source: ["Paradiso of Shackled Light Event Build"],
+            faction: "Sardegna Empire",
+            rarity: "Ultra Rare",
+            code: "4/45",
+            box: "rainbow",
+            equipSlot: [["BBGM"], ["CLGM", "DDGM"], ["AAGM", "AATFGM"]],
+            slotAmount: [3, 3, 1],
+            slotEff: ["150", "200", "100"],
+        },
+        "sovetsky_soyuz": {
+            name: "Sovetsky Soyuz",
+            source: ["Snowrealm Peregrination Event Build"],
+            faction: "Northern Parliament",
+            rarity: "Ultra Rare",
+            code: "4/44",
+            box: "rainbow",
+            equipSlot: [["BBGM"], ["CLGM", "DDGM"], ["AAGM", "AATFGM"]],
+            slotAmount: [3, 3, 1],
+            slotEff: ["150", "200", "120"],
+        },
+        "alsace": {
+            name: "Alsace",
+            source: ["Light of the Martyrium Event Build"],
+            faction: "Iris Libre",
+            rarity: "Ultra Rare",
+            code: "0/0e",
+            box: "rainbow",
+            equipSlot: [["BBGM"], ["CLGM", "DDGM"], ["AAGM", "AATFGM"]],
+            slotAmount: [3, 3, 1],
+            slotEff: ["145", "200", "100"],
         },
     },
 };
