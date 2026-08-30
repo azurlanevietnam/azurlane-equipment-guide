@@ -160,5 +160,16 @@ shipDetails["BB"] = {
             slotAmount: [3, 3, 1],
             slotEff: ["145", "200", "100"],
         },
+        "valparaíso": {
+            name: "Valparaíso",
+            source: ["PR9 Research"],
+            faction: "Liga de Pedrería",
+            rarity: "Decisive",
+            code: "8/85",
+            box: "rainbow",
+            equipSlot: [["BBGM"], ["CLGM", "DDGM"], ["AAGM", "AATFGM"]],
+            slotAmount: [3, 3, 1],
+            slotEff: ["140", "150", "150"],
+        },
     },
 };

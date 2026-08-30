@@ -1,6 +1,3 @@
-// ==========================================
-// 1. BIẾN TOÀN CỤC & KHỞI TẠO TRẠNG THÁI
-// ==========================================
 const fleetContainer = document.getElementById('fleet-builder-container');
 const shipModal = document.getElementById('shipSelectionModal');
 const shipModalGrid = document.getElementById('shipModalGrid');
@@ -26,7 +23,7 @@ let swapSourceSlotIndex = -1;
 let isSettingsMenuOpen = false;
 let isHeaderHidden = loadHeaderHiddenState();
 
-const VANGUARD_SHIP_TYPES = ["DD", "CL", "CA", "CB", "DDG", "AE", "IXv"];
+const VANGUARD_SHIP_TYPES = ["DD", "DDG", "CL", "CA", "CB", "AE", "IXv"];
 const MAIN_SHIP_TYPES = ["BC", "BB", "BBV", "CV", "CVL", "BM", "DDG", "AR", "IXm"];
 const SUBMARINE_SHIP_TYPES = ["SS", "SSV", "IXs"];
 
@@ -48,9 +45,6 @@ const MAP_EQUIP_CATEGORY = {
     "AUG": "Augmentation"
 };
 
-// ==========================================
-// 2. LƯU TRỮ VÀ ĐỌC DỮ LIỆU TỪ LOCALSTORAGE
-// ==========================================
 function loadHeaderHiddenState() {
     try {
         const saved = localStorage.getItem('azur_lane_header_hidden_state');
@@ -148,9 +142,6 @@ function loadFleetState() {
     return createEmptyFleetGroup(0);
 }
 
-// ==========================================
-// 3. HÀM TIỆN ÍCH, TRUY VẤN VÀ TÍNH TOÁN DỮ LIỆU
-// ==========================================
 function getSlotCategoryType(slotIndex) {
     let rowInGroup = slotIndex % 9;
     if (rowInGroup >= 6) return "SUB";
@@ -163,7 +154,6 @@ function getFleetGroupIndex(slotIndex) {
     return Math.floor(slotIndex / 9);
 }
 
-// Hàm tìm thông tin tàu hỗ trợ quét đệ quy cấu trúc dữ liệu con
 function getShipTypeAndData(shipId) {
     if (!shipId || !window.shipDetails) return null;
 
@@ -443,9 +433,6 @@ function getProcessedShipData(fleetSlotIndex) {
     return { type: shipType, data: shipDataCopy };
 }
 
-// ==========================================
-// 4. QUẢN LÝ MENU CÀI ĐẶT & ẨN/HIỆN THANH CHỨC NĂNG
-// ==========================================
 function toggleSettingsMenu() {
     isSettingsMenuOpen = !isSettingsMenuOpen;
     const panel = document.getElementById('settingsPanel');
@@ -484,9 +471,6 @@ function toggleGlobalFleetHeaders() {
     renderFleet();
 }
 
-// ==========================================
-// 5. QUẢN LÝ CHẾ ĐỘ ĐỔI TÀU (SWAP SHIP MODE)
-// ==========================================
 function toggleSwapShipMode() {
     isSwapShipMode = !isSwapShipMode;
     swapSourceSlotIndex = -1;
@@ -526,9 +510,6 @@ function handleShipSlotClick(slotIndex) {
     }
 }
 
-// ==========================================
-// 6. QUẢN LÝ THÊM, NHÂN BẢN, XÓA & RESET HẠM ĐỘI
-// ==========================================
 function addNewFleet(insertAfterGroupIndex) {
     const totalFleets = Math.floor(fleetState.length / 9);
 
@@ -685,9 +666,6 @@ function injectResetButton() {
     }
 }
 
-// ==========================================
-// 7. BỘ LỌC VÀ CHỌN TÀU (SHIP SELECTION & FILTER)
-// ==========================================
 function toggleShipFilter(btnEl) {
     isShipFilterOpen = !isShipFilterOpen;
     const panel = document.getElementById('shipFilterPanel');
@@ -705,10 +683,10 @@ function toggleShipFilter(btnEl) {
 
 function buildShipFilterHtml() {
     const factions = [
-        "Eagle Union", "Royal Navy", "Heavy Sakura", "Ironblood",
+        "Universal", "Eagle Union", "Royal Navy", "Heavy Sakura", "Ironblood",
         "Dragon Empery", "Sardegna Empire", "Northern Parliament",
         "Iris Libre", "Vichya Dominion", "Kingdom of Tulipia",
-        "Liga de Pedrería", "META", "Tempesta", "Universal", "Atelier Ryza"
+        "Liga de Pedrería", "META", "Tempesta", "Atelier Ryza"
     ];
 
     let types = [];
@@ -723,10 +701,10 @@ function buildShipFilterHtml() {
     } else if (slotType === "VANGUARD") {
         types = [
             { label: "Destroyer", code: "DD" },
+            { label: "Guided Missile Destroyer", code: "DDG" },
             { label: "Light Cruiser", code: "CL" },
             { label: "Heavy Cruiser", code: "CA" },
             { label: "Large Cruiser", code: "CB" },
-            { label: "Guided Missile Destroyer", code: "DDG" },
             { label: "Munition Ship", code: "AE" },
             { label: "Sailing Frigate V", code: "IXv" }
         ];
@@ -755,15 +733,59 @@ function buildShipFilterHtml() {
     ];
 
     let factionBtns = `<button type="button" class="filter-btn ${shipFilterFaction.has('ALL') ? 'active' : ''}" onclick="selectShipFactionFilter('ALL')">Hiển Thị Tất Cả</button>`;
+    
     factions.forEach(f => {
         const active = shipFilterFaction.has(f) ? 'active' : '';
-        factionBtns += `<button type="button" class="filter-btn ${active}" onclick="selectShipFactionFilter('${f}')">${f}</button>`;
+
+        let labelEntry = null;
+        if (window.labelDetails && window.labelDetails.faction) {
+            let factionObj = window.labelDetails.faction;
+            let matchedKey = Object.keys(factionObj).find(k => k.toLowerCase() === f.toLowerCase());
+            if (matchedKey) {
+                labelEntry = factionObj[matchedKey];
+            }
+        }
+
+        let iconHtml = "";
+        if (labelEntry && labelEntry.code) {
+            const iconUrl = `https://azurlane.netojuu.com/images/${labelEntry.code}_1.png`;
+            iconHtml = `<img src="${iconUrl}" alt="${f}" style="height: 36px; width: auto; vertical-align: middle; margin-left: 8px; object-fit: contain; filter: invert(1) brightness(2);">`;
+        }
+
+        factionBtns += `<button type="button" class="filter-btn ${active}" onclick="selectShipFactionFilter('${f}')">${f} ${iconHtml}</button>`;
     });
 
     let typeBtns = `<button type="button" class="filter-btn ${shipFilterType.has('ALL') ? 'active' : ''}" onclick="selectShipTypeFilter('ALL')">Hiển Thị Tất Cả</button>`;
+
     types.forEach(t => {
         const active = shipFilterType.has(t.code) ? 'active' : '';
-        typeBtns += `<button type="button" class="filter-btn ${active}" onclick="selectShipTypeFilter('${t.code}')">${t.label}</button>`;
+        
+        let lookupCode = t.code;
+        if (t.code.toUpperCase() === "DDG") {
+            lookupCode = (slotType === "VANGUARD") ? "DDGv" : "DDGm";
+        }
+
+        let labelEntry = null;
+        if (window.labelDetails && window.labelDetails.ship_type) {
+            let shipTypesObj = window.labelDetails.ship_type;
+            let matchedKey = Object.keys(shipTypesObj).find(k => k.toLowerCase() === lookupCode.toLowerCase());
+            if (matchedKey) {
+                labelEntry = shipTypesObj[matchedKey];
+            }
+        } else if (window.labelDetails) {
+            let matchedKey = Object.keys(window.labelDetails).find(k => k.toLowerCase() === lookupCode.toLowerCase());
+            if (matchedKey) {
+                labelEntry = window.labelDetails[matchedKey];
+            }
+        }
+
+        let iconHtml = "";
+        if (labelEntry && labelEntry.code) {
+            const iconUrl = `https://azurlane.netojuu.com/images/${labelEntry.code}/${lookupCode}_img0.png`;
+            iconHtml = `<img src="${iconUrl}" alt="${lookupCode}" style="width: 39px; height: 24px; vertical-align: middle; margin-left: 8px; object-fit: contain;">`;
+        }
+
+        typeBtns += `<button type="button" class="filter-btn ${active}" onclick="selectShipTypeFilter('${t.code}')">${t.label} ${iconHtml}</button>`;
     });
 
     let rarityBtns = `<button type="button" class="filter-btn ${shipFilterRarity.has('ALL') ? 'active' : ''}" onclick="selectShipRarityFilter('ALL')">Hiển Thị Tất Cả</button>`;
@@ -949,10 +971,10 @@ function renderShipListOnly() {
     `;
 
     const factionOrder = [
-        "Eagle Union", "Royal Navy", "Heavy Sakura", "Ironblood",
+        "Universal", "Eagle Union", "Royal Navy", "Heavy Sakura", "Ironblood",
         "Dragon Empery", "Sardegna Empire", "Northern Parliament",
         "Iris Libre", "Vichya Dominion", "Kingdom of Tulipia",
-        "Liga de Pedrería", "META", "Tempesta", "Universal", "Atelier Ryza"
+        "Liga de Pedrería", "META", "Tempesta", "Atelier Ryza"
     ];
 
     let slotType = getSlotCategoryType(selectingSlotIndex);
@@ -960,7 +982,7 @@ function renderShipListOnly() {
     if (slotType === "SUB") {
         typeOrder = ["SS", "SSV", "IXS", "SFS"];
     } else if (slotType === "VANGUARD") {
-        typeOrder = ["DD", "CL", "CA", "CB", "DDG", "AE", "MS", "IXV", "SFV"];
+        typeOrder = ["DD", "DDG", "CL", "CA", "CB", "AE", "IXv", "MS", "SFV"];
     } else {
         typeOrder = ["BC", "BB", "BBV", "CV", "CVL", "BM", "DDG", "AR", "RS", "IXM", "SFM", "IX"];
     }
@@ -1206,9 +1228,6 @@ function closeShipModal() {
     applyAntiShiftPadding(false);
 }
 
-// ==========================================
-// 8. BỘ LỌC VÀ CHỌN TRANG BỊ (EQUIP SELECTION & FILTER)
-// ==========================================
 function toggleEquipFilter(btnEl) {
     isEquipFilterOpen = !isEquipFilterOpen;
     const panel = document.getElementById('equipFilterPanel');
@@ -1235,7 +1254,7 @@ function buildEquipFilterHtml(allowedCategories) {
     const factions = [
         "Universal", "Eagle Union", "Royal Navy", "Heavy Sakura", "Ironblood",
         "Dragon Empery", "Sardegna Empire", "Northern Parliament",
-        "Iris Libre", "Vichya Dominion", "Kingdom of Tulipia",
+        "Iris Libre", "Vichya Dominion", "Iris Orthodoxy", "Kingdom of Tulipia",
         "Liga de Pedrería", "META", "Tempesta", "Atelier Ryza"
     ];
 
@@ -1262,9 +1281,30 @@ function buildEquipFilterHtml(allowedCategories) {
     }
 
     let factionBtns = `<button type="button" class="filter-btn ${equipFilterFaction.has('ALL') ? 'active' : ''}" onclick="selectEquipFactionFilter('ALL')">Hiển Thị Tất Cả</button>`;
+    
     factions.forEach(f => {
         const active = equipFilterFaction.has(f) ? 'active' : '';
-        factionBtns += `<button type="button" class="filter-btn ${active}" onclick="selectEquipFactionFilter('${f}')">${f}</button>`;
+
+        let labelEntry = null;
+        if (window.labelDetails && window.labelDetails.faction) {
+            let factionObj = window.labelDetails.faction;
+            let matchedKey = Object.keys(factionObj).find(k => k.toLowerCase() === f.toLowerCase());
+            if (matchedKey) {
+                labelEntry = factionObj[matchedKey];
+            }
+        }
+
+        let iconHtml = "";
+        if (labelEntry && labelEntry.code) {
+            // Kiểm tra nếu là Iris Orthodoxy thì dùng đuôi .png, ngược lại dùng _1.png
+            const iconUrl = (f === "Iris Orthodoxy")
+                ? `https://azurlane.netojuu.com/images/${labelEntry.code}.png`
+                : `https://azurlane.netojuu.com/images/${labelEntry.code}_1.png`;
+
+            iconHtml = `<img src="${iconUrl}" alt="${f}" style="height: 36px; width: auto; vertical-align: middle; margin-left: 8px; object-fit: contain; filter: invert(1) brightness(2);">`;
+        }
+
+        factionBtns += `<button type="button" class="filter-btn ${active}" onclick="selectEquipFactionFilter('${f}')">${f} ${iconHtml}</button>`;
     });
 
     let rarityBtns = `<button type="button" class="filter-btn ${equipFilterRarity.has('ALL') ? 'active' : ''}" onclick="selectEquipRarityFilter('ALL')">Hiển Thị Tất Cả</button>`;
@@ -1460,7 +1500,7 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
     const equipFactionOrder = [
         "Universal", "Eagle Union", "Royal Navy", "Heavy Sakura", "Ironblood",
         "Dragon Empery", "Sardegna Empire", "Northern Parliament",
-        "Iris Libre", "Vichya Dominion", "Kingdom of Tulipia",
+        "Iris Libre", "Vichya Dominion", "Iris Orthodoxy", "Kingdom of Tulipia",
         "Liga de Pedrería", "META", "Tempesta", "Atelier Ryza"
     ];
 
@@ -1774,9 +1814,6 @@ function closeEquipModal() {
     applyAntiShiftPadding(false);
 }
 
-// ==========================================
-// 9. HIỆU ỨNG TƯƠNG TÁC GIAO DIỆN & POPUP HOVER
-// ==========================================
 function handleIconHover(iconEl, isHover) {
     const wrapper = iconEl.closest('.ship-item-wrapper');
     const nameBox = wrapper.querySelector('.ship-name-box');
@@ -1861,9 +1898,6 @@ window.onclick = function (event) {
     if (confirmModal && event.target === confirmModal) closeConfirmModal();
 };
 
-// ==========================================
-// 10. RENDER BỐ CỤC ĐỘI HÌNH (FLEET BUILDER RENDER)
-// ==========================================
 function renderFleetSlotRow(index) {
     let slot = fleetState[index];
     let shipInfo = slot.shipId ? getProcessedShipData(index) : null;
@@ -2035,9 +2069,6 @@ function renderFleet() {
     }
 }
 
-// ==========================================
-// 11. KHỞI CHẠY HỆ THỐNG
-// ==========================================
 function initFleetBuilder() {
     injectEquipModal();
     injectConfirmModal();

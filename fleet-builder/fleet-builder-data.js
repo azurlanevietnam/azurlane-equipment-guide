@@ -2,6 +2,7 @@
 const fleetDataFiles = [
     // 1. TẢI TỪ ĐIỂN VÀ TOÀN BỘ KHỞI TẠO TỪ THƯ MỤC "equip"
     'equip/equip-data.js',
+    'label/label-data.js',
 
     // 2. TẢI DỮ LIỆU TỪNG LOẠI TÀU TỪ THƯ MỤC "ship"
     'ship/destroyer-data.js',
