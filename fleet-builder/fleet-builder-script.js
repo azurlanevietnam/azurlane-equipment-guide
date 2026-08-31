@@ -1269,15 +1269,48 @@ function buildEquipFilterHtml(allowedCategories) {
     let categoryBtns = "";
     if (allowedCategories.length >= 2) {
         categoryBtns += `<button type="button" class="filter-btn ${equipFilterCategory.has('ALL') ? 'active' : ''}" onclick="selectEquipCategoryFilter('ALL', false)">Hiển Thị Tất Cả</button>`;
+        
         allowedCategories.forEach(cat => {
             const active = equipFilterCategory.has(cat) ? 'active' : '';
-            categoryBtns += `<button type="button" class="filter-btn ${active}" onclick="selectEquipCategoryFilter('${cat}', false)">${cat}</button>`;
+
+            let labelEntry = null;
+            if (window.labelDetails && window.labelDetails.equipment_type) {
+                let equipTypeObj = window.labelDetails.equipment_type;
+                let matchedKey = Object.keys(equipTypeObj).find(k => k.toLowerCase() === cat.toLowerCase());
+                if (matchedKey) {
+                    labelEntry = equipTypeObj[matchedKey];
+                }
+            }
+
+            let iconHtml = "";
+            if (labelEntry && labelEntry.code) {
+                const iconUrl = `https://azurlane.netojuu.com/images/${labelEntry.code}.png`;
+                iconHtml = `<img src="${iconUrl}" alt="${cat}" style="max-width: 36px; max-height: 36px; width: auto; height: auto; vertical-align: middle; margin-left: 8px; object-fit: contain;">`;
+            }
+
+            categoryBtns += `<button type="button" class="filter-btn ${active}" onclick="selectEquipCategoryFilter('${cat}', false)">${cat} ${iconHtml}</button>`;
         });
     } else if (allowedCategories.length === 1) {
         const singleCat = allowedCategories[0];
         equipFilterCategory.clear();
         equipFilterCategory.add(singleCat);
-        categoryBtns += `<button type="button" class="filter-btn active" onclick="selectEquipCategoryFilter('${singleCat}', true)">${singleCat}</button>`;
+
+        let labelEntry = null;
+        if (window.labelDetails && window.labelDetails.equipment_type) {
+            let equipTypeObj = window.labelDetails.equipment_type;
+            let matchedKey = Object.keys(equipTypeObj).find(k => k.toLowerCase() === singleCat.toLowerCase());
+            if (matchedKey) {
+                labelEntry = equipTypeObj[matchedKey];
+            }
+        }
+
+        let iconHtml = "";
+        if (labelEntry && labelEntry.code) {
+            const iconUrl = `https://azurlane.netojuu.com/images/${labelEntry.code}.png`;
+            iconHtml = `<img src="${iconUrl}" alt="${singleCat}" style="max-width: 36px; max-height: 36px; width: auto; height: auto; vertical-align: middle; margin-left: 8px; object-fit: contain;">`;
+        }
+
+        categoryBtns += `<button type="button" class="filter-btn active" onclick="selectEquipCategoryFilter('${singleCat}', true)">${singleCat} ${iconHtml}</button>`;
     }
 
     let factionBtns = `<button type="button" class="filter-btn ${equipFilterFaction.has('ALL') ? 'active' : ''}" onclick="selectEquipFactionFilter('ALL')">Hiển Thị Tất Cả</button>`;
@@ -1296,7 +1329,6 @@ function buildEquipFilterHtml(allowedCategories) {
 
         let iconHtml = "";
         if (labelEntry && labelEntry.code) {
-            // Kiểm tra nếu là Iris Orthodoxy thì dùng đuôi .png, ngược lại dùng _1.png
             const iconUrl = (f === "Iris Orthodoxy")
                 ? `https://azurlane.netojuu.com/images/${labelEntry.code}.png`
                 : `https://azurlane.netojuu.com/images/${labelEntry.code}_1.png`;

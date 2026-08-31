@@ -7,6 +7,18 @@ equipData["Augmentation"] = {
 
 equipDetails["Augmentation"] = {
     "exc_aug_cb": {
+        "star_blaster": {
+            name: "Star Blaster",
+            tier: "N/A",
+            source: ["Augment Crafting"],
+            exclusive: ["san_diego_kai"],
+            stats: ["FP +35", "EVA +20"],
+            equippable: ["CL"],
+            linkTab: 0,
+            desc: ["Tăng cho San Diego Kai 20% chỉ số AA. Trong thời gian skill 1 được kích hoạt, San Diego Kai được giảm 15% sát thương nhận phải."],
+            code: "8/85/Augment_13140",
+            box: "yellow"
+        },
         "oldladys_royalsword": {
             name: "Old Lady's Royal Sword",
             tier: "N/A",

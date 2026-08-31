@@ -126,5 +126,63 @@ window.labelDetails = {
         "Atelier Ryza": {
             code: "0/0d/Um"
         }
+    },
+    "equipment_type": {
+        "DD-gun": {
+            name: "Destroyer Gun",
+            code: "1/12/50160"
+        },
+        "CL-gun": {
+            name: "Light Cruiser Gun",
+            code: "3/37/22280"
+        },
+        "CA-gun": {
+            name: "Heavy Cruiser Gun",
+            code: "5/5c/43160"
+        },
+        "CB-gun": {
+            name: "Large Cruiser Gun",
+            code: "c/c2/14000"
+        },
+        "BB-gun": {
+            name: "Battleship Gun",
+            code: "e/e8/14400"
+        },
+        "AA-gun": {
+            name: "Anti-Air Gun",
+            code: "3/31/16480"
+        },
+        "AA-Gun (Time Fuze)": {
+            name: "Time Fuze Anti-Air Gun",
+            code: "f/f6/26680"
+        },
+        "Surface Torpedo": {
+            name: "Surface Torpedo",
+            code: "6/64/45160"
+        },
+        "Guided Missile": {
+            name: "Guided Missile",
+            code: "0/05/56020"
+        },
+        "Fighter": {
+            name: "Fighter",
+            code: "3/34/85600"
+        },
+        "Dive Bomber": {
+            name: "Dive Bomber",
+            code: "7/7b/39340"
+        },
+        "Torpedo Bomber": {
+            name: "Torpedo Bomber",
+            code: "e/e9/28400"
+        },
+        "Seaplane": {
+            name: "Seaplane",
+            code: "d/dc/17460"
+        },
+        "Auxiliary": {
+            name: "Auxiliary",
+            code: "d/d5/2400"
+        },
     }
 };
