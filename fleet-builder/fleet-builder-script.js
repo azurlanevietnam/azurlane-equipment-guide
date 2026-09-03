@@ -155,10 +155,12 @@ function getFleetGroupIndex(slotIndex) {
 }
 
 function getShipTypeAndData(shipId) {
-    if (!shipId || !window.shipDetails) return null;
+    if (!shipId) return null;
+    const ships = window.shipDetails || (typeof shipDetails !== 'undefined' ? shipDetails : null);
+    if (!ships) return null;
 
     let found = null;
-    for (let type in window.shipDetails) {
+    for (let type in ships) {
         let searchNested = (obj) => {
             if (found || !obj || typeof obj !== 'object') return;
 
@@ -174,7 +176,7 @@ function getShipTypeAndData(shipId) {
             }
         };
 
-        searchNested(window.shipDetails[type]);
+        searchNested(ships[type]);
         if (found) return found;
     }
     return null;
@@ -244,36 +246,41 @@ function getSlotAllowedCategories(shipInfo, slotIndex) {
 }
 
 function getEquipDataGlobal(category, eqId) {
-    if (!eqId || !window.equipDetails) return null;
+    if (!eqId) return null;
+    const details = window.equipDetails || (typeof equipDetails !== 'undefined' ? equipDetails : null);
+    if (!details) return null;
 
     let targetCat = category;
-    if (category === "CA-gun" || category === "CB-gun") targetCat = "CA-gun";
-    if (category === "Surface Torpedo" || category === "Guided Missile") targetCat = "Surface Torpedo";
-    if (category === "AA-gun" || category === "AA-Gun (Time Fuze)") targetCat = "AA-gun";
+    if (category === "CA-gun" || category === "CB-gun" || category === "CAGM" || category === "CBGM") targetCat = "CA-gun";
+    else if (category === "Surface Torpedo" || category === "Guided Missile" || category === "TRPM" || category === "GMM") targetCat = "Surface Torpedo";
+    else if (category === "AA-gun" || category === "AA-Gun (Time Fuze)" || category === "AAGM" || category === "AATFGM") targetCat = "AA-gun";
 
-    if (targetCat && window.equipDetails[targetCat]) {
-        let catContainer = window.equipDetails[targetCat];
-        if (catContainer[eqId]) return catContainer[eqId];
-    }
-
-    let foundData = null;
-    let searchNested = (obj) => {
-        if (foundData || !obj || typeof obj !== 'object') return;
-
+    function searchItem(obj) {
+        if (!obj || typeof obj !== 'object') return null;
         if (obj[eqId] && typeof obj[eqId] === 'object' && obj[eqId].name) {
-            foundData = obj[eqId];
-            return;
+            return obj[eqId];
         }
-
-        for (let key in obj) {
-            if (typeof obj[key] === 'object' && obj[key] !== null) {
-                searchNested(obj[key]);
+        for (let k of Object.keys(obj)) {
+            let val = obj[k];
+            if (val && typeof val === 'object' && !Array.isArray(val) && k !== "equipSlot" && k !== "customRules") {
+                let res = searchItem(val);
+                if (res) return res;
             }
         }
-    };
+        return null;
+    }
 
-    searchNested(window.equipDetails);
-    return foundData;
+    if (targetCat && details[targetCat]) {
+        let found = searchItem(details[targetCat]);
+        if (found) return found;
+    }
+
+    for (let catKey of Object.keys(details)) {
+        let found = searchItem(details[catKey]);
+        if (found) return found;
+    }
+
+    return null;
 }
 
 function getProcessedShipData(fleetSlotIndex) {
@@ -291,16 +298,20 @@ function getProcessedShipData(fleetSlotIndex) {
     if (shipDataCopy.customRules && Array.isArray(shipDataCopy.customRules)) {
         shipDataCopy.customRules.forEach(rule => {
             if (rule.type === "SLOT_EFF_BONUS") {
+                let checkSlot = rule.triggerSlotIndex !== undefined ? rule.triggerSlotIndex : rule.slotIndex;
                 let targetSlot = rule.slotIndex;
                 let requiredCat = rule.equipCategory;
                 let bonusVal = rule.bonus;
 
-                let eq = slot.equips[targetSlot];
+                let eq = slot.equips[checkSlot];
                 if (eq && eq.id) {
                     let eqData = getEquipDataGlobal(eq.category, eq.id);
                     let isCBGun = eq.category === "CBGM" || eq.category === "CB-gun" || (eqData && eqData.gunType === "cb");
 
-                    if (eq.category === requiredCat || (requiredCat === "CBGM" && isCBGun)) {
+                    let matchCategory = (eq.category === requiredCat) ||
+                                        ((requiredCat === "CBGM" || requiredCat === "CB-gun") && isCBGun);
+
+                    if (matchCategory) {
                         let currentEff = parseInt(shipDataCopy.slotEff[targetSlot], 10) || 0;
                         shipDataCopy.slotEff[targetSlot] = String(currentEff + bonusVal);
                         shipDataCopy._modifiedEffIndices[targetSlot] = true;
@@ -733,7 +744,7 @@ function buildShipFilterHtml() {
     ];
 
     let factionBtns = `<button type="button" class="filter-btn ${shipFilterFaction.has('ALL') ? 'active' : ''}" onclick="selectShipFactionFilter('ALL')">Hiển Thị Tất Cả</button>`;
-    
+
     factions.forEach(f => {
         const active = shipFilterFaction.has(f) ? 'active' : '';
 
@@ -759,7 +770,7 @@ function buildShipFilterHtml() {
 
     types.forEach(t => {
         const active = shipFilterType.has(t.code) ? 'active' : '';
-        
+
         let lookupCode = t.code;
         if (t.code.toUpperCase() === "DDG") {
             lookupCode = (slotType === "VANGUARD") ? "DDGv" : "DDGm";
@@ -988,8 +999,10 @@ function renderShipListOnly() {
     }
 
     let allShipsList = [];
-    if (window.shipDetails) {
-        for (let cat in window.shipDetails) {
+    const ships = window.shipDetails || (typeof shipDetails !== 'undefined' ? shipDetails : null);
+
+    if (ships) {
+        for (let cat in ships) {
             let processShipEntries = (shipObj) => {
                 for (let shipId in shipObj) {
                     let shipData = shipObj[shipId];
@@ -1007,7 +1020,7 @@ function renderShipListOnly() {
                 }
             };
 
-            processShipEntries(window.shipDetails[cat]);
+            processShipEntries(ships[cat]);
         }
     }
 
@@ -1269,7 +1282,7 @@ function buildEquipFilterHtml(allowedCategories) {
     let categoryBtns = "";
     if (allowedCategories.length >= 2) {
         categoryBtns += `<button type="button" class="filter-btn ${equipFilterCategory.has('ALL') ? 'active' : ''}" onclick="selectEquipCategoryFilter('ALL', false)">Hiển Thị Tất Cả</button>`;
-        
+
         allowedCategories.forEach(cat => {
             const active = equipFilterCategory.has(cat) ? 'active' : '';
 
@@ -1314,7 +1327,7 @@ function buildEquipFilterHtml(allowedCategories) {
     }
 
     let factionBtns = `<button type="button" class="filter-btn ${equipFilterFaction.has('ALL') ? 'active' : ''}" onclick="selectEquipFactionFilter('ALL')">Hiển Thị Tất Cả</button>`;
-    
+
     factions.forEach(f => {
         const active = equipFilterFaction.has(f) ? 'active' : '';
 
@@ -1537,6 +1550,7 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
     ];
 
     let allEquipsList = [];
+    const details = window.equipDetails || (typeof equipDetails !== 'undefined' ? equipDetails : null);
 
     allowedCategories.forEach(category => {
         let targetDataCategory = category;
@@ -1548,11 +1562,11 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
             targetDataCategory = "AA-gun";
         }
 
-        if (window.equipDetails && window.equipDetails[targetDataCategory]) {
-            let catContainer = window.equipDetails[targetDataCategory];
+        if (details && details[targetDataCategory]) {
+            let catContainer = details[targetDataCategory];
 
             let processEquipEntries = (equipObj) => {
-                for (let eqId in equipObj) {
+                for (let eqId of Object.keys(equipObj)) {
                     let eqData = equipObj[eqId];
 
                     if (eqData && typeof eqData === 'object' && !eqData.code && !eqData.name) {
@@ -1640,7 +1654,7 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
 
     allEquipsList.forEach(item => {
         let eqId = item.id;
-        let category = item.category === "Augmentation" || selectingEquipSlotIndex === 5 ? "Augmentation" : item.category;
+        let itemCategory = item.category === "Augmentation" || selectingEquipSlotIndex === 5 ? "Augmentation" : item.category;
         let eqData = item.data;
 
         if (eqData.exclusive && Array.isArray(eqData.exclusive)) {
@@ -1666,7 +1680,7 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
 
         let isDisabled = isLimitedOnShip || isFleetLimitReached;
         let itemClass = isDisabled ? "modal-ship-icon equip-disabled" : `modal-ship-icon ${boxClass}`;
-        let clickAction = isDisabled ? "" : `onclick="selectEquip('${eqId}', '${category}')"`;
+        let clickAction = isDisabled ? "" : `onclick="selectEquip('${eqId}', '${itemCategory}')"`;
 
         gridHtml += `
             <div class="ship-item-wrapper" onmouseleave="handleItemLeave(this)">
@@ -2002,7 +2016,7 @@ function renderFleetSlotRow(index) {
                 <div class="square-slot equip-slot ${boxClass}" ${onClickEvent}>
                     ${slotInfoBadgeHtml}
                     <span class="equip-badge-enhance">+${enhanceVal}</span>
-                    <img src="${iconUrl}" class="slot-image">
+                    <img src="${iconUrl}" class="slot-image" alt="${eqData.name}">
                 </div>
             `;
         } else {
@@ -2111,10 +2125,22 @@ function initFleetBuilder() {
 }
 
 function waitForDataAndRender() {
+    const requiredCategories = [
+        "CA-gun", "Surface Torpedo", "BB-gun", "DD-gun", "CL-gun", 
+        "AA-gun", "Fighter", "Dive Bomber", "Torpedo Bomber", 
+        "Auxiliary", "Augmentation"
+    ];
+
     const checkDataReady = setInterval(() => {
-        if (window.shipDetails && window.equipDetails && Object.keys(window.equipDetails).length > 0) {
-            clearInterval(checkDataReady);
-            renderFleet();
+        const details = window.equipDetails || (typeof equipDetails !== 'undefined' ? equipDetails : null);
+        const ships = window.shipDetails || (typeof shipDetails !== 'undefined' ? shipDetails : null);
+
+        if (ships && details) {
+            const isAllLoaded = requiredCategories.every(cat => details[cat] && Object.keys(details[cat]).length > 0);
+            if (isAllLoaded) {
+                clearInterval(checkDataReady);
+                renderFleet();
+            }
         }
     }, 50);
 }

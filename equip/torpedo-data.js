@@ -115,7 +115,7 @@ equipDetails["Surface Torpedo"] = {
             box: "yellow"
         },
         "quint-533-mkix": {
-            name: "533mm Quintuple Torpedo Mount Mk 17",
+            name: "533mm Quintuple Torpedo Mount Mk IX",
             torpType: "trp",
             tier: "N/A",
             source: ["Gear Lab"],

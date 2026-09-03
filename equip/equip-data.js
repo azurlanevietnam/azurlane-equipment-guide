@@ -11,7 +11,7 @@ const CAGM = "CA-gun";
 const CBGM = "CB-gun";
 const BBGM = "BB-gun";
 const AAGM = "AA-gun";
-const AATFGM = "AA-Gun (Time Fuze)"; // <-- THÊM HẰNG SỐ MỚI
+const AATFGM = "AA-Gun (Time Fuze)";
 const TRPM = "Surface Torpedo";
 const GMM = "Guided Missile";
 const AUX = "Auxiliary";
@@ -26,9 +26,9 @@ const categories = [
 // ==========================================
 // 2. KHỞI TẠO CÁC OBJECT GỐC LƯU TRỮ DỮ LIỆU
 // ==========================================
-window.equipData = {};
-window.equipDetails = {};
-window.shipDetails = {};
+window.equipData = window.equipData || {};
+window.equipDetails = window.equipDetails || {};
+window.shipDetails = window.shipDetails || {};
 
 // ==========================================
 // 3. DANH SÁCH FILE DỮ LIỆU CẦN TẢI
@@ -43,7 +43,7 @@ const dataFiles = [
     'dd-gun-data.js',
     'ca-gun-data.js',
     'aa-gun-data.js',
-    "torpedo-data.js",
+    'torpedo-data.js',
     'fighter-data.js',
     'dive-bomber-data.js',
     'torp-bomber-data.js',
@@ -53,8 +53,11 @@ const dataFiles = [
     'augmentation-data.js'
 ];
 
-dataFiles.push('equip-script.js');
-dataFiles.push('plugin-linkex.js');
+// Kiểm tra: Nếu KHÔNG PHẢI trang Fleet Builder thì mới nạp equip-script.js
+const isFleetBuilderPage = document.getElementById('fleet-builder-container') !== null;
+if (!isFleetBuilderPage) {
+    dataFiles.push('equip-script.js');
+}
 
 dataFiles.forEach(fileName => {
     let script = document.createElement('script');
