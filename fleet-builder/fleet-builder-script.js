@@ -317,7 +317,7 @@ function getProcessedShipData(fleetSlotIndex) {
                     let isCBGun = eq.category === "CBGM" || eq.category === "CB-gun" || (eqData && eqData.gunType === "cb");
 
                     let matchCategory = (eq.category === requiredCat) ||
-                                        ((requiredCat === "CBGM" || requiredCat === "CB-gun") && isCBGun);
+                        ((requiredCat === "CBGM" || requiredCat === "CB-gun") && isCBGun);
 
                     if (matchCategory) {
                         let currentEff = parseInt(shipDataCopy.slotEff[targetSlot], 10) || 0;
@@ -400,6 +400,32 @@ function getProcessedShipData(fleetSlotIndex) {
                 let currentEff = parseInt(shipDataCopy.slotEff[targetSlot], 10) || 0;
                 shipDataCopy.slotEff[targetSlot] = String(currentEff + bonusVal);
                 shipDataCopy._modifiedEffIndices[targetSlot] = true;
+            }
+
+            if (rule.type === "VANGUARD_COUNT_EXCLUDING_SELF_SLOT_EFF_BONUS") {
+                let targetSlot = rule.targetSlotIndex;
+                let minCount = rule.minCount || 1;
+                let bonusVal = rule.bonus;
+
+                const fleetGroupIdx = getFleetGroupIndex(fleetSlotIndex);
+                const startVanguardIdx = fleetGroupIdx * 9 + 3; // Slot Vanguard bắt đầu từ index 3
+                const endVanguardIdx = startVanguardIdx + 3;    // Slot 3, 4, 5
+
+                let otherVanguardCount = 0;
+                for (let i = startVanguardIdx; i < endVanguardIdx; i++) {
+                    if (i !== fleetSlotIndex) {
+                        let sData = fleetState[i];
+                        if (sData && sData.shipId) {
+                            otherVanguardCount++;
+                        }
+                    }
+                }
+
+                if (otherVanguardCount >= minCount) {
+                    let currentEff = parseInt(shipDataCopy.slotEff[targetSlot], 10) || 0;
+                    shipDataCopy.slotEff[targetSlot] = String(currentEff + bonusVal);
+                    shipDataCopy._modifiedEffIndices[targetSlot] = true;
+                }
             }
 
             if (rule.type === "HAKURYUU_FACTION_BONUS") {
@@ -2141,8 +2167,8 @@ function initFleetBuilder() {
 
 function waitForDataAndRender() {
     const requiredCategories = [
-        "CA-gun", "Surface Torpedo", "BB-gun", "DD-gun", "CL-gun", 
-        "AA-gun", "Fighter", "Dive Bomber", "Torpedo Bomber", 
+        "CA-gun", "Surface Torpedo", "BB-gun", "DD-gun", "CL-gun",
+        "AA-gun", "Fighter", "Dive Bomber", "Torpedo Bomber",
         "Auxiliary", "Augmentation"
     ];
 

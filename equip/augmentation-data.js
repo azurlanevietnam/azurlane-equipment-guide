@@ -6,7 +6,7 @@ equipData["Augmentation"] = {
 };
 
 equipDetails["Augmentation"] = {
-    "exc_aug_cb": {
+    "exc_aug_dd": {
         "ultra_rainbow_hammer": {
             name: "Ultra Rainbow Hammer",
             tier: "N/A",
@@ -20,6 +20,8 @@ equipDetails["Augmentation"] = {
             code: "5/5e/9000",
             box: "yellow"
         },
+    },
+    "exc_aug_cb": {
         "star_blaster": {
             name: "Star Blaster",
             tier: "N/A",
