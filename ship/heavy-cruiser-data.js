@@ -19,6 +19,17 @@ shipDetails["CA"] = {
                 }
             ]
         },
+        "unzen": {
+            name: "Unzen",
+            source: ["Effulgence Before Eclipse Event Build"],
+            faction: "Heavy Sakura",
+            rarity: "Ultra Rare",
+            code: "a/a4",
+            box: "rainbow",
+            equipSlot: [["CAGM"], ["TRPM"], ["AAGM"]],
+            slotAmount: [2, 2, 1],
+            slotEff: ["140", "150", "130"],
+        },
         "hindenburg": {
             name: "Hindenburg",
             source: ["PR6 Research"],
@@ -41,16 +52,16 @@ shipDetails["CA"] = {
             slotAmount: [1, 2, 1],
             slotEff: ["150", "70", "105"],
         },
-        "napoli": {
-            name: "Napoli",
-            source: ["PR7 Research"],
-            faction: "Sardegna Empire",
-            rarity: "Decisive",
-            code: "b/b8",
+        "moskva": {
+            name: "Moskva",
+            source: ["Springtide Inn Online Event Build"],
+            faction: "Northern Parliament",
+            rarity: "Ultra Rare",
+            code: "6/6e",
             box: "rainbow",
-            equipSlot: [["CAGM"], ["CLGM"], ["AAGM"]],
-            slotAmount: [1, 2, 1],
-            slotEff: ["150", "70", "105"],
+            equipSlot: [["CAGM"], ["DDGM"], ["AAGM"]],
+            slotAmount: [2, 1, 1],
+            slotEff: ["135", "100", "135"],
         },
         "gouden_leeuw": {
             name: "Gouden Leeuw",

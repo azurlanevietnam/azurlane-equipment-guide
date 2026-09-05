@@ -7,6 +7,19 @@ equipData["Augmentation"] = {
 
 equipDetails["Augmentation"] = {
     "exc_aug_cb": {
+        "ultra_rainbow_hammer": {
+            name: "Ultra Rainbow Hammer",
+            tier: "N/A",
+            source: ["Augment Crafting"],
+            exclusive: ["specialized_bulin_custom_mkiii"],
+            stats: ["HP +99", "LUCK +9"],
+            equippable: ["DD"],
+            maxUpgrade: 0,
+            linkTab: 0,
+            desc: ["Tăng cho Bulin Mk III các chỉ sổ FP, TRP, AVI, AA, RLD, EVA, ACC, ASW thêm 9 đơn vị."],
+            code: "5/5e/9000",
+            box: "yellow"
+        },
         "star_blaster": {
             name: "Star Blaster",
             tier: "N/A",

@@ -7,6 +7,7 @@ const MAX_FLEETS = 36;
 let fleetState = loadFleetState();
 let selectingSlotIndex = -1;
 let selectingEquipSlotIndex = -1;
+let currentEquipEnhanceVal = 10;
 
 let shipFilterFaction = new Set(['ALL']);
 let shipFilterType = new Set(['ALL']);
@@ -203,7 +204,14 @@ function getAffinityDisplay(affinityKey) {
     }
 }
 
-function getMaxEnhanceByBox(boxColor, category) {
+function getMaxEnhanceByBox(boxColor, category, eqData) {
+    if (eqData && typeof eqData.maxUpgrade === 'number') {
+        return eqData.maxUpgrade;
+    }
+    if (eqData && typeof eqData.maxEnhance === 'number') {
+        return eqData.maxEnhance;
+    }
+
     if (category === "Augmentation" || selectingEquipSlotIndex === 5) {
         return 10;
     }
@@ -1744,10 +1752,15 @@ function openEquipModal(fleetIndex, slotIndex) {
         }
     }
 
-    let maxAllowedEnhance = (isAugmentSlot || allowedCategories.includes("Augmentation")) ? 10 : 13;
-
     const fleetGroupIndex = getFleetGroupIndex(fleetIndex);
     let existingEquip = fleetState[fleetIndex].equips[slotIndex];
+    let existingEqData = (existingEquip && existingEquip.id) ? getEquipDataGlobal(existingEquip.category, existingEquip.id) : null;
+
+    let maxAllowedEnhance = isAugmentSlot ? 10 : 13;
+    if (existingEqData) {
+        maxAllowedEnhance = getMaxEnhanceByBox(existingEqData.box, existingEquip.category, existingEqData);
+    }
+
     if (existingEquip && existingEquip.enhance !== undefined) {
         currentEquipEnhanceVal = Math.min(existingEquip.enhance, maxAllowedEnhance);
     } else {
@@ -1778,19 +1791,21 @@ function openEquipModal(fleetIndex, slotIndex) {
 }
 
 function handleEquipEnhanceRangeChange(val) {
-    let maxAllowed = (selectingEquipSlotIndex === 5) ? 10 : 13;
-    currentEquipEnhanceVal = Math.min(parseInt(val, 10), maxAllowed);
-    document.getElementById('equipEnhanceInput').value = currentEquipEnhanceVal;
+    let num = parseInt(val, 10);
+    currentEquipEnhanceVal = num;
+    let inputEl = document.getElementById('equipEnhanceInput');
+    if (inputEl) inputEl.value = num;
 }
 
 function handleEquipEnhanceInputChange(val) {
     let inputEl = document.getElementById('equipEnhanceInput');
     let rangeEl = document.getElementById('equipEnhanceRange');
     let num = parseInt(val, 10);
-    let maxAllowed = (selectingEquipSlotIndex === 5) ? 10 : 13;
+
+    let maxAllowed = rangeEl ? parseInt(rangeEl.max, 10) : 13;
 
     if (isNaN(num)) {
-        inputEl.value = currentEquipEnhanceVal;
+        if (inputEl) inputEl.value = currentEquipEnhanceVal;
         return;
     }
 
@@ -1798,8 +1813,8 @@ function handleEquipEnhanceInputChange(val) {
     if (num > maxAllowed) num = maxAllowed;
 
     currentEquipEnhanceVal = num;
-    inputEl.value = num;
-    rangeEl.value = num;
+    if (inputEl) inputEl.value = num;
+    if (rangeEl) rangeEl.value = num;
 }
 
 function handleSetDefaultEquipEnhance() {
@@ -1814,7 +1829,7 @@ function handleSetDefaultEquipEnhance() {
             let currentEq = fleetState[selectingSlotIndex].equips[selectingEquipSlotIndex];
             if (currentEq && currentEq.id) {
                 let eqData = getEquipDataGlobal(currentEq.category, currentEq.id);
-                let maxEnhance = eqData ? getMaxEnhanceByBox(eqData.box, currentEq.category) : maxAllowed;
+                let maxEnhance = eqData ? getMaxEnhanceByBox(eqData.box, currentEq.category, eqData) : maxAllowed;
 
                 currentEq.enhance = Math.min(finalDefault, maxEnhance);
                 saveFleetState();
@@ -1830,7 +1845,7 @@ function selectEquip(eqId, category) {
     if (selectingSlotIndex !== -1 && selectingEquipSlotIndex !== -1) {
         if (eqId && category) {
             let eqData = getEquipDataGlobal(category, eqId);
-            let maxEnhance = eqData ? getMaxEnhanceByBox(eqData.box, category) : ((selectingEquipSlotIndex === 5) ? 10 : 13);
+            let maxEnhance = eqData ? getMaxEnhanceByBox(eqData.box, category, eqData) : ((selectingEquipSlotIndex === 5) ? 10 : 13);
 
             let finalEnhance = Math.min(currentEquipEnhanceVal, maxEnhance);
 
