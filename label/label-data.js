@@ -123,6 +123,9 @@ window.labelDetails = {
         "Tempesta": {
             code: "f/fa/Mot"
         },
+        "SSSS": {
+            code: "0/0d/Um"
+        },
         "Atelier Ryza": {
             code: "0/0d/Um"
         }

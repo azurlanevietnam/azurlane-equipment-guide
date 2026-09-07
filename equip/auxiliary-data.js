@@ -7,18 +7,6 @@ equipData["Auxiliary"] = {
 
 equipDetails["Auxiliary"] = {
     "rainbow_aux": {
-        "t93_pot": {
-            name: "Type 93 Pure Oxygen Torpedo",
-            tier: "N/A",
-            source: ["Core Data Shop"],
-            faction: "Heavy Sakura",
-            stats: ["TRP +118", "RLD +13"],
-            equippable: ["DD", "DDG", "CL", "CA", "CB", "SS", "SSV"],
-            linkTab: 3,
-            desc: [],
-            code: "5/59/2600",
-            box: "rainbow"
-        },
         "admiralty_fct": {
             name: "Admiralty Fire Control Table",
             tier: "N/A",
@@ -33,6 +21,31 @@ equipDetails["Auxiliary"] = {
             code: "c/c4/3580",
             box: "rainbow"
         },
+        "z_flag": {
+            name: "Z Flag",
+            tier: "N/A",
+            source: ["Core Data Shop"],
+            faction: "Heavy Sakura",
+            stats: ["EVA +18", "ACC +13", "LUCK +5"],
+            equippable: ["BB", "BC", "BBV", "CV"],
+            fleetLimit: 3,
+            linkTab: 0,
+            desc: ["Tăng 5% tỉ lệ chí mạng cho tàu mang trang bị. Nếu là Mikasa, toàn hạm đội được tăng 5% FP & ACC."],
+            code: "d/d0/640",
+            box: "rainbow"
+        },
+        "t93_pot": {
+            name: "Type 93 Pure Oxygen Torpedo",
+            tier: "N/A",
+            source: ["Core Data Shop"],
+            faction: "Heavy Sakura",
+            stats: ["TRP +118", "RLD +13"],
+            equippable: ["DD", "DDG", "CL", "CA", "CB", "SS", "SSV"],
+            linkTab: 3,
+            desc: [],
+            code: "5/59/2600",
+            box: "rainbow"
+        },
     },
     "yellow_aux": {
         "rpg-adventure": {
@@ -45,6 +58,30 @@ equipDetails["Auxiliary"] = {
             linkTab: 0,
             desc: ["Trong trận đấu, kích hoạt ngẫu nhiên một trong ba hiệu ứng sau:"],
             code: "c/c1/150280",
+            box: "yellow"
+        },
+        "frontier_medal": {
+            name: "Frontier Medal",
+            tier: "N/A",
+            source: ["Collection Reward"],
+            faction: "Universal",
+            stats: ["AVI +118", "HP +72"],
+            equippable: ["CV", "CVL"],
+            linkTab: 0,
+            desc: ["Trong chế độ Exercise (PvP), khi được trang bị trên flagship: Tăng 10% sát thương gây ra của CV/CVL hai phe & giảm 10%  sát thương gây ra của BB/BC hai phe."],
+            code: "2/22/820",
+            box: "yellow"
+        },
+        "steam_catapult": {
+            name: "Steam Catapult",
+            tier: "N/A",
+            source: ["T4/T5 Tech Box"],
+            faction: "Universal",
+            stats: ["AVI +118", "HP +90"],
+            equippable: ["CV", "CVL", "BBV"],
+            linkTab: 3,
+            desc: [""],
+            code: "9/96/1400",
             box: "yellow"
         },
         "hydraulic-rudder": {
@@ -99,38 +136,28 @@ equipDetails["Auxiliary"] = {
             code: "b/bf/1060",
             box: "yellow"
         },
-        "frontier_medal": {
-            name: "Frontier Medal",
+        "533-mag-torp": {
+            name: "533mm Magnetic Torpedo",
             tier: "N/A",
-            source: ["Collection Reward"],
-            stats: ["AVI +118", "HP +72"],
-            equippable: ["CV", "CVL"],
-            linkTab: 0,
-            desc: ["Trong chế độ Exercise (PvP), khi được trang bị trên flagship: Tăng 10% sát thương gây ra của CV/CVL hai phe & giảm 10%  sát thương gây ra của BB/BC hai phe."],
-            code: "2/22/820",
+            source: ["Core Data Shop"],
+            faction: "Ironblood",
+            stats: ["TRP +85", "ACC +18"],
+            equippable: ["DD", "DDG", "CL", "CA", "CB"],
+            linkTab: 3,
+            desc: ["Loạt ngư lôi đầu tiên phóng mỗi trận được chuyển thành ngư lôi từ tính và tăng 5% sát thương gây ra."],
+            code: "6/67/2700",
             box: "yellow"
         },
-        "goldburn": {
-            name: "Goldburn",
+        "fairy_magic_poster": {
+            name: "\"Fairy Magic\" Poster",
             tier: "N/A",
-            source: ["World-Spanning Arclight Event Reward"],
-            stats: ["HP +640"],
-            limit: 1,
+            source: ["Core Data Shop"],
+            faction: "Northern Parliament",
+            stats: ["EVA +18", "ACC +45"],
             fleetLimit: 2,
             linkTab: 0,
-            desc: ["Nếu tàu mang trang bị này là tàu hàng trước hoặc thuộc faction SSSS, tàu được tăng 38 RLD. Nếu tàu là kỳ hạm, CV hoặc CVL, phóng một loạt barrage đặc biệt 25s sau khi trận đấu bắt đầu."],
-            code: "e/e9/89400",
-            box: "yellow"
-        },
-        "steam_catapult": {
-            name: "Steam Catapult",
-            tier: "N/A",
-            source: ["T4/T5 Tech Box"],
-            stats: ["AVI +118", "HP +90"],
-            equippable: ["CV", "CVL", "BBV"],
-            linkTab: 3,
-            desc: [""],
-            code: "9/96/1400",
+            desc: ["Nếu tàu mang trang bị thuộc faction Northern Parliament, chỉ số LUCK +5, đồng giảm giảm sát thương nhận phải về 1 trong 3 lần nhận sát thương đầu tiên mỗi trận."],
+            code: "f/f9/3840",
             box: "yellow"
         },
         "angels_feather": {
@@ -143,6 +170,31 @@ equipDetails["Auxiliary"] = {
             linkTab: 0,
             desc: [""],
             code: "5/5f/51260",
+            box: "yellow"
+        },
+        "goldburn": {
+            name: "Goldburn",
+            tier: "N/A",
+            source: ["World-Spanning Arclight Event Reward"],
+            faction: "SSSS",
+            stats: ["HP +640"],
+            limit: 1,
+            fleetLimit: 2,
+            linkTab: 0,
+            desc: ["Nếu tàu mang trang bị này là tàu hàng trước hoặc thuộc faction SSSS, tàu được tăng 38 RLD. Nếu tàu là kỳ hạm, CV hoặc CVL, phóng một loạt barrage đặc biệt 25s sau khi trận đấu bắt đầu."],
+            code: "e/e9/89400",
+            box: "yellow"
+        },
+        "aw-apr": {
+            name: "All Work, All Play Robot",
+            tier: "N/A",
+            source: ["Dangerous Inventions Incoming! Event Reward"],
+            faction: "To LOVE-Ru",
+            stats: ["FP +20", "ACC +29"],
+            fleetLimit: 1,
+            linkTab: 0,
+            desc: ["Khi vào trận, tàu mang trang bị này được tăng 1% sát thương gây ra mỗi 20s, cộng dồn tối đa 3 lần."],
+            code: "c/c4/150500",
             box: "yellow"
         },
     },
@@ -164,6 +216,7 @@ equipDetails["Auxiliary"] = {
             name: "Repair Toolkit",
             tier: "N/A",
             source: ["3-4, 10-3, 14-1 Drop", "Any T3/4 Tech Box"],
+            faction: "Universal",
             stats: ["HP +530"],
             equippable: ["All"],
             linkTab: 3,
@@ -188,6 +241,7 @@ equipDetails["Auxiliary"] = {
             name: "Elite Aviation Maintenance Manjuu",
             tier: "N/A",
             source: ["Core Data Shop"],
+            faction: "Universal",
             stats: ["AVI +65"],
             equippable: ["CV", "CVL", "BBV"],
             limit: 1,
@@ -200,6 +254,7 @@ equipDetails["Auxiliary"] = {
             name: "Drop Tank",
             tier: "N/A",
             source: ["5-3 Drop", "Any T3/T4 Tech Box"],
+            faction: "Universal",
             stats: ["AVI +75", "HP +64"],
             equippable: ["CV", "CVL", "BBV"],
             linkTab: 3,

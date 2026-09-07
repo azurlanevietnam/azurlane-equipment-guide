@@ -28,6 +28,17 @@ const VANGUARD_SHIP_TYPES = ["DD", "DDG", "CL", "CA", "CB", "AE", "IXv"];
 const MAIN_SHIP_TYPES = ["BC", "BB", "BBV", "CV", "CVL", "BM", "DDG", "AR", "IXm"];
 const SUBMARINE_SHIP_TYPES = ["SS", "SSV", "IXs"];
 
+const MASTER_FACTION_ORDER = [
+    "Universal", "Eagle Union", "Royal Navy", "Heavy Sakura", "Ironblood",
+    "Dragon Empery", "Sardegna Empire", "Northern Parliament",
+    "Iris Libre", "Vichya Dominion", "Iris Orthodoxy", "Kingdom of Tulipia",
+    "Liga de Pedrería", "META", "Tempesta",
+    "Neptunia", "Bilibili", "Utawarerumono", "Kizuna AI", "Hololive",
+    "Venus Vacation", "The Idolmaster", "SSSS", "Atelier Ryza",
+    "Senran Kagura", "To LOVE-Ru", "BLACK★ROCK SHOOTER", "Atelier Yumia",
+    "Danmachi", "Date A Live", "NieR:Automata"
+];
+
 const MAP_EQUIP_CATEGORY = {
     "DDGM": "DD-gun",
     "CLGM": "CL-gun",
@@ -408,8 +419,8 @@ function getProcessedShipData(fleetSlotIndex) {
                 let bonusVal = rule.bonus;
 
                 const fleetGroupIdx = getFleetGroupIndex(fleetSlotIndex);
-                const startVanguardIdx = fleetGroupIdx * 9 + 3; // Slot Vanguard bắt đầu từ index 3
-                const endVanguardIdx = startVanguardIdx + 3;    // Slot 3, 4, 5
+                const startVanguardIdx = fleetGroupIdx * 9 + 3;
+                const endVanguardIdx = startVanguardIdx + 3;
 
                 let otherVanguardCount = 0;
                 for (let i = startVanguardIdx; i < endVanguardIdx; i++) {
@@ -726,17 +737,45 @@ function toggleShipFilter(btnEl) {
     }
 }
 
+function getAvailableShipFactions(slotType) {
+    const available = new Set();
+    const ships = window.shipDetails || (typeof shipDetails !== 'undefined' ? shipDetails : null);
+    if (!ships) return available;
+
+    for (let cat in ships) {
+        let catUpper = cat.toUpperCase();
+        let isSlotMatch = false;
+
+        if (slotType === "SUB" && SUBMARINE_SHIP_TYPES.includes(catUpper)) isSlotMatch = true;
+        else if (slotType === "VANGUARD" && VANGUARD_SHIP_TYPES.includes(catUpper)) isSlotMatch = true;
+        else if (slotType === "MAIN" && MAIN_SHIP_TYPES.includes(catUpper)) isSlotMatch = true;
+
+        if (!isSlotMatch) continue;
+
+        let scan = (obj) => {
+            for (let k in obj) {
+                let item = obj[k];
+                if (item && typeof item === 'object') {
+                    if (item.name && item.faction) {
+                        available.add(item.faction);
+                    } else {
+                        scan(item);
+                    }
+                }
+            }
+        };
+        scan(ships[cat]);
+    }
+    return available;
+}
+
 function buildShipFilterHtml() {
-    const factions = [
-        "Universal", "Eagle Union", "Royal Navy", "Heavy Sakura", "Ironblood",
-        "Dragon Empery", "Sardegna Empire", "Northern Parliament",
-        "Iris Libre", "Vichya Dominion", "Kingdom of Tulipia",
-        "Liga de Pedrería", "META", "Tempesta", "Atelier Ryza"
-    ];
+    let slotType = getSlotCategoryType(selectingSlotIndex);
+    const availableFactions = getAvailableShipFactions(slotType);
+
+    const factions = MASTER_FACTION_ORDER.filter(f => availableFactions.has(f));
 
     let types = [];
-    let slotType = getSlotCategoryType(selectingSlotIndex);
-
     if (slotType === "SUB") {
         types = [
             { label: "Submarine", code: "SS" },
@@ -1015,13 +1054,6 @@ function renderShipListOnly() {
         </div>
     `;
 
-    const factionOrder = [
-        "Universal", "Eagle Union", "Royal Navy", "Heavy Sakura", "Ironblood",
-        "Dragon Empery", "Sardegna Empire", "Northern Parliament",
-        "Iris Libre", "Vichya Dominion", "Kingdom of Tulipia",
-        "Liga de Pedrería", "META", "Tempesta", "Atelier Ryza"
-    ];
-
     let slotType = getSlotCategoryType(selectingSlotIndex);
     let typeOrder = [];
     if (slotType === "SUB") {
@@ -1063,8 +1095,8 @@ function renderShipListOnly() {
         let rB = getRarityTierRank(b.data.rarity);
         if (rA !== rB) return rA - rB;
 
-        let fA = factionOrder.indexOf(a.data.faction);
-        let fB = factionOrder.indexOf(b.data.faction);
+        let fA = MASTER_FACTION_ORDER.indexOf(a.data.faction);
+        let fB = MASTER_FACTION_ORDER.indexOf(b.data.faction);
         if (fA === -1) fA = 99;
         if (fB === -1) fB = 99;
         if (fA !== fB) return fA - fB;
@@ -1297,13 +1329,60 @@ function resetEquipFilterState() {
     equipFilterRarity = new Set(['ALL']);
 }
 
+function getAvailableEquipFactions(allowedCategories, shipInfo) {
+    const available = new Set();
+    const details = window.equipDetails || (typeof equipDetails !== 'undefined' ? equipDetails : null);
+    if (!details) return available;
+
+    allowedCategories.forEach(category => {
+        let targetDataCategory = category;
+        if (category === "CA-gun" || category === "CB-gun") targetDataCategory = "CA-gun";
+        else if (category === "Surface Torpedo" || category === "Guided Missile") targetDataCategory = "Surface Torpedo";
+        else if (category === "AA-gun" || category === "AA-Gun (Time Fuze)") targetDataCategory = "AA-gun";
+
+        if (details[targetDataCategory]) {
+            let scan = (obj) => {
+                for (let k in obj) {
+                    let eqData = obj[k];
+                    if (eqData && typeof eqData === 'object') {
+                        if (eqData.name && eqData.code) {
+                            let actualCategory = category;
+                            if (targetDataCategory === "CA-gun") actualCategory = (eqData.gunType === "cb") ? "CB-gun" : "CA-gun";
+                            else if (targetDataCategory === "Surface Torpedo") actualCategory = (eqData.torpType === "gm") ? "Guided Missile" : "Surface Torpedo";
+                            else if (targetDataCategory === "AA-gun") actualCategory = (eqData.gunType === "aatf") ? "AA-Gun (Time Fuze)" : "AA-gun";
+
+                            if (category === "CA-gun" && actualCategory !== "CA-gun") return;
+                            if (category === "CB-gun" && actualCategory !== "CB-gun") return;
+                            if (category === "Surface Torpedo" && actualCategory !== "Surface Torpedo") return;
+                            if (category === "Guided Missile" && actualCategory !== "Guided Missile") return;
+                            if (category === "AA-gun" && actualCategory !== "AA-gun") return;
+                            if (category === "AA-Gun (Time Fuze)" && actualCategory !== "AA-Gun (Time Fuze)") return;
+
+                            let equipableList = eqData.equippable || eqData.equipable;
+                            let isAllowed = (!equipableList || !Array.isArray(equipableList) || equipableList.length === 0 || equipableList.includes("All") || equipableList.includes(shipInfo.type));
+                            let unequippableList = eqData.unequippable || eqData.unequipList;
+                            if (unequippableList && Array.isArray(unequippableList) && unequippableList.includes(shipInfo.type)) isAllowed = false;
+
+                            if (isAllowed) {
+                                available.add(eqData.faction || "Universal");
+                            }
+                        } else {
+                            scan(eqData);
+                        }
+                    }
+                }
+            };
+            scan(details[targetDataCategory]);
+        }
+    });
+    return available;
+}
+
 function buildEquipFilterHtml(allowedCategories) {
-    const factions = [
-        "Universal", "Eagle Union", "Royal Navy", "Heavy Sakura", "Ironblood",
-        "Dragon Empery", "Sardegna Empire", "Northern Parliament",
-        "Iris Libre", "Vichya Dominion", "Iris Orthodoxy", "Kingdom of Tulipia",
-        "Liga de Pedrería", "META", "Tempesta", "Atelier Ryza"
-    ];
+    let shipInfo = (selectingSlotIndex !== -1 && fleetState[selectingSlotIndex].shipId) ? getProcessedShipData(selectingSlotIndex) : null;
+    const availableFactions = shipInfo ? getAvailableEquipFactions(allowedCategories, shipInfo) : new Set(MASTER_FACTION_ORDER);
+
+    const factions = MASTER_FACTION_ORDER.filter(f => availableFactions.has(f));
 
     const rarities = [
         { label: "Ultra Rare", code: "rainbow", cls: "rarity-decisive" },
@@ -1576,13 +1655,6 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
         </div>
     `;
 
-    const equipFactionOrder = [
-        "Universal", "Eagle Union", "Royal Navy", "Heavy Sakura", "Ironblood",
-        "Dragon Empery", "Sardegna Empire", "Northern Parliament",
-        "Iris Libre", "Vichya Dominion", "Iris Orthodoxy", "Kingdom of Tulipia",
-        "Liga de Pedrería", "META", "Tempesta", "Atelier Ryza"
-    ];
-
     let allEquipsList = [];
     const details = window.equipDetails || (typeof equipDetails !== 'undefined' ? equipDetails : null);
 
@@ -1673,8 +1745,8 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
 
         let fAStr = a.data.faction || 'Universal';
         let fBStr = b.data.faction || 'Universal';
-        let fA = equipFactionOrder.indexOf(fAStr);
-        let fB = equipFactionOrder.indexOf(fBStr);
+        let fA = MASTER_FACTION_ORDER.indexOf(fAStr);
+        let fB = MASTER_FACTION_ORDER.indexOf(fBStr);
         if (fA === -1) fA = 99;
         if (fB === -1) fB = 99;
         if (fA !== fB) return fA - fB;
