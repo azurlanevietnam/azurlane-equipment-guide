@@ -195,12 +195,22 @@ function getShipTypeAndData(shipId) {
 }
 
 function getShipIconUrl(shipId, shipData) {
-    if (shipId.endsWith('_kai')) {
-        return `https://cdn.nagami.moe/squareicon/${shipData.code}.png`;
-    } else {
-        const formattedName = shipData.name.replace(/ /g, '_');
-        return `https://azurlane.netojuu.com/images/${shipData.code}/${formattedName}Icon.png`;
+    if (shipData.code) {
+        if (shipId.endsWith('_kai')) {
+            return `https://cdn.nagami.moe/squareicon/${shipData.code}.png`;
+        } else {
+            const formattedName = shipData.name.replace(/ /g, '_');
+            return `https://azurlane.netojuu.com/images/${shipData.code}/${formattedName}Icon.png`;
+        }
     }
+    return shipData.code2 || "";
+}
+
+function getEquipIconUrl(eqData) {
+    if (eqData.code) {
+        return `https://azurlane.netojuu.com/images/${eqData.code}.png`;
+    }
+    return eqData.code2 || "";
 }
 
 function getAffinityDisplay(affinityKey) {
@@ -356,6 +366,45 @@ function getProcessedShipData(fleetSlotIndex) {
                 });
 
                 if (factionEquipCount >= minCount) {
+                    let currentEff = parseInt(shipDataCopy.slotEff[targetSlot], 10) || 0;
+                    shipDataCopy.slotEff[targetSlot] = String(currentEff + bonusVal);
+                    shipDataCopy._modifiedEffIndices[targetSlot] = true;
+                }
+            }
+
+            if (rule.type === "FACTION_OR_FLEET_FACTION_SLOT_EFF_BONUS") {
+                let targetSlot = rule.targetSlotIndex !== undefined ? rule.targetSlotIndex : 0;
+                let requiredFaction = rule.requiredFaction || "Heavy Sakura";
+                let bonusVal = rule.bonus || 10;
+                let isSatisfied = false;
+                for (let eq of slot.equips) {
+                    if (eq && eq.id) {
+                        let eqData = getEquipDataGlobal(eq.category, eq.id);
+                        if (eqData && eqData.faction === requiredFaction) {
+                            isSatisfied = true;
+                            break;
+                        }
+                    }
+                }
+                if (!isSatisfied) {
+                    const fleetGroupIdx = getFleetGroupIndex(fleetSlotIndex);
+                    const startIdx = fleetGroupIdx * 9;
+                    for (let i = 0; i < 6; i++) {
+                        let checkSlotIdx = startIdx + i;
+                        if (checkSlotIdx !== fleetSlotIndex) {
+                            let sData = fleetState[checkSlotIdx];
+                            if (sData && sData.shipId) {
+                                let info = getShipTypeAndData(sData.shipId);
+                                if (info && info.data && info.data.faction === requiredFaction) {
+                                    isSatisfied = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (isSatisfied) {
                     let currentEff = parseInt(shipDataCopy.slotEff[targetSlot], 10) || 0;
                     shipDataCopy.slotEff[targetSlot] = String(currentEff + bonusVal);
                     shipDataCopy._modifiedEffIndices[targetSlot] = true;
@@ -831,9 +880,13 @@ function buildShipFilterHtml() {
         }
 
         let iconHtml = "";
-        if (labelEntry && labelEntry.code) {
-            const iconUrl = `https://azurlane.netojuu.com/images/${labelEntry.code}_1.png`;
-            iconHtml = `<img src="${iconUrl}" alt="${f}" style="height: 36px; width: auto; vertical-align: middle; margin-left: 8px; object-fit: contain; filter: invert(1) brightness(2);">`;
+        if (labelEntry) {
+            if (labelEntry.code) {
+                const iconUrl = `https://azurlane.netojuu.com/images/${labelEntry.code}_1.png`;
+                iconHtml = `<img src="${iconUrl}" alt="${f}" style="height: 36px; width: auto; vertical-align: middle; margin-left: 8px; object-fit: contain; filter: invert(1) brightness(2);">`;
+            } else if (labelEntry.code2) {
+                iconHtml = `<img src="${labelEntry.code2}" alt="${f}" style="height: 36px; width: auto; vertical-align: middle; margin-left: 8px; object-fit: contain; filter: invert(1) brightness(2);">`;
+            }
         }
 
         factionBtns += `<button type="button" class="filter-btn ${active}" onclick="selectShipFactionFilter('${f}')">${f} ${iconHtml}</button>`;
@@ -864,9 +917,13 @@ function buildShipFilterHtml() {
         }
 
         let iconHtml = "";
-        if (labelEntry && labelEntry.code) {
-            const iconUrl = `https://azurlane.netojuu.com/images/${labelEntry.code}/${lookupCode}_img0.png`;
-            iconHtml = `<img src="${iconUrl}" alt="${lookupCode}" style="width: 39px; height: 24px; vertical-align: middle; margin-left: 8px; object-fit: contain;">`;
+        if (labelEntry) {
+            if (labelEntry.code) {
+                const iconUrl = `https://azurlane.netojuu.com/images/${labelEntry.code}/${lookupCode}_img0.png`;
+                iconHtml = `<img src="${iconUrl}" alt="${lookupCode}" style="width: 39px; height: 24px; vertical-align: middle; margin-left: 8px; object-fit: contain;">`;
+            } else if (labelEntry.code2) {
+                iconHtml = `<img src="${labelEntry.code2}" alt="${lookupCode}" style="width: 39px; height: 24px; vertical-align: middle; margin-left: 8px; object-fit: contain;">`;
+            }
         }
 
         typeBtns += `<button type="button" class="filter-btn ${active}" onclick="selectShipTypeFilter('${t.code}')">${t.label} ${iconHtml}</button>`;
@@ -1073,7 +1130,7 @@ function renderShipListOnly() {
                 for (let shipId in shipObj) {
                     let shipData = shipObj[shipId];
 
-                    if (shipData && typeof shipData === 'object' && !shipData.code && !shipData.name) {
+                    if (shipData && typeof shipData === 'object' && !shipData.code && !shipData.code2 && !shipData.name) {
                         processShipEntries(shipData);
                         continue;
                     }
@@ -1345,7 +1402,7 @@ function getAvailableEquipFactions(allowedCategories, shipInfo) {
                 for (let k in obj) {
                     let eqData = obj[k];
                     if (eqData && typeof eqData === 'object') {
-                        if (eqData.name && eqData.code) {
+                        if (eqData.name && (eqData.code || eqData.code2)) {
                             let actualCategory = category;
                             if (targetDataCategory === "CA-gun") actualCategory = (eqData.gunType === "cb") ? "CB-gun" : "CA-gun";
                             else if (targetDataCategory === "Surface Torpedo") actualCategory = (eqData.torpType === "gm") ? "Guided Missile" : "Surface Torpedo";
@@ -1409,9 +1466,13 @@ function buildEquipFilterHtml(allowedCategories) {
             }
 
             let iconHtml = "";
-            if (labelEntry && labelEntry.code) {
-                const iconUrl = `https://azurlane.netojuu.com/images/${labelEntry.code}.png`;
-                iconHtml = `<img src="${iconUrl}" alt="${cat}" style="max-width: 36px; max-height: 36px; width: auto; height: auto; vertical-align: middle; margin-left: 8px; object-fit: contain;">`;
+            if (labelEntry) {
+                if (labelEntry.code) {
+                    const iconUrl = `https://azurlane.netojuu.com/images/${labelEntry.code}.png`;
+                    iconHtml = `<img src="${iconUrl}" alt="${cat}" style="max-width: 36px; max-height: 36px; width: auto; height: auto; vertical-align: middle; margin-left: 8px; object-fit: contain;">`;
+                } else if (labelEntry.code2) {
+                    iconHtml = `<img src="${labelEntry.code2}" alt="${cat}" style="max-width: 36px; max-height: 36px; width: auto; height: auto; vertical-align: middle; margin-left: 8px; object-fit: contain;">`;
+                }
             }
 
             categoryBtns += `<button type="button" class="filter-btn ${active}" onclick="selectEquipCategoryFilter('${cat}', false)">${cat} ${iconHtml}</button>`;
@@ -1431,9 +1492,13 @@ function buildEquipFilterHtml(allowedCategories) {
         }
 
         let iconHtml = "";
-        if (labelEntry && labelEntry.code) {
-            const iconUrl = `https://azurlane.netojuu.com/images/${labelEntry.code}.png`;
-            iconHtml = `<img src="${iconUrl}" alt="${singleCat}" style="max-width: 36px; max-height: 36px; width: auto; height: auto; vertical-align: middle; margin-left: 8px; object-fit: contain;">`;
+        if (labelEntry) {
+            if (labelEntry.code) {
+                const iconUrl = `https://azurlane.netojuu.com/images/${labelEntry.code}.png`;
+                iconHtml = `<img src="${iconUrl}" alt="${singleCat}" style="max-width: 36px; max-height: 36px; width: auto; height: auto; vertical-align: middle; margin-left: 8px; object-fit: contain;">`;
+            } else if (labelEntry.code2) {
+                iconHtml = `<img src="${labelEntry.code2}" alt="${singleCat}" style="max-width: 36px; max-height: 36px; width: auto; height: auto; vertical-align: middle; margin-left: 8px; object-fit: contain;">`;
+            }
         }
 
         categoryBtns += `<button type="button" class="filter-btn active" onclick="selectEquipCategoryFilter('${singleCat}', true)">${singleCat} ${iconHtml}</button>`;
@@ -1454,12 +1519,15 @@ function buildEquipFilterHtml(allowedCategories) {
         }
 
         let iconHtml = "";
-        if (labelEntry && labelEntry.code) {
-            const iconUrl = (f === "Iris Orthodoxy")
-                ? `https://azurlane.netojuu.com/images/${labelEntry.code}.png`
-                : `https://azurlane.netojuu.com/images/${labelEntry.code}_1.png`;
-
-            iconHtml = `<img src="${iconUrl}" alt="${f}" style="height: 36px; width: auto; vertical-align: middle; margin-left: 8px; object-fit: contain; filter: invert(1) brightness(2);">`;
+        if (labelEntry) {
+            if (labelEntry.code) {
+                const iconUrl = (f === "Iris Orthodoxy")
+                    ? `https://azurlane.netojuu.com/images/${labelEntry.code}.png`
+                    : `https://azurlane.netojuu.com/images/${labelEntry.code}_1.png`;
+                iconHtml = `<img src="${iconUrl}" alt="${f}" style="height: 36px; width: auto; vertical-align: middle; margin-left: 8px; object-fit: contain; filter: invert(1) brightness(2);">`;
+            } else if (labelEntry.code2) {
+                iconHtml = `<img src="${labelEntry.code2}" alt="${f}" style="height: 36px; width: auto; vertical-align: middle; margin-left: 8px; object-fit: contain; filter: invert(1) brightness(2);">`;
+            }
         }
 
         factionBtns += `<button type="button" class="filter-btn ${active}" onclick="selectEquipFactionFilter('${f}')">${f} ${iconHtml}</button>`;
@@ -1675,7 +1743,7 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
                 for (let eqId of Object.keys(equipObj)) {
                     let eqData = equipObj[eqId];
 
-                    if (eqData && typeof eqData === 'object' && !eqData.code && !eqData.name) {
+                    if (eqData && typeof eqData === 'object' && !eqData.code && !eqData.code2 && !eqData.name) {
                         processEquipEntries(eqData);
                         continue;
                     }
@@ -1771,7 +1839,7 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
         }
 
         let safeName = item.displayName.replace(/"/g, '&quot;');
-        let iconUrl = `https://azurlane.netojuu.com/images/${eqData.code}.png`;
+        let iconUrl = getEquipIconUrl(eqData);
         let boxClass = eqData.box ? `box-${eqData.box}` : "box-grey";
 
         let isLimitedOnShip = limitedEquipsOnCurrentShip.has(eqId);
@@ -2122,7 +2190,7 @@ function renderFleetSlotRow(index) {
 
         if (isShipSelected && eqSave && eqSave.id && eqData) {
             let boxClass = eqData.box ? `box-${eqData.box}` : "box-grey";
-            let iconUrl = `https://azurlane.netojuu.com/images/${eqData.code}.png`;
+            let iconUrl = getEquipIconUrl(eqData);
             let enhanceVal = eqSave.enhance !== undefined ? eqSave.enhance : 0;
 
             equipsHtml += `

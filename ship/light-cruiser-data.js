@@ -47,6 +47,18 @@ shipDetails["CL"] = {
             slotAmount: [3, 1, 1],
             slotEff: ["120", "165", "130"]
         },
+        "tiger": {
+            name: "Belfast Kai",
+            source: ["Belfast + Sealane Protector Event Reward"],
+            faction: "Royal Navy",
+            rarity: "Ultra Rare",
+            code: "",
+            code2: "https://azlassets.nagami.moe/squareicon/hu.png",
+            box: "rainbow",
+            equipSlot: [["CLGM"], ["CLGM"], ["AAGM"]],
+            slotAmount: [1, 1, 2],
+            slotEff: ["135", "135", "150"],
+        },
     },
     "purple_cl": {
         "aurora": {

@@ -61,6 +61,26 @@ shipDetails["BB"] = {
                 }
             ]
         },
+        "azuchi": {
+            name: "Azuchi",
+            source: ["Tales of the Paranormal Event Build"],
+            faction: "Heavy Sakura",
+            rarity: "Ultra Rare",
+            code: "",
+            code2: "https://azlassets.nagami.moe/squareicon/antu.png",
+            box: "rainbow",
+            equipSlot: [["BBGM"], ["CLGM", "DDGM"], ["AAGM", "AATFGM"]],
+            slotAmount: [3, 3, 1],
+            slotEff: ["155", "200", "100"],
+            customRules: [
+                {
+                    type: "FACTION_OR_FLEET_FACTION_SLOT_EFF_BONUS",
+                    targetSlotIndex: 0,
+                    requiredFaction: "Heavy Sakura",
+                    bonus: 10
+                }
+            ]
+        },
         "musashi": {
             name: "Musashi",
             source: ["Heavy + Special Build", "UR Exchange"],
