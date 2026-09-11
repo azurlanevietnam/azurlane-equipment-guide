@@ -48,12 +48,11 @@ shipDetails["CL"] = {
             slotEff: ["120", "165", "130"]
         },
         "tiger": {
-            name: "Belfast Kai",
+            name: "Tiger",
             source: ["Belfast + Sealane Protector Event Reward"],
             faction: "Royal Navy",
             rarity: "Ultra Rare",
-            code: "",
-            code2: "https://azlassets.nagami.moe/squareicon/hu.png",
+            code: "e/e0",
             box: "rainbow",
             equipSlot: [["CLGM"], ["CLGM"], ["AAGM"]],
             slotAmount: [1, 1, 2],

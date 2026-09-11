@@ -27,8 +27,8 @@ equipDetails["CL-gun"] = {
             box: "rainbow"
         },
         "twin-152-mk-xxvi": {
-            name: "Twin 152mm (QF 6\" Mk. XXVI)",
-            tier: "SS-",
+            name: "Twin 152mm (QF 6\" Mk XXVI)",
+            tier: "SS",
             source: ["Tales of the Paranormal Event Shop"],
             faction: "Royal Navy",
             unequippable: ["BBV", "BM", "AR", "AE", "SSV", "IXs", "IXv", "IXm"],
@@ -41,8 +41,7 @@ equipDetails["CL-gun"] = {
             coef: 1.36,
             linkTab: 0,
             desc: [""],
-            code: "",
-            code2: "https://azlassets.nagami.moe/equips/22300.png",
+            code: "4/41/22300",
             box: "rainbow"
         }
     },
@@ -101,7 +100,7 @@ equipDetails["CL-gun"] = {
             code: "5/5e/22260",
             box: "yellow"
         },
-        "twin-152-mk-xxvi": {
+        "twin-152-mk-xxvi-t3": {
             name: "Twin 152mm (QF 6\" Mk. XXVI)",
             tier: "N/A",
             source: ["Tales of the Paranormal Event Reward, Shop, Drop"],
@@ -114,10 +113,9 @@ equipDetails["CL-gun"] = {
             dmg: ["2", "30"],
             range: "70",
             coef: 1.36,
-            linkTab: 0,
+            linkTab: 3,
             desc: [""],
-            code: "",
-            code2: "https://azlassets.nagami.moe/equips/22300.png",
+            code: "4/41/22300",
             box: "yellow"
         },
         "triple-150-t5p": {
