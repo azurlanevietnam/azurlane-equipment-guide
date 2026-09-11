@@ -458,7 +458,7 @@ equipDetails["CA-gun"] = {
         },
     },
     "purple_cagm": {
-        "twin-203-skc34": {
+        "twin-203-skc34-t2": {
             name: "Twin 203mm (SK C/34)",
             gunType: "ca",
             tier: "N/A",

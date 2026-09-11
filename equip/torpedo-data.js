@@ -177,7 +177,7 @@ equipDetails["Surface Torpedo"] = {
             tier: "N/A",
             source: ["Gear Lab"],
             faction: "Heavy Sakura",
-            equippable: ["DD", "CL", "CA", "CB", "BC"],
+            equippable: ["CL", "CA", "CB"],
             stats: ["TRP +45"],
             ammoType: "Torp",
             ammoMod: "80% / 100% / 130%",
@@ -209,7 +209,7 @@ equipDetails["Surface Torpedo"] = {
             code: "5/51/45100",
             box: "yellow"
         },
-        "quint-533-hom": {
+        "quint-533-hom-t3": {
             name: "533mm Quintuple Homing Torpedo Mount",
             torpType: "trp",
             tier: "N/A",
