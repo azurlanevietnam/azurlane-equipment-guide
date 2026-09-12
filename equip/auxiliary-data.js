@@ -148,6 +148,19 @@ equipDetails["Auxiliary"] = {
             code: "6/67/2700",
             box: "yellow"
         },
+        "FuMO-25": {
+            name: "Funkmess-Ortung 25 Radar",
+            tier: "N/A",
+            source: ["Core Data Shop"],
+            faction: "Ironblood",
+            stats: ["FP +32", "ACC +35"],
+            equippable: ["CL", "CA", "CB", "BC", "BB", "BBV", "BM", "AE"],
+            limit: 1,
+            linkTab: 0,
+            desc: [""],
+            code: "0/0f/960",
+            box: "yellow"
+        },
         "fairy_magic_poster": {
             name: "\"Fairy Magic\" Poster",
             tier: "N/A",

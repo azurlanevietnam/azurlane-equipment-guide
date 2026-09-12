@@ -49,7 +49,7 @@ shipDetails["BB"] = {
             rarity: "Ultra Rare",
             code: "yanzhan_g",
             box: "rainbow",
-            equipSlot: [["BBGM"], ["CLGM", "DDGM"], ["AAGM", "AATFGM"]],
+            equipSlot: [["BBGM"], ["CLGM", "DDGM"], ["AAGM", "AATFGM"], ["ASWA"]],
             slotAmount: [3, 3, 1],
             slotEff: ["140", "200", "115"],
             customRules: [

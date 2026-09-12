@@ -187,5 +187,21 @@ window.labelDetails = {
             name: "Auxiliary",
             code: "d/d5/2400"
         },
+        "ASW (Surface)": {
+            name: "ASW (Surface)",
+            code: "4/42/25800"
+        },
+        "ASW (Airborne)": {
+            name: "ASW (Airborne)",
+            code: "4/42/4260"
+        },
+        "ASW (Koln)": {
+            name: "ASW (Koln)",
+            code: "c/c7/740"
+        },
+        "Cargo": {
+            name: "Cargo",
+            code: "d/d1/3400"
+        }
     }
 };

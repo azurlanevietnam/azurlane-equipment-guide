@@ -15,6 +15,10 @@ const AATFGM = "AA-Gun (Time Fuze)";
 const TRPM = "Surface Torpedo";
 const GMM = "Guided Missile";
 const AUX = "Auxiliary";
+const ASWS = "ASW (Surface)";
+const ASWA = "ASW (Airborne)";
+const ASWK = "ASW (Koln)";
+const CARGO = "Cargo";
 const AUG = "Augmentation";
 
 const categories = [
@@ -49,6 +53,7 @@ const dataFiles = [
     'torp-bomber-data.js',
     'seaplane-data.js',
     'asw-data.js',
+    'cargo-data.js',
     'auxiliary-data.js',
     'augmentation-data.js'
 ];

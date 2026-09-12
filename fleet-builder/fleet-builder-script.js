@@ -54,7 +54,11 @@ const MAP_EQUIP_CATEGORY = {
     "TB": "Torpedo Bomber",
     "SP": "Seaplane",
     "AUX": "Auxiliary",
-    "AUG": "Augmentation"
+    "AUG": "Augmentation",
+    "ASWS": "ASW (Surface)",
+    "ASWA": "ASW (Airborne)",
+    "ASWK": "ASW (Koln)",
+    "CARGO": "Cargo"
 };
 
 function loadHeaderHiddenState() {
@@ -266,7 +270,40 @@ function applyAntiShiftPadding(isModalOpen) {
 
 function getSlotAllowedCategories(shipInfo, slotIndex) {
     if (slotIndex === 5) return ["Augmentation"];
-    if (slotIndex === 3 || slotIndex === 4) return ["Auxiliary"];
+
+    if (slotIndex === 3 || slotIndex === 4) {
+        let allowed = ["Auxiliary"];
+        if (shipInfo && shipInfo.data && shipInfo.data.equipSlot && shipInfo.data.equipSlot[3]) {
+            let shipId = fleetState[selectingSlotIndex] ? fleetState[selectingSlotIndex].shipId : null;
+            let isWarspiteKai = shipId === "warspite_kai" || (shipInfo.data && (shipInfo.data.code === "yanzhan_g" || shipInfo.data.name === "Warspite Kai"));
+            let isKolnSpecial = shipId === "köln_kai" || shipId === "köln_meta";
+
+            let extraSlots = shipInfo.data.equipSlot[3] || [];
+            extraSlots.forEach(code => {
+                let mapped = MAP_EQUIP_CATEGORY[code] || code;
+
+                // Riêng Warspite Kai: ASWA chỉ có thể trang bị ở slot index 4
+                if (isWarspiteKai && mapped === "ASW (Airborne)" && slotIndex !== 4) {
+                    return;
+                }
+
+                // Riêng Köln Kai & Köln META: ASWK chỉ có thể trang bị ở slot index 3
+                if (isKolnSpecial && mapped === "ASW (Koln)" && slotIndex !== 3) {
+                    return;
+                }
+
+                // Chặn toàn bộ các tàu khác không phải köln_kai hoặc köln_meta
+                if (!isKolnSpecial && mapped === "ASW (Koln)") {
+                    return;
+                }
+
+                if (!allowed.includes(mapped)) {
+                    allowed.push(mapped);
+                }
+            });
+        }
+        return allowed;
+    }
 
     if (!shipInfo || !shipInfo.data || !shipInfo.data.equipSlot) return [];
 
@@ -283,6 +320,8 @@ function getEquipDataGlobal(category, eqId) {
     if (category === "CA-gun" || category === "CB-gun" || category === "CAGM" || category === "CBGM") targetCat = "CA-gun";
     else if (category === "Surface Torpedo" || category === "Guided Missile" || category === "TRPM" || category === "GMM") targetCat = "Surface Torpedo";
     else if (category === "AA-gun" || category === "AA-Gun (Time Fuze)" || category === "AAGM" || category === "AATFGM") targetCat = "AA-gun";
+    else if (category === "ASW (Surface)" || category === "ASW (Airborne)" || category === "ASW (Koln)" || category === "ASW" || category === "ASWS" || category === "ASWA" || category === "ASWK") targetCat = "ASW";
+    else if (category === "Cargo" || category === "CARGO") targetCat = "Cargo";
 
     function searchItem(obj) {
         if (!obj || typeof obj !== 'object') return null;
@@ -372,45 +411,6 @@ function getProcessedShipData(fleetSlotIndex) {
                 }
             }
 
-            if (rule.type === "FACTION_OR_FLEET_FACTION_SLOT_EFF_BONUS") {
-                let targetSlot = rule.targetSlotIndex !== undefined ? rule.targetSlotIndex : 0;
-                let requiredFaction = rule.requiredFaction || "Heavy Sakura";
-                let bonusVal = rule.bonus || 10;
-                let isSatisfied = false;
-                for (let eq of slot.equips) {
-                    if (eq && eq.id) {
-                        let eqData = getEquipDataGlobal(eq.category, eq.id);
-                        if (eqData && eqData.faction === requiredFaction) {
-                            isSatisfied = true;
-                            break;
-                        }
-                    }
-                }
-                if (!isSatisfied) {
-                    const fleetGroupIdx = getFleetGroupIndex(fleetSlotIndex);
-                    const startIdx = fleetGroupIdx * 9;
-                    for (let i = 0; i < 6; i++) {
-                        let checkSlotIdx = startIdx + i;
-                        if (checkSlotIdx !== fleetSlotIndex) {
-                            let sData = fleetState[checkSlotIdx];
-                            if (sData && sData.shipId) {
-                                let info = getShipTypeAndData(sData.shipId);
-                                if (info && info.data && info.data.faction === requiredFaction) {
-                                    isSatisfied = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (isSatisfied) {
-                    let currentEff = parseInt(shipDataCopy.slotEff[targetSlot], 10) || 0;
-                    shipDataCopy.slotEff[targetSlot] = String(currentEff + bonusVal);
-                    shipDataCopy._modifiedEffIndices[targetSlot] = true;
-                }
-            }
-
             if (rule.type === "MULTIPLE_SHIP_TYPE_SLOT_EFF_BONUS") {
                 let targetSlot = rule.targetSlotIndex;
                 let requiredType = rule.requiredShipType;
@@ -482,6 +482,48 @@ function getProcessedShipData(fleetSlotIndex) {
                 }
 
                 if (otherVanguardCount >= minCount) {
+                    let currentEff = parseInt(shipDataCopy.slotEff[targetSlot], 10) || 0;
+                    shipDataCopy.slotEff[targetSlot] = String(currentEff + bonusVal);
+                    shipDataCopy._modifiedEffIndices[targetSlot] = true;
+                }
+            }
+
+            if (rule.type === "FACTION_OR_FLEET_FACTION_SLOT_EFF_BONUS") {
+                let targetSlot = rule.targetSlotIndex !== undefined ? rule.targetSlotIndex : 0;
+                let requiredFaction = rule.requiredFaction || "Heavy Sakura";
+                let bonusVal = rule.bonus || 10;
+                let isSatisfied = false;
+
+                for (let eq of slot.equips) {
+                    if (eq && eq.id) {
+                        let eqData = getEquipDataGlobal(eq.category, eq.id);
+                        if (eqData && eqData.faction === requiredFaction) {
+                            isSatisfied = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!isSatisfied) {
+                    const fleetGroupIdx = getFleetGroupIndex(fleetSlotIndex);
+                    const startIdx = fleetGroupIdx * 9;
+
+                    for (let i = 0; i < 6; i++) {
+                        let checkSlotIdx = startIdx + i;
+                        if (checkSlotIdx !== fleetSlotIndex) {
+                            let sData = fleetState[checkSlotIdx];
+                            if (sData && sData.shipId) {
+                                let info = getShipTypeAndData(sData.shipId);
+                                if (info && info.data && info.data.faction === requiredFaction) {
+                                    isSatisfied = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (isSatisfied) {
                     let currentEff = parseInt(shipDataCopy.slotEff[targetSlot], 10) || 0;
                     shipDataCopy.slotEff[targetSlot] = String(currentEff + bonusVal);
                     shipDataCopy._modifiedEffIndices[targetSlot] = true;
@@ -1396,6 +1438,8 @@ function getAvailableEquipFactions(allowedCategories, shipInfo) {
         if (category === "CA-gun" || category === "CB-gun") targetDataCategory = "CA-gun";
         else if (category === "Surface Torpedo" || category === "Guided Missile") targetDataCategory = "Surface Torpedo";
         else if (category === "AA-gun" || category === "AA-Gun (Time Fuze)") targetDataCategory = "AA-gun";
+        else if (category === "ASW (Surface)" || category === "ASW (Airborne)" || category === "ASW (Koln)") targetDataCategory = "ASW";
+        else if (category === "Cargo") targetDataCategory = "Cargo";
 
         if (details[targetDataCategory]) {
             let scan = (obj) => {
@@ -1407,6 +1451,12 @@ function getAvailableEquipFactions(allowedCategories, shipInfo) {
                             if (targetDataCategory === "CA-gun") actualCategory = (eqData.gunType === "cb") ? "CB-gun" : "CA-gun";
                             else if (targetDataCategory === "Surface Torpedo") actualCategory = (eqData.torpType === "gm") ? "Guided Missile" : "Surface Torpedo";
                             else if (targetDataCategory === "AA-gun") actualCategory = (eqData.gunType === "aatf") ? "AA-Gun (Time Fuze)" : "AA-gun";
+                            else if (targetDataCategory === "ASW") {
+                                if (eqData.aswType === "surface" || eqData.aswType === "dc" || eqData.aswType === "sonar") actualCategory = "ASW (Surface)";
+                                else if (eqData.aswType === "airborne") actualCategory = "ASW (Airborne)";
+                                else if (eqData.aswType === "koln") actualCategory = "ASW (Koln)";
+                                else actualCategory = "ASW";
+                            }
 
                             if (category === "CA-gun" && actualCategory !== "CA-gun") return;
                             if (category === "CB-gun" && actualCategory !== "CB-gun") return;
@@ -1414,6 +1464,9 @@ function getAvailableEquipFactions(allowedCategories, shipInfo) {
                             if (category === "Guided Missile" && actualCategory !== "Guided Missile") return;
                             if (category === "AA-gun" && actualCategory !== "AA-gun") return;
                             if (category === "AA-Gun (Time Fuze)" && actualCategory !== "AA-Gun (Time Fuze)") return;
+                            if (category === "ASW (Surface)" && actualCategory !== "ASW (Surface)") return;
+                            if (category === "ASW (Airborne)" && actualCategory !== "ASW (Airborne)") return;
+                            if (category === "ASW (Koln)" && actualCategory !== "ASW (Koln)") return;
 
                             let equipableList = eqData.equippable || eqData.equipable;
                             let isAllowed = (!equipableList || !Array.isArray(equipableList) || equipableList.length === 0 || equipableList.includes("All") || equipableList.includes(shipInfo.type));
@@ -1674,6 +1727,8 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
 
     let limitedEquipsOnCurrentShip = new Set();
     let fleetEquipCounts = {};
+    let sonarCountOnShip = 0;
+    let cargoCountOnShip = 0;
 
     const PAIR_LIMIT_GROUPS = [
         ["hpfcr", "admiralty_fct"]
@@ -1701,6 +1756,16 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
 
     currentShipEquips.forEach((eq, eqIdx) => {
         if (eq && eq.id && eqIdx !== selectingEquipSlotIndex) {
+            let eqData = getEquipDataGlobal(eq.category, eq.id);
+            if (eqData) {
+                if (eqData.aswType === 'sonar') {
+                    sonarCountOnShip++;
+                }
+                if (eq.category === 'Cargo' || eqData.category === 'Cargo') {
+                    cargoCountOnShip++;
+                }
+            }
+
             PAIR_LIMIT_GROUPS.forEach(group => {
                 if (group.includes(eq.id)) {
                     group.forEach(itemId => {
@@ -1734,6 +1799,10 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
             targetDataCategory = "Surface Torpedo";
         } else if (category === "AA-gun" || category === "AA-Gun (Time Fuze)") {
             targetDataCategory = "AA-gun";
+        } else if (category === "ASW (Surface)" || category === "ASW (Airborne)" || category === "ASW (Koln)") {
+            targetDataCategory = "ASW";
+        } else if (category === "Cargo") {
+            targetDataCategory = "Cargo";
         }
 
         if (details && details[targetDataCategory]) {
@@ -1761,6 +1830,12 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
                     else if (targetDataCategory === "AA-gun") {
                         actualCategory = (eqData.gunType === "aatf") ? "AA-Gun (Time Fuze)" : "AA-gun";
                     }
+                    else if (targetDataCategory === "ASW") {
+                        if (eqData.aswType === "surface" || eqData.aswType === "dc" || eqData.aswType === "sonar") actualCategory = "ASW (Surface)";
+                        else if (eqData.aswType === "airborne") actualCategory = "ASW (Airborne)";
+                        else if (eqData.aswType === "koln") actualCategory = "ASW (Koln)";
+                        else actualCategory = "ASW";
+                    }
 
                     if (category === "CA-gun" && actualCategory !== "CA-gun") continue;
                     if (category === "CB-gun" && actualCategory !== "CB-gun") continue;
@@ -1768,6 +1843,9 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
                     if (category === "Guided Missile" && actualCategory !== "Guided Missile") continue;
                     if (category === "AA-gun" && actualCategory !== "AA-gun") continue;
                     if (category === "AA-Gun (Time Fuze)" && actualCategory !== "AA-Gun (Time Fuze)") continue;
+                    if (category === "ASW (Surface)" && actualCategory !== "ASW (Surface)") continue;
+                    if (category === "ASW (Airborne)" && actualCategory !== "ASW (Airborne)") continue;
+                    if (category === "ASW (Koln)" && actualCategory !== "ASW (Koln)") continue;
 
                     let equipableList = eqData.equippable || eqData.equipable;
                     let isEquippableAllowed = false;
@@ -1852,7 +1930,13 @@ function renderEquipListOnly(allowedCategories, shipInfo) {
 
         let isFleetLimitReached = (eqData.fleetLimit !== undefined && currentCountInFleet >= eqData.fleetLimit);
 
-        let isDisabled = isLimitedOnShip || isFleetLimitReached;
+        // Quy tắc giới hạn Sonar (tối đa 1) & Cargo (tối đa 2) trên cùng 1 tàu
+        let isSonar = (eqData.aswType === 'sonar');
+        let isCargo = (item.category === 'Cargo' || eqData.category === 'Cargo');
+        let isSonarLimitReached = isSonar && (sonarCountOnShip >= 1);
+        let isCargoLimitReached = isCargo && (cargoCountOnShip >= 2);
+
+        let isDisabled = isLimitedOnShip || isFleetLimitReached || isSonarLimitReached || isCargoLimitReached;
         let itemClass = isDisabled ? "modal-ship-icon equip-disabled" : `modal-ship-icon ${boxClass}`;
         let clickAction = isDisabled ? "" : `onclick="selectEquip('${eqId}', '${itemCategory}')"`;
 
@@ -2309,7 +2393,7 @@ function waitForDataAndRender() {
     const requiredCategories = [
         "CA-gun", "Surface Torpedo", "BB-gun", "DD-gun", "CL-gun",
         "AA-gun", "Fighter", "Dive Bomber", "Torpedo Bomber",
-        "Auxiliary", "Augmentation"
+        "Auxiliary", "Augmentation", "ASW"
     ];
 
     const checkDataReady = setInterval(() => {

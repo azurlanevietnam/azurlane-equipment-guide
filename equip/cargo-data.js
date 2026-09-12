@@ -1,0 +1,101 @@
+equipDetails["Cargo"] = {
+    "yellow_cargo": {
+        "40cm-ngp": {
+            name: "40cm Type 94 Naval Gun Parts (Cargo)",
+            tier: "N/A",
+            source: ["Core Data Shop"],
+            faction: "Heavy Sakura",
+            stats: ["HP +840"],
+            equippable: ["AE"],
+            limit: 1,
+            fleetLimit: 2,
+            linkTab: 0,
+            desc: ["Khi tàu mang trang bị là Kashino, tăng 10% chỉ số FP cho toàn bộ main fleet & CB trong đội hình."],
+            code: "d/d1/3400",
+            box: "yellow"
+        },
+        "crab": {
+            name: "Crab (With Receipt)",
+            tier: "N/A",
+            source: ["World-Spanning Arclight Event Shop"],
+            faction: "SSSS",
+            stats: ["HP +840"],
+            equippable: ["AE"],
+            limit: 1,
+            fleetLimit: 2,
+            linkTab: 0,
+            desc: ["Khi tàu mang trang bị là Princess Hime, tăng 8% chỉ số FP & TRP cho mọi tàu có faction SSSS đội hình."],
+            code: "5/5a/89640",
+            box: "yellow"
+        },
+        "dragon-fig": {
+            name: "Dragon Figurine",
+            tier: "N/A",
+            source: ["World-Spanning Arclight Event Shop"],
+            faction: "SSSS",
+            stats: ["HP +840"],
+            equippable: ["AE"],
+            limit: 1,
+            fleetLimit: 2,
+            linkTab: 0,
+            desc: ["Khi tàu mang trang bị là Princess Hime, tăng 8% chỉ số FP & AVI cho Yue Minami, Chise Asukagawa, The 2nd & Mujina trong đội hình."],
+            code: "7/7d/89660",
+            box: "yellow"
+        },
+    },
+    "purple_cargo": {
+        "sc-ngp": {
+            name: "Small-Caliber Naval Gun Parts (Cargo)",
+            tier: "N/A",
+            source: ["Core Data Shop"],
+            faction: "Universal",
+            stats: ["HP +580"],
+            equippable: ["AE"],
+            limit: 1,
+            linkTab: 0,
+            desc: ["Tăng 8% chỉ số FP cho toàn bộ vanguard trong đội hình."],
+            code: "b/b7/3520",
+            box: "purple"
+        },
+        "torp-mat": {
+            name: "Torpedo Materials (Cargo)",
+            tier: "N/A",
+            source: ["Core Data Shop"],
+            faction: "Universal",
+            stats: ["HP +580"],
+            equippable: ["AE"],
+            limit: 1,
+            linkTab: 0,
+            desc: ["Tăng 8% chỉ số TRP cho toàn bộ đội hình."],
+            code: "f/f5/3540",
+            box: "purple"
+        },
+        "aviation-mat": {
+            name: "Aviation Materials (Cargo)",
+            tier: "N/A",
+            source: ["Core Data Shop"],
+            faction: "Heavy Sakura",
+            stats: ["HP +580"],
+            equippable: ["AE"],
+            limit: 1,
+            linkTab: 0,
+            desc: ["Tăng 8% chỉ số AVI cho toàn bộ đội hình. Hiệu ứng không cộng dồn với Mawei Type-Wu."],
+            code: "7/70/3500",
+            box: "purple"
+        },
+        "type-wu": {
+            name: "Mawei Type-Wu",
+            tier: "N/A",
+            source: ["Core Data Shop"],
+            faction: "Dragon Empery",
+            stats: ["HP +315", "AVI +38"],
+            equippable: ["AE"],
+            limit: 1,
+            fleetLimit: 2,
+            linkTab: 0,
+            desc: ["Tăng 10% chỉ số AVI cho toàn bộ main fleet trong đội hình. Hiệu ứng không cộng dồn với Aviation Materials."],
+            code: "a/af/3820",
+            box: "purple"
+        },
+    }
+}
