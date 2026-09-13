@@ -48,6 +48,42 @@ equipDetails["Auxiliary"] = {
         },
     },
     "yellow_aux": {
+        "alizarin-st": {
+            name: "Alizarin Support Towel",
+            tier: "N/A",
+            source: ["Heart-Linking Harmony Event Shop"],
+            faction: "Universal",
+            stats: ["HP +640"],
+            fleetLimit: 1,
+            linkTab: 0,
+            desc: ["Khi bắt đầu trận đấu, tàu mang trang bị được tăng 3% chỉ số FP, TRP, AVI, RLD trong 15s."],
+            code: "6/69/89760",
+            box: "yellow"
+        },
+        "cyanidin-st": {
+            name: "Cyanidin Support Towel",
+            tier: "N/A",
+            source: ["Heart-Linking Harmony Event Reward"],
+            faction: "Universal",
+            stats: ["HP +640"],
+            fleetLimit: 1,
+            linkTab: 0,
+            desc: ["Khi bắt đầu trận đấu, tàu mang trang bị được nhận một lớp giáp ảo tương đương 2% HP tối đa trong 15s."],
+            code: "e/e7/89780",
+            box: "yellow"
+        },
+        "celestial-body": {
+            name: "Celestial Body",
+            tier: "N/A",
+            source: ["War Archives Reward"],
+            faction: "Universal",
+            stats: ["HP +640"],
+            fleetLimit: 2,
+            linkTab: 0,
+            desc: ["Tàu mang trang bị sẽ được tính là tàu µ (Muse)."],
+            code: "8/8a/89220",
+            box: "yellow"
+        },
         "rpg-adventure": {
             name: "RPG Adventure Interface",
             tier: "N/A",
@@ -60,7 +96,44 @@ equipDetails["Auxiliary"] = {
             code: "c/c1/150280",
             box: "yellow"
         },
-        "frontier_medal": {
+        "ship-mc": {
+            name: "Ship Maintenance Crane T3",
+            tier: "N/A",
+            source: ["9-2 Drop", "Any T4/T5 Tech Box"],
+            faction: "Universal",
+            equippable: ["AR"],
+            stats: ["HP +590"],
+            limit: 1,
+            linkTab: 3,
+            desc: ["Mỗi 5s, hồi 15 HP cho tàu chịu sát thương nhiều nhất trong đội hình. Hiệu ứng không cộng dồn."],
+            code: "4/46/1000",
+            box: "yellow"
+        },
+        "cosmic-kicks": {
+            name: "Cosmic Kicks",
+            tier: "N/A",
+            source: ["War Archives Reward"],
+            faction: "Universal",
+            stats: ["EVA +34", "SPD +5"],
+            fleetLimit: 2,
+            linkTab: 0,
+            desc: ["Tàu mang trang bị sẽ được tính là tàu µ (Muse)."],
+            code: "a/a8/89200",
+            box: "yellow"
+        },
+        "hm-ticket": {
+            name: "Harmony µ Ticket",
+            tier: "N/A",
+            source: ["Heart-Linking Harmony Event Reward"],
+            faction: "Universal",
+            stats: ["AA +44", "ACC +36"],
+            fleetLimit: 1,
+            linkTab: 0,
+            desc: [""],
+            code: "d/d0/89740",
+            box: "yellow"
+        },
+        "frontier-medal": {
             name: "Frontier Medal",
             tier: "N/A",
             source: ["Collection Reward"],
@@ -72,7 +145,7 @@ equipDetails["Auxiliary"] = {
             code: "2/22/820",
             box: "yellow"
         },
-        "steam_catapult": {
+        "steam-catapult": {
             name: "Steam Catapult",
             tier: "N/A",
             source: ["T4/T5 Tech Box"],
