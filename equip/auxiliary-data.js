@@ -157,6 +157,63 @@ equipDetails["Auxiliary"] = {
             code: "9/96/1400",
             box: "yellow"
         },
+        "protocol-zk": {
+            name: "Protocol Zero Key",
+            tier: "N/A",
+            source: ["The Vagabond's Recruitment Plan Event Shop"],
+            faction: "Universal",
+            stats: ["HP +472", "SPD +4"],
+            fleetLimit: 1,
+            linkTab: 0,
+            desc: ["Trong trận đấu, khi tàu mang trang bị nhận phải sát thương, tàu được tăng 3% sát thương gây ra & chịu thêm 1% sát thương nhận phải trong 20s. Thời gian tái kích hoạt tối thiểu 30s."],
+            code: "7/71/151060",
+            box: "yellow"
+        },
+        "the_vagabond": {
+            name: "The Vagabond",
+            tier: "N/A",
+            source: ["The Vagabond's Recruitment Plan Event Shop"],
+            faction: "Universal",
+            stats: ["EVA +18", "ACC +45"],
+            fleetLimit: 1,
+            linkTab: 0,
+            desc: ["Nếu tất cả các tàu trong hạm đội không có chung faction, 5s sau khi bắt đầu trận đấu, toàn hạm đội được giảm 4% sát thương nhận phải cho đến hết trận."],
+            code: "7/7a/151020",
+            box: "yellow"
+        },
+        "resplendent_astrum": {
+            name: "Resplendent Astrum",
+            tier: "N/A",
+            source: ["Core Data Shop"],
+            faction: "Universal",
+            stats: ["AA +44", "ACC +36"],
+            linkTab: 0,
+            desc: [""],
+            code: "2/22/89180",
+            box: "yellow"
+        },
+        "sacred_lumiere": {
+            name: "Sacred Lumière",
+            tier: "N/A",
+            source: ["Core Data Shop"],
+            faction: "Universal",
+            stats: ["AA +44", "ACC +36"],
+            linkTab: 0,
+            desc: [""],
+            code: "6/67/89160",
+            box: "yellow"
+        },
+        "wh_verheerender": {
+            name: "White-Hot Verheerender",
+            tier: "N/A",
+            source: ["Core Data Shop"],
+            faction: "Universal",
+            stats: ["AA +44", "ACC +36"],
+            linkTab: 0,
+            desc: [""],
+            code: "d/d8/89140",
+            box: "yellow"
+        },
         "hydraulic-rudder": {
             name: "Improved Hydraulic Rudder",
             tier: "N/A",
@@ -244,7 +301,7 @@ equipDetails["Auxiliary"] = {
             code: "6/67/2700",
             box: "yellow"
         },
-        "FuMO-25": {
+        "fumo-25": {
             name: "Funkmess-Ortung 25 Radar",
             tier: "N/A",
             source: ["Core Data Shop"],
@@ -276,6 +333,7 @@ equipDetails["Auxiliary"] = {
             faction: "Iris Orthodoxy",
             stats: ["AVI +106", "HP +15"],
             equippable: ["CV", "CVL", "BBV", "SFS", "SFV", "SFM"],
+            fleetLimit: 2,
             linkTab: 0,
             desc: [""],
             code: "5/5f/51260",
