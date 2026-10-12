@@ -214,6 +214,18 @@ equipDetails["Auxiliary"] = {
             code: "d/d8/89140",
             box: "yellow"
         },
+        "wn-treaty": {
+            name: "Washington Naval Treaty",
+            tier: "N/A",
+            source: ["Collection Reward"],
+            faction: "Universal",
+            stats: ["EVA +26", "ACC +36"],
+            fleetLimit: 1,
+            linkTab: 0,
+            desc: ["Chỉ trong chế độ Exercise, nếu tàu mang trang bị là Flagship, giảm 15% gây ra bởi cả hai hạm đội."],
+            code: "5/53/860",
+            box: "yellow"
+        },
         "hydraulic-rudder": {
             name: "Improved Hydraulic Rudder",
             tier: "N/A",
@@ -385,23 +397,57 @@ equipDetails["Auxiliary"] = {
             source: ["3-4, 10-3, 14-1 Drop", "Any T3/4 Tech Box"],
             faction: "Universal",
             stats: ["HP +530"],
-            equippable: ["All"],
             linkTab: 3,
             desc: ["Trong trận đấu, mỗi 15s, tàu mang trang bị này sẽ hồi 1% HP."],
             code: "d/d5/2400",
             box: "purple"
         },
-        "homing_beacon": {
-            name: "Homing Beacon",
+        "directors_screenplay": {
+            name: "Director's Screenplay",
+            tier: "N/A",
+            source: ["To a Brighter World Event Reward"],
+            faction: "Universal",
+            stats: ["HP +475", "SPD +3"],
+            fleetLimit: 1,
+            linkTab: 0,
+            desc: ["Khi bắt đầu trận đấu và cứ sau mỗi 30s, kích hoạt ngẫu nhiên một trong những hiệu ứng kéo dài 30s sau:"],
+            code: "d/de/150940",
+            box: "purple"
+        },
+        "intel_report-as": {
+            name: "Intel Report - Arctic Stronghold",
             tier: "N/A",
             source: ["Core Data Shop"],
-            faction: "Royal Navy",
-            stats: ["AVI +65"],
-            equippable: ["CV", "CVL", "BBV"],
-            limit: 1,
+            faction: "Universal",
+            stats: ["HP +190", "FP +21"],
+            fleetLimit: 2,
             linkTab: 0,
-            desc: ["Giảm 4% thời gian reload không kích."],
-            code: "2/24/680",
+            desc: ["Giảm 6% sát thương nhận phải từ Siren, hiệu ứng không cộng dồn."],
+            code: "6/6e/780",
+            box: "purple"
+        },
+        "staff_pass": {
+            name: "Staff Pass",
+            tier: "N/A",
+            source: ["Fight On! The Ultimate Job-Hunting Operation! Event Reward"],
+            faction: "Universal",
+            stats: ["HP +530"],
+            fleetLimit: 1,
+            linkTab: 0,
+            desc: ["Tàu mang trang bị được tăng 3 SPD nếu thuộc faction Royal Navy, nếu là Javelin, đồng thời tăng 5% sát thương gây ra trong 60s đầu trận."],
+            code: "8/86/151260",
+            box: "purple"
+        },
+        "systemwide-bounty": {
+            name: "Systemwide Bounty",
+            tier: "N/A",
+            source: ["The Vagabond's Recruitment Plan Event Reward"],
+            faction: "Universal",
+            stats: ["HP +371", "SPD +3"],
+            fleetLimit: 1,
+            linkTab: 0,
+            desc: ["Giảm 1% tỉ lệ né tránh của tàu mang trang bị. Trong trận đấu, lần đầu tàu mang trang bị giảm HP xuống dưới 80%, hiệu ứng giảm tỉ lệ né tránh được xóa, đồng thời tăng 3% ACC toàn hạm đội cho tới hết trận."],
+            code: "7/75/151040",
             box: "purple"
         },
         "aviation_manjuu": {
@@ -429,6 +475,18 @@ equipDetails["Auxiliary"] = {
             code: "2/2b/2100",
             box: "purple"
         },
+        "autoloader": {
+            name: "Autoloader",
+            tier: "N/A",
+            source: ["6-3, 10-1, 11-3, 14-3 Drop", "Any T3/T4 Tech Box"],
+            faction: "Universal",
+            stats: ["FP +8", "RLD +38"],
+            unequippable: ["CV", "CVL", "IXm", "IXv", "IXs"],
+            linkTab: 3,
+            desc: [""],
+            code: "4/4e/2200",
+            box: "purple"
+        },
         "100150_aviation_gasoline": {
             name: "100/150 Aviation Gasoline",
             tier: "N/A",
@@ -439,6 +497,19 @@ equipDetails["Auxiliary"] = {
             linkTab: 0,
             desc: ["Tăng 5 SPD & 140 HP cho toàn bộ máy bay trên tàu được trang bị. Hiệu ứng không cộng dồn."],
             code: "d/d4/660",
+            box: "purple"
+        },
+        "homing_beacon": {
+            name: "Homing Beacon",
+            tier: "N/A",
+            source: ["Core Data Shop"],
+            faction: "Royal Navy",
+            stats: ["AVI +65"],
+            equippable: ["CV", "CVL", "BBV"],
+            limit: 1,
+            linkTab: 0,
+            desc: ["Giảm 4% thời gian reload không kích."],
+            code: "2/24/680",
             box: "purple"
         },
         "albion_erp": {
