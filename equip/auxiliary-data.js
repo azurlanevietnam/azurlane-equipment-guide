@@ -239,8 +239,8 @@ equipDetails["Auxiliary"] = {
             code: "4/48/1760",
             box: "yellow"
         },
-        "hpfcr": {
-            name: "High Performance Fire Control Radar",
+        "hsfcr": {
+            name: "High Standard Fire-Control Radar",
             tier: "N/A",
             source: ["PR3/4/5/6/7 Research"],
             faction: "Eagle Union",
@@ -262,6 +262,79 @@ equipDetails["Auxiliary"] = {
             linkTab: 0,
             desc: ["Tăng 8% tỉ lệ chí mạng của pháo chính."],
             code: "8/8a/620",
+            box: "yellow"
+        },
+        "euedc": {
+            name: "Eagle Union Elite Damage Control",
+            tier: "N/A",
+            source: [""],
+            faction: "Eagle Union",
+            stats: [""],
+            fleetLimit: 1,
+            linkTab: 0,
+            desc: [""],
+            code: "1/15/840",
+            box: "yellow"
+        },
+        "error-xiii": {
+            name: "Error XIII",
+            tier: "N/A",
+            source: [""],
+            faction: "Eagle Union",
+            stats: [""],
+            fleetLimit: 1,
+            linkTab: 0,
+            desc: [""],
+            code: "5/50/151220",
+            box: "yellow"
+        },
+        "fd-drone": {
+            name: "Fargo Direct Drone",
+            tier: "N/A",
+            source: [""],
+            faction: "Eagle Union",
+            stats: [""],
+            unequippable: ["SS", "SSV", "IXm", "IXv", "IXs"],
+            fleetLimit: 1,
+            linkTab: 0,
+            desc: [""],
+            code: "f/f2/150360",
+            box: "yellow"
+        },
+        "lbs-tag": {
+            name: "Little Beaver Squadron Tag",
+            tier: "N/A",
+            source: [""],
+            faction: "Eagle Union",
+            stats: [""],
+            fleetLimit: 1,
+            linkTab: 0,
+            desc: [""],
+            code: "b/be/500",
+            box: "yellow"
+        },
+        "pearl-tears": {
+            name: "Pearl Tears",
+            tier: "N/A",
+            source: [""],
+            faction: "Eagle Union",
+            stats: [""],
+            fleetLimit: 1,
+            linkTab: 0,
+            desc: [""],
+            code: "7/78/520",
+            box: "yellow"
+        },
+        "sg-radar": {
+            name: "SG Radar",
+            tier: "N/A",
+            source: [""],
+            faction: "Eagle Union",
+            stats: [""],
+            unequippable: ["CV", "CVL", "IXm", "IXv", "IXs"],
+            linkTab: 3,
+            desc: [""],
+            code: "9/9f/1500",
             box: "yellow"
         },
         "6crh-ap": {
@@ -487,6 +560,54 @@ equipDetails["Auxiliary"] = {
             code: "4/4e/2200",
             box: "purple"
         },
+        "anti-torp-bulge": {
+            name: "Anti-Torpedo Bulge",
+            tier: "N/A",
+            source: [""],
+            faction: "Universal",
+            stats: [""],
+            unequippable: ["DD", "SS", "SSV", "IXm", "IXv", "IXs"],
+            linkTab: 3,
+            desc: [""],
+            code: "b/b6/1300",
+            box: "purple"
+        },
+        "fuel-filter": {
+            name: "Fuel Filter",
+            tier: "N/A",
+            source: [""],
+            faction: "Universal",
+            stats: [""],
+            unequippable: ["IXm", "IXv", "IXs"],
+            linkTab: 3,
+            desc: [""],
+            code: "2/2b/2000",
+            box: "purple"
+        },
+        "gyroscope": {
+            name: "Gyroscope",
+            tier: "N/A",
+            source: [""],
+            faction: "Universal",
+            stats: [""],
+            unequippable: ["CV", "CVL", "IXm", "IXv", "IXs"],
+            linkTab: 3,
+            desc: [""],
+            code: "b/b8/2300",
+            box: "purple"
+        },
+        "improved-boiler": {
+            name: "Improved Boiler",
+            tier: "N/A",
+            source: [""],
+            faction: "Universal",
+            stats: [""],
+            unequippable: ["IXm", "IXv", "IXs"],
+            linkTab: 3,
+            desc: [""],
+            code: "d/de/1800",
+            box: "purple"
+        },
         "100150_aviation_gasoline": {
             name: "100/150 Aviation Gasoline",
             tier: "N/A",
@@ -497,6 +618,43 @@ equipDetails["Auxiliary"] = {
             linkTab: 0,
             desc: ["Tăng 5 SPD & 140 HP cho toàn bộ máy bay trên tàu được trang bị. Hiệu ứng không cộng dồn."],
             code: "d/d4/660",
+            box: "purple"
+        },
+        "aroaf": {
+            name: "Action Report: Operation AF",
+            tier: "N/A",
+            source: [""],
+            faction: "Eagle Union",
+            stats: [""],
+            fleetLimit: 2,
+            linkTab: 0,
+            desc: [""],
+            code: "8/81/940",
+            box: "purple"
+        },
+        "bs-mystery": {
+            name: "Blue Sea Mystery",
+            tier: "N/A",
+            source: [""],
+            faction: "Eagle Union",
+            stats: [""],
+            fleetLimit: 1,
+            linkTab: 0,
+            desc: [""],
+            code: "b/bb/150920",
+            box: "purple"
+        },
+        "md-hat": {
+            name: "Master Detective's Hat",
+            tier: "N/A",
+            source: [""],
+            faction: "Eagle Union",
+            stats: [""],
+            equippable: ["CV", "CVL"],
+            fleetLimit: 1,
+            linkTab: 0,
+            desc: [""],
+            code: "f/fd/151200",
             box: "purple"
         },
         "homing_beacon": {
@@ -535,6 +693,19 @@ equipDetails["Auxiliary"] = {
             desc: ["Trong trận đấu, tàu mang trang bị này tăng 5% sát thương gây ra lên tàu META."],
             code: "a/a2/3900",
             box: "purple"
+        },
+    },
+    "blue_aux": {
+        "fire extinguisher": {
+            name: "Fire Extinguisher",
+            tier: "N/A",
+            source: [""],
+            faction: "Universal",
+            stats: [""],
+            linkTab: 3,
+            desc: [""],
+            code: "e/ee/2500",
+            box: "blue"
         },
     }
 };
